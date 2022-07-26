@@ -66,9 +66,9 @@ class user_register_validation extends FormRequest
     public function messages()
     {
         return [
-           // 'user_email.required' => 'Email is required!',
+           'user_email.required_if' => 'Email is required!',
 
-           // 'user_password.required' => 'User Password is required!',
+            'user_password.required_if' => 'User Password is required!',
            // 'access_type.required' => 'Access type is required!',
         ];
     }

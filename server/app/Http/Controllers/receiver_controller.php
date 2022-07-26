@@ -17,7 +17,7 @@ class receiver_controller extends Controller
     {
         //
         $service = new receiver_service();
-        $list = $service->fetch_receiver($customer_id);
+        $list = $service->fetch_receiver($request, $customer_id);
         return response()->json($list);
     }
 
@@ -58,7 +58,7 @@ class receiver_controller extends Controller
     }
 
    
-    public function update(Request $request, $customer_id, $receiver_id)
+    public function update(receiver_validation $request, $customer_id, $receiver_id)
     {
         $service = new receiver_service();
        

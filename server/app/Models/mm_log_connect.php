@@ -19,7 +19,11 @@ class mm_log_connect extends Model
         'request_message',
         'response_message',
         'content',
-        'count_last_request'
+        'count_last_request',
+        'request_destination',
+        'request_origin',
+        'response_code',
+        'request_method'
         
     ];
 

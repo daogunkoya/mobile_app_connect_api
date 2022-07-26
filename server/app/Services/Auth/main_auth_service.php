@@ -33,7 +33,7 @@ class main_auth_service implements AuthContract
          if($request->user_email == $request->user_password)return  [['errors'=>['user_email'=>['user email and user password must be different']]],422];
          
          //check email verified
-         if(!mm_user_confirm::where('user_email',$request->user_email)->where('confirm_status', 1)->where('store_id', $store_id)->exists()) return  [['errors'=>['user_email'=>['the user email supplied is not verified']]],400];
+        // if(!mm_user_confirm::where('user_email',$request->user_email)->where('confirm_status', 1)->where('store_id', $store_id)->exists()) return  [['errors'=>['user_email'=>['the user email supplied is not verified']]],400];
         
         //check user exists within store
         if(mm_user::where('user_email',$request->user_email)->where('store_id', $store_id)->exists()) return  [['errors'=>['user_email'=>['email already exists']]],400];
@@ -67,7 +67,7 @@ class main_auth_service implements AuthContract
       //create token
         $token = auth()
             ->claims(['id_user' => $user->id_user])
-            ->setTTL(config('betterdeal.auth_token_expire')) //min
+            ->setTTL(180000) //min
             ->login($user);
 
         
@@ -159,10 +159,10 @@ class main_auth_service implements AuthContract
                 ],
             ];
 
-            sqs_service::job([
-                'type'=>'mailchimp_subscribe_user',
-                'operation'=>'mailchimp_subscribe_user',
-                'data'=>$member]);
+            // sqs_service::job([
+            //     'type'=>'mailchimp_subscribe_user',
+            //     'operation'=>'mailchimp_subscribe_user',
+            //     'data'=>$member]);
 
             return;
 
@@ -231,7 +231,7 @@ class main_auth_service implements AuthContract
         $user_redirect = $user_access_type != 1?2:1;
      
         $token = auth()
-                ->setTTL(80000)
+                ->setTTL(180000)
                 ->attempt(['user_email' => $request->user_email, 'password' => $request->user_password, 'store_id'=>$store_id]);
 
         
@@ -332,7 +332,7 @@ public function log_activity($user_id){
         $sqs_data = ['modified_item_id' => $user_id,'user_id'=>$user_id,'log_type'=>'submit','item_type'=>5];
         //log item activity to   bd_log_activity
       // \App\Services\Activity\activity_service::prepare($sqs_data);
-      sqs_service::job(['type' => 'log_item_activity','data'=>$sqs_data]);
+     // sqs_service::job(['type' => 'log_item_activity','data'=>$sqs_data]);
     }
 
     return;

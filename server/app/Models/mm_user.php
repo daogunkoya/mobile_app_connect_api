@@ -140,42 +140,42 @@ public function getNameAttribute()
 
 
 
-public function getTimeAgoAttribute($value){
-    return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->longAbsoluteDiffForHumans();
-}
+// public function getTimeAgoAttribute($value){
+//     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->longAbsoluteDiffForHumans();
+// }
 
-public function getUserCountAttribute($value){
-    //var_dump($value);
-    return [
-        'count_rate' => mm_user::where('id_user', $value)->value('user_rate'),
-        'count_view' => mm_user::where('id_user', $value)->value('count_item_view')??0,
-        'count_deal'=> bd_item_deal::where('user_id', $value)->where('item_status', 1)->where('moderation_status',2)->count()??0,
-        'count_discussion'=>  mm_user::where('id_user', $value)->value('count_item_discussion')??0,
-        'count_comment' =>mm_user::where('id_user', $value)->value('count_item_comment')??0,
-        'count_report' => mm_user::where('id_user', $value)->value('count_item_report')??0
-    ];
-}
-
-
-public function getUserCountDealAttribute($value){
-    return   bd_item_deal::where('user_id', $value)->where('item_status', 1)->count()??0;
-}
+// public function getUserCountAttribute($value){
+//     //var_dump($value);
+//     return [
+//         'count_rate' => mm_user::where('id_user', $value)->value('user_rate'),
+//         'count_view' => mm_user::where('id_user', $value)->value('count_item_view')??0,
+//         'count_deal'=> bd_item_deal::where('user_id', $value)->where('item_status', 1)->where('moderation_status',2)->count()??0,
+//         'count_discussion'=>  mm_user::where('id_user', $value)->value('count_item_discussion')??0,
+//         'count_comment' =>mm_user::where('id_user', $value)->value('count_item_comment')??0,
+//         'count_report' => mm_user::where('id_user', $value)->value('count_item_report')??0
+//     ];
+// }
 
 
-public function getUserCountDiscussionAttribute($value){
-    return  bd_item_discussion::where('user_id', $value)->where('item_status', 1)->count()??0;
-}
+// public function getUserCountDealAttribute($value){
+//     return   bd_item_deal::where('user_id', $value)->where('item_status', 1)->count()??0;
+// }
 
 
-public function getUserCountCommentAttribute($value){
-    return  bd_item_comment::where('user_id', $value)->where('comment_status', 1)->count()??0;
-}
+// public function getUserCountDiscussionAttribute($value){
+//     return  bd_item_discussion::where('user_id', $value)->where('item_status', 1)->count()??0;
+// }
 
-public function getUserGroupAttribute($value){
-    $groups = mm_user_connect::where('user_id', $value)->where('connect_status', 1)->pluck('connect_id');
-    $groups = !empty($groups)?$groups->toArray():[];
-    return  json_encode($groups);
-}
+
+// public function getUserCountCommentAttribute($value){
+//     return  bd_item_comment::where('user_id', $value)->where('comment_status', 1)->count()??0;
+// }
+
+// public function getUserGroupAttribute($value){
+//     $groups = mm_user_connect::where('user_id', $value)->where('connect_status', 1)->pluck('connect_id');
+//     $groups = !empty($groups)?$groups->toArray():[];
+//     return  json_encode($groups);
+// }
 
 
 public function getUserImageUrlAttribute($value){

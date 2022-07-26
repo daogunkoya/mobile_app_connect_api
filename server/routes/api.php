@@ -78,6 +78,10 @@ Route::prefix('v1')->group(function () {
             Route::resource('/banks', 'App\Http\Controllers\banks_controller');
             Route::get('/bank/list', 'App\Http\Controllers\banks_controller@list');
             Route::resource('/senders', 'App\Http\Controllers\senders_controller');
+
+            Route::resource('/commissions', 'App\Http\Controllers\commissions_controller');
+            Route::resource('/rates', 'App\Http\Controllers\rates_controller');
+            Route::resource('/currencies', 'App\Http\Controllers\currencies_controller');
         });
 
 });

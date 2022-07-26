@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Agents;
+namespace App\Http\Requests\Commissions;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class agent_customer_validation extends FormRequest
+class commissions_validation extends FormRequest
 {
   
     /**
@@ -30,16 +30,20 @@ class agent_customer_validation extends FormRequest
     public function rules()
     {
         $store_id = session()->get('process_store_id')??request()->process_store_id;
+       
+       
+       
         return [  
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'customer_title'=>'required',
-       'customer_fname'=>'required',
-       'customer_lname'=>'required',
-       'customer_dob'=>'required',
-       'customer_email'=>'required|email',
-       'customer_address'=>'required',
-       'customer_postcode'=>'required',
+       'user_id'=>'exists:mm_user,id_user',
+       'start_from'=>'required',
+       'end_at'=>'required',
+       'value'=>'required',
+       'agent_quota'=>'required',
+       'currency_id'=>'required|exists:mm_currency,id_currency',
+       
+       
         
     
         ];
@@ -48,14 +52,8 @@ class agent_customer_validation extends FormRequest
     public function messages()
     {
         return [
-            
-            'customer_title.required' => 'title is required!',
-            'customer_fname.required' => 'first name is required!',
-            'customer_lname.required' => 'last name is required!',
-            'customer_email.required' => 'email is required!',
-            'customer_dob.required' => 'Date of birth is required!',
-            'customer_address.required' => 'address is required!',
-            'customer_postcode.required' => 'postcode is required!',
+            'receiver_title.required' => 'title is required!',
+           
           
         ];
     }

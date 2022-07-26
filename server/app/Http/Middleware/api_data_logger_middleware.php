@@ -26,11 +26,16 @@ use App\Services\sqs\sqs_service;
     public function terminate($request, $response)
 
     { 
-       
-        
-        $origin_url = request()->headers->get('referer');
-        $origin = parse_url(request()->headers->get('referer'));
-        $origin_host = $origin['host']??'';
+        $origin_referer = request()->headers->get('referer');
+        $full_url = $request->fullUrl();
+        $origin = parse_url($full_url);
+        $origin_host = '';
+        if(!empty($origin))$origin_host = $origin['host']??$origin['path'];
+
+        $request_type = 2;                  //general domain request
+        if (filter_var($origin_host, FILTER_VALIDATE_IP)){
+            $request_type = 3;              //ip request
+        }
       
 
     // if (env('API_DATALOGGER', true)) {
@@ -43,12 +48,14 @@ use App\Services\sqs\sqs_service;
     $data = [];
     $data ['^^'] =  '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^';
     $data ['Time'] =  gmdate("F j, Y, g:i a");
-    $data['Origin_url'] =  $origin_url;
+    $data['Origin_url'] = $origin_host;
+    $data['Origin_referer'] = $origin_referer ;
     $data['api-request']=  $request->fullUrl();
     $data['store_name']=   $request->process_store_name??'';
     $data['Duration'] = number_format($end_time - LARAVEL_START, 3) ;
     $data['IP Address']=  $request->ip();
     $data['store_id']=      $request->process_store_id??'';
+    $data['response_code'] =   $response->status();
     
    
    
@@ -64,7 +71,7 @@ use App\Services\sqs\sqs_service;
 
 
 
-    $main_content = optional(mm_log_connect::where('request_type', 2)->first())->toArray();
+    $main_content = optional(mm_log_connect::where('request_type', $request_type)->first())->toArray();
     $main_content =$main_content??[];
     $entry_content =$main_content??[];
     
@@ -93,8 +100,8 @@ use App\Services\sqs\sqs_service;
 
     $users  = $main_content['user_id']??[];
     $users =!empty($main_content['user_id'])?json_decode($main_content['user_id'], true):[];
-    if(!empty($request->user->id_user)) array_unshift($users , $request->user->id_user??'');
-    $user_id= json_encode($users, JSON_PRETTY_PRINT);
+    if(!empty($request->user && !empty($users))) array_unshift($users , $request->user->id_user);
+    $user_id= !empty($users)?json_encode($users, JSON_PRETTY_PRINT):'';
    
 
     $contents = $main_content['content']??[];
@@ -121,30 +128,46 @@ use App\Services\sqs\sqs_service;
         //     'response_message' => $response_update,
         //     'user_id' => $request->user
         // ]);
-        
+
+
+         
+        //temporarily suspended for s3 single content in db
         //for s3 storage and monitor daily request, combine request of type 2 until it is 30 & then delete the whole content
-        $today_id = mm_log_connect::where('request_type', 2)->value('id_log');
-        if(!empty($today_id)){
-            mm_log_connect::where('id_log', $today_id)->update( [
-                                                                    'request_type' => 2,
-                                                                    'content' => $contents,
-                                                                    'request_message' => $request_update,
-                                                                    'response_message' => $response_update,
-                                                                    'user_id' => $request->user
-            ]);
-        }else{
-            mm_log_connect::create( [
-                'store_id' =>$request->process_store_id??'',
-                'store_name' =>$request->process_store_name??'',
-                'request_type' => 2,
-                'content' => $contents,
-                'request_message' => $request_update,
-                'response_message' => $response_update,
-                'user_id' => $request->user     
-]);
-        }
+        // if($request_type != 3){
 
 
+        //     $today_id = mm_log_connect::where('request_type', $request_type)->value('id_log');
+        //     if(!empty($today_id)){
+        //                 mm_log_connect::where('id_log', $today_id)->update( [
+        //                                                                         'request_type' => $request_type,
+        //                                                                         'request_method'=> 'ALL',
+        //                                                                         'content' => $contents,
+        //                                                                         'request_origin'=> $origin_referer ??'NOT_SET',
+        //                                                                         'request_destination'=> $request->fullUrl()??'NOT_SET',
+        //                                                                         'request_message' => $request_update,
+        //                                                                         'response_message' => $response_update,
+        //                                                                         'response_code' => $response->status(),
+        //                                                                         'user_id' => !empty($request->user->id_user)?$request->user->id_user:''
+        //                 ]);
+        //     }else{
+        //                 mm_log_connect::create( [
+        //                     'request_type' => 2,
+        //                     'request_method'=> 'ALL',
+        //                     'content' => $contents,
+        //                     'request_origin'=>$origin_referer ??'NOT_SET',
+        //                     'request_destination'=> $request->fullUrl()??'NOT_SET',
+        //                     'request_message' => $request_update,
+        //                     'response_message' => $response_update,
+        //                     'response_code' => $response->status(),
+        //                     'user_id' =>!empty($request->user->id_user)?$request->user->id_user:''    
+        //                 ]);
+        //     }
+        // }
+
+
+
+
+        //Manage delete
         //count update on type 2 request
         mm_log_connect::where('request_type', 2)->where('count_last_request', '<', 31)
                             ->update(['count_last_request'=>DB::raw('count_last_request + 1')]);
@@ -162,23 +185,28 @@ use App\Services\sqs\sqs_service;
         
 
 //Create log for every entry
-        
+$request_method = $request->method();
+if($request_type != 3){   
         mm_log_connect::create([
-            'store_id' =>$request->process_store_id??'',
-            'store_name' =>$request->process_store_name??'',
             'request_type' => 1,
+            'request_method'=> $request_method??'GET',
+            'request_origin'=> $origin_referer ??'NOT_SET',
+            'request_destination'=> $request->fullUrl()??'NOT_SET',
             'content' => json_encode($todays_input_output, JSON_PRETTY_PRINT),
             'request_message' => json_encode($today_req, JSON_PRETTY_PRINT),
             'response_message' => json_encode($today_resp, JSON_PRETTY_PRINT),
-            'user_id' => $request->user->id_user??''
+            'response_code' => $response->status(),
+            'user_id' =>!empty($request->user->id_user)?$request->user->id_user:''
         ]);
-
-       // sqs_service::job(['type' => 'daily_request_tos3','data'=>NULL]);
-
-
-       //to be continue later
-       //send ogs to s3
-      //  \App\Services\Helper::move_image_toS3($contents);
+    }
+      
+      
+      
+      
+      
+        // sqs_service::job(['type' => 'daily_request_tos3','data'=>NULL]);
+        //send ogs to s3
+        //  \App\Services\Helper::move_image_toS3($contents);
 
     
         return;

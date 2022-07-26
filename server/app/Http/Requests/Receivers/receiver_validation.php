@@ -37,9 +37,12 @@ class receiver_validation extends FormRequest
        'receiver_fname'=>'required',
        'receiver_lname'=>'required',
        'receiver_dob'=>'required',
-       'receiver_email'=>'required',
+       'receiver_email'=>'required|email',
        'receiver_address'=>'required',
        'receiver_postcode'=>'required',
+       'account_number'=>'required',
+       'identity_type'=>'required',
+       'transfer_type'=>'required',
         
     
         ];
@@ -48,7 +51,16 @@ class receiver_validation extends FormRequest
     public function messages()
     {
         return [
-            'user_handle.required' => 'user handle is required!',
+            'receiver_title.required' => 'title is required!',
+            'receiver_fname.required' => 'first name is required!',
+            'receiver_lname.required' => 'last name is required!',
+            'receiver_email.required' => 'email is required!',
+            'receiver_dob.required' => 'Date of birth is required!',
+            'receiver_address.required' => 'address is required!',
+            'receiver_postcode.required' => 'postcode is required!',
+            'identity_type.required' => 'postcode is required!',
+            'transfer_type.required' => 'transfer_type is required!',
+            'account_number.required' => 'account_number is required!',
           
         ];
     }

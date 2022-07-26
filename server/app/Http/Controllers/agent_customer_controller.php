@@ -13,11 +13,11 @@ class agent_customer_controller extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
         $service = new agent_customer_service();
-        $list = $service->fetch_agent_customer();
+        $list = $service->fetch_agent_customer($request);
         return response()->json($list);
     }
 
@@ -54,7 +54,7 @@ class agent_customer_controller extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $customer_id)
+    public function update(agent_customer_validation $request, $customer_id)
     {
         $service = new agent_customer_service();
        

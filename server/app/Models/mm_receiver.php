@@ -38,7 +38,9 @@ class mm_receiver extends Model
                 'account_number',
                 'transfer_type'  ,
                 'identity_type',
-                'bank'  
+                'bank' ,
+                'receiver_status',
+                'moderation_status' 
                 
                 ];
 

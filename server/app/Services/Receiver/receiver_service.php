@@ -2,7 +2,7 @@
 namespace App\Services\Receiver;
 use App\Models\mm_receiver;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\Helper;
 use App\Models\mm_log_device;
 use Illuminate\Support\Facades\Http;
 use App\Models\mm_user;
@@ -12,12 +12,38 @@ class receiver_service{
 
 
     //fetch receiver
-    public  function fetch_receiver($customer_id){
-        $receiver_query = mm_receiver::where('customer_id', $customer_id);
+    public  function fetch_receiver($request,$customer_id){
+
+
+        $user_id = "2bda0c37-4eac-44e5-a014-6c029d76dc62";
+        $input = $request->all();
         $select = ['id_receiver as receiver_id','user_id','receiver_title','id_receiver as receiver_name', 'receiver_mname','receiver_fname','receiver_lname','receiver_dob', 'receiver_email', 'receiver_phone', 'receiver_mobile', 'receiver_address','transfer_type','identity_type','account_number','bank' ];
-        $receiver  =  optional($receiver_query->select($select)->limit(20)->get())->toArray();
-        $count  =  $receiver_query->count();
-            return ['receiver_count'=>$count,'receiver'=>$receiver];
+        //$search =!empty($input['search'])? "%".$input['search']."%":'%';
+        $search =!empty($input['search']) && $input['search'] !="null" ? "%".$input['search']."%":'%';
+
+        $query = mm_receiver::where('user_id', $user_id)->where('customer_id', $customer_id)->where('receiver_name', 'like', $search)->orderBy('created_at', 'DESC');
+        $count  =  $query->count();
+        $limit = $input['limit']??20;
+        
+        ////pagination
+        if(!empty($input['cursor'])){
+            $receiver_id = optional($query->select('id_receiver')->get())->toArray();
+            $key =  Helper::find_key($receiver_id,'id_receiver',$input['cursor']);  
+            $page_start = $key ===false?0:$key+1;
+        }
+
+        $receivers  =  optional($query->select($select)->skip($page_start??0)->limit($limit)->get())->toArray();
+    
+            return  ['receiver_count'=>$count,'receiver'=>$receivers];
+
+
+
+
+        // $receiver_query = mm_receiver::where('customer_id', $customer_id);
+        // $select = ['id_receiver as receiver_id','user_id','receiver_title','id_receiver as receiver_name', 'receiver_mname','receiver_fname','receiver_lname','receiver_dob', 'receiver_email', 'receiver_phone', 'receiver_mobile', 'receiver_address','transfer_type','identity_type','account_number','bank' ];
+        // $receiver  =  optional($receiver_query->select($select)->limit(20)->get())->toArray();
+        // $count  =  $receiver_query->count();
+        //     return ['receiver_count'=>$count,'receiver'=>$receiver];
     }
 
 

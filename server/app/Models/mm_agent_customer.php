@@ -33,7 +33,9 @@ class mm_agent_customer extends Model
             'customer_mobile',
             'customer_address',
             'customer_postcode' ,
-            'photo_id'    
+            'photo_id',
+            'customer_status',
+            'moderation_status'    
             
             ];
 
@@ -80,9 +82,9 @@ class mm_agent_customer extends Model
                 return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             }
 
-            // public function getCreatedAtAttribute($value){
-            //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
-            // }
+            public function getCountCustomerReceiverAttribute($customer_id){
+                return mm_receiver::where('customer_id',$customer_id)->count();
+            }
 
             
 
