@@ -21,7 +21,7 @@ class mm_receiver extends Model
                 'store_id',
                 'user_id',
                 'user_type',
-                'customer_id',
+                'sender_id',
                 'receiver_title',
                 'receiver_name',
                 'receiver_slug',
@@ -36,8 +36,11 @@ class mm_receiver extends Model
                 'receiver_postcode' ,
                 'account_number',
                 'account_number',
+                'bank_id',
                 'transfer_type'  ,
+                'transfer_type_key',
                 'identity_type',
+                'identity_type_id',
                 'bank' ,
                 'receiver_status',
                 'moderation_status' 
@@ -76,6 +79,8 @@ class mm_receiver extends Model
             {
                 return 'uuid';
             }
+
+            
 
 
             public function getKeyType()

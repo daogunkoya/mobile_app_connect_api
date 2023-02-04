@@ -27,10 +27,21 @@ class banks_controller extends Controller
    
     public function list()
     {
-        $list =  optional(mm_bank::where('status', 'b')->pluck('name'))->toArray();
-        $count =  mm_bank::where('status', 'b')->count();
+        $list_bank =  optional(mm_bank::where('bank_category', 'b')->select('name as value', 'id_bank as key')->get())->toArray();
+        $count_bank =  mm_bank::where('bank_category', 'b')->count();
+        $list_pickup =  optional(mm_bank::where('bank_category', 'p')->select('name as value', 'id_bank as key')->get())->toArray();
+        $count_pickup =  mm_bank::where('bank_category', 'p')->count();
+        $proof_id_list =  optional(mm_bank::where('bank_proof_identity', '1')->select('name as value', 'id_bank as key')->get())->toArray();
 
-        return response()->json(['bank_count'=>$count, 'bank'=>$list]);
+        $option_list =  optional(mm_bank::where('transfer_type', '3')->select('name as value', 'transfer_type_key as key')->get())->toArray();
+      
+
+        return response()->json(['bank_count'=>$count_bank,
+                                 'bank'=>$list_bank,
+                                 'bank_pickup'=>$count_pickup,
+                                 'list_pickup'=>$list_pickup,
+                                'proof_id'=>$proof_id_list,
+                                'transfer_type_list'=>$option_list]);
     }
 
     /**
@@ -42,6 +53,18 @@ class banks_controller extends Controller
     public function store(Request $request)
     {
         //
+        foreach($request->bank as $bank){
+
+            mm_bank::create([
+                    'store_id'=>store_id(),
+                    'name'=> $bank,
+                    'transfer_type' => 1,
+                    'status'=> 'b'
+
+            ]);
+        }
+
+        return;
     }
 
     /**

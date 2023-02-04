@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Session;
 use App\Models\mm_store;
 use App\Models\mm_domain;
+use App\Models\mm_currency;
 use App\Services\Helper;
+
 
 
 
@@ -105,7 +107,9 @@ if (! function_exists('image_exist')){
 
   if(! function_exists('user_id')){
     function user_id(){
-      return request()->user->id_user??''; 
+      $user =  user();
+      $user_id = $user['id_user']??'';
+      return request()->user->id_user??$user_id; 
     }
 }
 
@@ -166,6 +170,84 @@ if (! function_exists('image_exist')){
 
 
 
+
+//authenticate user
+
+if(! function_exists('user')){
+
+ function user(){
+
+
+  //get user token if it exists
+      try{
+          $user = JWTAuth::parseToken()->authenticate();
+
+          return !empty($user)?$user->toArray():[];
+      }catch (Exception $e) {
+          if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+              return [];
+          }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+              return [];
+          }else{
+              return [];
+          }
+      }
+  }
+}
+
+
+
+if(! function_exists('store_user_id')){
+
+  function store_user_id(){
+ 
+ 
+   //get user token if it exists
+       try{
+           $user = JWTAuth::parseToken()->authenticate();
+ 
+           $user = !empty($user)?$user->toArray():[];
+           return $user['id_user']??'';
+       }catch (Exception $e) {
+           if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+               return '';
+           }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+               return '';
+           }else{
+               return '';
+           }
+       }
+   }
+ }
+
+
+ if(! function_exists('user_currency')){
+
+  function user_currency(){
+ 
+ 
+   //get user token if it exists
+       try{
+           $user = JWTAuth::parseToken()->authenticate();
+ 
+           $user = !empty($user)?$user->toArray():[];
+           
+           $currency_id =  $user['user_active_currency']??'';
+           if(empty($currency))$currency_id = mm_currency::where('default_currency', 1)->value('id_currency');
+           return $currency_id;
+           
+          }catch (Exception $e) {
+           if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+               return mm_currency::where('default_currency', 1)->value('id_currency');
+           }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+            return mm_currency::where('default_currency', 1)->value('id_currency');
+           }else{
+            return mm_currency::where('default_currency', 1)->value('id_currency');
+           }
+       }
+       
+   }
+ }
 
 
 

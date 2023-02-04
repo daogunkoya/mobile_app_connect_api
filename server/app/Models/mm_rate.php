@@ -66,6 +66,12 @@ class mm_rate extends Model
             public function getUserAttribute($user_id){
                 return optional(mm_user::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'user_email', 'created_at')->first())->toArray();
             }
+
+            public function getMainRateAttribute($value){
+                return  number_format($value, 2);
+            }
+
+
             public function getCurrencyAttribute($currency_id){
                 
                 return optional(mm_currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();

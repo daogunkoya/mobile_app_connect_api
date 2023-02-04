@@ -102,4 +102,13 @@ class rates_controller extends Controller
         return response()->json([$response]);
 
     }
+
+
+    public function todays_rate(Request $request, rate_service $rate_service, mm_rate $mm_rate){
+      
+        $response = $rate_service::todays_rate();
+        
+        return response()->json($response, 200);
+
+    }
 }

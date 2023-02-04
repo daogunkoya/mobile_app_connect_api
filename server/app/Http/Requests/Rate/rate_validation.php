@@ -33,8 +33,9 @@ class rate_validation extends FormRequest
         return [  
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'user_id'=>'exists:mm_user,id_user',
-       'main_rate'=>'required',
+       'user_id'=>'required|exists:mm_user,id_user',
+       'currency_id'=>'required',
+       'main_rate'=>'numeric|required',
        
         
     

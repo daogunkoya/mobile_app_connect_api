@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\sender;
+use App\Services\Sender\sender_service;
+use App\Http\Requests\Sender\sender_validation;
 
 class senders_controller extends Controller
 {
@@ -14,16 +15,10 @@ class senders_controller extends Controller
      */
     public function index(Request $request)
     {
-
-       
         //
-       // $id = isset($id)?$id:Auth::id();
-       
-
-        $senders = sender::orderBy('created_at','DESC')->limit('30')->get();
-        $senders = !empty($senders)?$senders->toArray():[];
-
-        return response()->json($senders);
+        $service = new sender_service();
+        $list = $service->fetch_agent_customer($request);
+        return response()->json($list);
     }
 
     /**
@@ -42,34 +37,15 @@ class senders_controller extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(sender_validation $request)
     {
         //
-        $new_sender = sender::create($request->all());
-        return response()->json($new_sender->id_customer);
+        $service = new sender_service();
+       
+        $agent_customer_id = $service->create_customer($request->all(), $request->user->id_user);
+        return response()->json(['agent_customer_id' => $agent_customer_id]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -78,9 +54,12 @@ class senders_controller extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(sender_validation $request, $customer_id)
     {
-        //
+        $service = new sender_service();
+       
+        $agent_customer_id = $service->update_customer($request->all(), $request->user->id_user, $customer_id);
+        return response()->json(['agent_customer_id' => $agent_customer_id]);
     }
 
     /**

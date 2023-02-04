@@ -40,7 +40,8 @@ class receiver_validation extends FormRequest
        'receiver_email'=>'required|email',
        'receiver_address'=>'required',
        'receiver_postcode'=>'required',
-       'account_number'=>'required',
+       'transfer_type_key'=>'required',
+       'account_number'=>'required_if:transfer_type_key,1',
        'identity_type'=>'required',
        'transfer_type'=>'required',
         

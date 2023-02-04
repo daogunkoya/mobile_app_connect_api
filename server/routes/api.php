@@ -39,6 +39,19 @@ Route::prefix('v1')->group(function () {
         Route::post('/users/me', 'App\Http\Controllers\aauth_controller@me');
 
 
+          //no token required here
+
+
+          //fetch todays rate
+          Route::get('/rates/today', 'App\Http\Controllers\rates_controller@todays_rate');
+          
+          //calclate commission,total,local from amount
+          Route::post('/transactions/calculate', 'App\Http\Controllers\transactions_controller@calculate_transaction');
+          
+          //fetch commission based on amount
+          Route::get('/commissions/value', 'App\Http\Controllers\commissions_controller@get_commission');
+
+
         /*
         |--------------------------------------------------------------------------
         | Authenticated Routed
@@ -56,9 +69,17 @@ Route::prefix('v1')->group(function () {
         
         //requires token  **************************************
 
+      
+
+
+
+
         Route::group(['middleware' => ['jwt.verify','api']], function() {
 
-
+            
+            
+            //transactions
+            Route::resource('transactions', 'App\Http\Controllers\transactions_controller');
 
             //for agent customers
 
@@ -79,7 +100,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/bank/list', 'App\Http\Controllers\banks_controller@list');
             Route::resource('/senders', 'App\Http\Controllers\senders_controller');
 
+           
             Route::resource('/commissions', 'App\Http\Controllers\commissions_controller');
+            
+        
+           
             Route::resource('/rates', 'App\Http\Controllers\rates_controller');
             Route::resource('/currencies', 'App\Http\Controllers\currencies_controller');
         });

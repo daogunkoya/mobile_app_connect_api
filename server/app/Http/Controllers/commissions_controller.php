@@ -104,4 +104,18 @@ class commissions_controller extends Controller
         return response()->json([$response]);
 
     }
+
+    public function get_commission( Request $request,commission_service $commission_service){ 
+
+       if(!empty($request->amount)){
+
+          
+           $amount = $request->amount;
+           
+           $res = $commission_service::fetch_commission_value($amount  );
+
+           return response()->json($res);
+       } 
+       return response()->json(['errors'=>['amount'=>['amount is required']]]) ;   
+    }
 }

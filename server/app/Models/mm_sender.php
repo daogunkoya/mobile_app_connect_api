@@ -11,30 +11,30 @@ use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
 
-class mm_agent_customer extends Model
+class mm_sender extends Model
 {
     
-            protected $table = "mm_agent_customer";
-            protected $primaryKey = 'id_customer';
+            protected $table = "mm_sender";
+            protected $primaryKey = 'id_sender';
 
             protected $fillable = [
             'store_id',
             'user_id',
-            'customer_title',
-            'customer_name',
-            'customer_slug',
-            'customer_fname',
-            'customer_mname',
-            'customer_lname',
-            'customer_dob',
+            'sender_title',
+            'sender_name',
+            'sender_slug',
+            'sender_fname',
+            'sender_mname',
+            'sender_lname',
+            'sender_dob',
             'currency_id', 
-            'customer_email',
-            'customer_phone',
-            'customer_mobile',
-            'customer_address',
-            'customer_postcode' ,
+            'sender_email',
+            'sender_phone',
+            'sender_mobile',
+            'sender_address',
+            'sender_postcode' ,
             'photo_id',
-            'customer_status',
+            'sender_status',
             'moderation_status'    
             
             ];
@@ -55,14 +55,14 @@ class mm_agent_customer extends Model
             {
                 parent::boot();
                 self::creating(function ($model) {
-                    $model->id_customer = (string) Uuid::generate(4);
+                    $model->id_sender = (string) Uuid::generate(4);
 
 
 
                       // generate uniqu slug
-                      $slug = str_slug($model->customer_name).mt_rand(100,1000);
-                      while(mm_agent_customer::where('customer_slug',$slug)->exists() ) $slug = str_slug($model->customer_name).mt_rand(100,1000);
-                      $model->customer_slug =$slug;
+                      $slug = str_slug($model->sender_name).mt_rand(100,1000);
+                      while(mm_sender::where('sender_slug',$slug)->exists() ) $slug = str_slug($model->sender_name).mt_rand(100,1000);
+                      $model->sender_slug =$slug;
                 });
             }
 
@@ -82,8 +82,8 @@ class mm_agent_customer extends Model
                 return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             }
 
-            public function getCountCustomerReceiverAttribute($customer_id){
-                return mm_receiver::where('customer_id',$customer_id)->count();
+            public function getCountSenderReceiverAttribute($sender_id){
+                return mm_receiver::where('sender_id',$sender_id)->count();
             }
 
             

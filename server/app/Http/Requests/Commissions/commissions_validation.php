@@ -36,7 +36,8 @@ class commissions_validation extends FormRequest
         return [  
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'user_id'=>'exists:mm_user,id_user',
+       
+       //'user_id'=>'exists:mm_user,id_user',
        'start_from'=>'required',
        'end_at'=>'required',
        'value'=>'required',

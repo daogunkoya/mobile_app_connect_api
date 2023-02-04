@@ -12,8 +12,11 @@ use App\Services\sqs\sqs_service;
 use Webpatser\Uuid\Uuid;
 use App\Services\User_Device\user_device_service;
 use App\Models\mm_user_device;
-use App\Models\bd_order_item;
+use App\Models\mm_transaction;
+use App\Models\mm_sender;
+use App\Models\mm_receiver;
 use App\Services\Helper;
+use App\Services\Rate\rate_service;
 
 class main_auth_service implements AuthContract
 {
@@ -135,18 +138,57 @@ class main_auth_service implements AuthContract
                                     'store_url' => session()->get('process_store_url'),
                                     'store_name' => session()->get('process_store_name'),
                                     'store_version' => session()->get('process_store_version'),
+                                    
                                     'access_token' => $token,
                                     'token_type' => 'bearer',
                                     'expires_in' =>$now->addSeconds(auth()->factory()->getTTL())->timestamp
                                     //'expires_in' => auth()->factory()->getTTL() * 60,
                                 ];
-
-                
+                                $store_data=$this->store_data($user_id);
+                                $response = array_merge($response_token, $store_data);
         
                   //  return response()->json($response_token);
-                    return [$response_token, 200];
+                    return [$response, 200];
                     
     }
+
+
+
+
+    //fetch store related data
+        public function store_data($user_id){
+
+            // $user_id = user_id()??'';
+            // var_dump($user_id);
+            $rate = rate_service::todays_rate();
+            $today_rate = $rate['main_rate']??0;
+            
+            $total_sent = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->sum('total_amount');
+            $total_pending = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->where('moderation_status', 1)->sum('total_amount');
+            $total_paid = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->where('moderation_status', 2)->sum('total_amount');
+            $count_total_sent = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->count();
+            $count_total_pending = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->where('moderation_status', 1)->count();
+            $count_total_paid = mm_transaction::where('user_id', $user_id)->where('transaction_status',1)->where('moderation_status', 2)->count();
+            $count_sender = mm_sender::where('user_id', $user_id)->count();
+            $count_receiver = mm_receiver::where('user_id', $user_id)->count();
+
+
+            return [
+                'store_name'=>store_name(),
+                'store_url' => session()->get('process_store_url'),
+                'rate'=>$today_rate,
+                'total_pending'=>number_format($total_pending,2),
+                'total_paid'=> number_format($total_paid,2),
+                'total_sent' => number_format($total_sent,2),
+                'count_total_sent'=>$count_total_sent,
+                'count_total_pending'=>$count_total_pending,
+                'count_total_paid'=>$count_total_paid,
+                'count_total_sender'=>$count_sender,
+                'count_total_receiver'=>$count_receiver,
+
+            ];
+        }
+
 //adding new user to mailchimp api 
     public function mailchimp_job($user_data){
              //$mailchimp = new \App\Services\MailChimpService;     

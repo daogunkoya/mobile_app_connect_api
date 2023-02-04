@@ -88,7 +88,7 @@ class mm_store extends Model
 
                     // generate uniqu slug
                     $slug = str_slug($model->store_name).mt_rand(100,1000);
-                    while(bd_store::where('store_slug',$slug)->exists() ) $slug = str_slug($model->store_name).mt_rand(100,1000);
+                    while(mm_store::where('store_slug',$slug)->exists() ) $slug = str_slug($model->store_name).mt_rand(100,1000);
                     $model->store_slug =$slug;
 
                     //$model->record_count_update = $model->count() + 1;

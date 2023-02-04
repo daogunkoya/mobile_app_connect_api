@@ -27,6 +27,8 @@ class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
     protected $fillable = [
         'image_id',
         'store_id',
+        'user_credit',
+        'user_active_currency',
         'user_role_type',
         'user_name',
          'user_handle',
@@ -136,6 +138,13 @@ class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
 public function getNameAttribute()
 {
     return "{$this->user_name}";
+}
+
+
+
+public function getValueAttribute($value)
+{
+    return strtoupper($value);
 }
 
 

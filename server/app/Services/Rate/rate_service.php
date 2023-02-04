@@ -1,9 +1,24 @@
 <?php
 namespace App\Services\Rate;
 use App\Models\mm_commission;
+use App\Models\mm_rate;
 use App\Services\Helper;
 
 class rate_service{
+
+
+    //fetch todays rate
+    public static function todays_rate(){
+       
+       
+        $user_id =   user_id();
+        $res = optional(mm_rate::whereIn('user_id', [$user_id])
+                    ->select('main_rate', 'bou_rate', 'sold_rate', 'currency_id as currency')
+                    ->orderBy('created_at', 'desc')
+                    ->first())->toArray();
+
+                    return $res;
+    }
 
     public function store_rate($input, $rate_model){
     
@@ -49,8 +64,8 @@ class rate_service{
         $count = $query->count();
         $limit = $input['limit']??8;
         
-        $currencies =  optional($currency_model::where('store_id', store_id())->limit(5)->pluck('currency_code','id_currency'))->toArray();
-        $users =optional($user_model::where('store_id', store_id())->whereIn('user_role_type', [1,2])->pluck('user_name','id_user'))->toArray();
+        $currencies =  optional($currency_model::where('store_id', store_id())->limit(5)->select('currency_code as value','id_currency as key')->get())->toArray();
+        $users =optional($user_model::where('store_id', store_id())->whereIn('user_role_type', [1,2])->select('user_name as value','id_user as key')->get())->toArray();
 
          ////pagination
          if(!empty($input['cursor'])){

@@ -25,6 +25,7 @@ class mm_currency extends Model
             'currency_destination',
             'currency_destination_symbol',
             'currency_code',
+            'default_currency',
             'income_category',
             'currency_status',
             'moderation_status' 

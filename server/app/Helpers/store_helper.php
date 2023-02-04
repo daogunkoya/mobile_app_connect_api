@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Session;
-use App\Models\bd_store;
+use App\Models\mm_store;
 use App\Models\bd_domain;
 
 // for creating image link url
@@ -54,16 +54,23 @@ if(! function_exists('store_version')){
     }
 }
 
+//function name for store_name
+if(! function_exists('store_name')){
+    function store_name(){
+      return mm_store::where('id_store', store_id())->value('store_name'); 
+    }
+}
+
 
 //initialize new store info
 if(! function_exists('initialise_store')){
     function initialise_store($store_id){
 
 
-    if(bd_store::where('id_store', $store_id)->exists()){
+    if(mm_store::where('id_store', $store_id)->exists()){
             $host_domain = bd_domain::where('store_id', $store_id)->orderBy('domain_default', 'desc')->value('domain_host'); 
             $store_url = "https://".$host_domain; 
-            $store_name = bd_store::where('id_store', $store_id)->value('store_name');
+            $store_name = mm_store::where('id_store', $store_id)->value('store_name');
 
             Session::forget('process_store_id'); 
             Session::forget('process_store_name');
