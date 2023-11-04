@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class receiver_validation extends FormRequest
 {
-  
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,23 +28,23 @@ class receiver_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
-        return [  
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
+        return [
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'receiver_title'=>'required',
-       'receiver_fname'=>'required',
-       'receiver_lname'=>'required',
-       'receiver_dob'=>'required',
-       'receiver_email'=>'required|email',
-       'receiver_address'=>'required',
-       'receiver_postcode'=>'required',
-       'transfer_type_key'=>'required',
-       'account_number'=>'required_if:transfer_type_key,1',
-       'identity_type'=>'required',
-       'transfer_type'=>'required',
-        
-    
+        'receiver_title' => 'required',
+        'receiver_fname' => 'required',
+        'receiver_lname' => 'required',
+//        'receiver_dob' => 'required',
+//        'receiver_email' => 'required|email',
+        'receiver_address' => 'required',
+//        'receiver_postcode' => 'required',
+        'transfer_type_key' => 'required',
+        'account_number' => 'required_if:transfer_type_key,1',
+        'identity_type' => 'required',
+        'transfer_type' => 'required',
+
+
         ];
     }
 
@@ -62,7 +61,7 @@ class receiver_validation extends FormRequest
             'identity_type.required' => 'postcode is required!',
             'transfer_type.required' => 'transfer_type is required!',
             'account_number.required' => 'account_number is required!',
-          
+
         ];
     }
 

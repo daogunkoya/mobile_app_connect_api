@@ -10,9 +10,9 @@ class CommentService
 {
     public function fetchComments(Task $task): array
     {
-      
 
-       $comments =  optional($task->comments()->orderBy('created_at', 'desc')->get())->toArray();
+
+        $comments =  optional($task->comments()->orderBy('created_at', 'desc')->get())->toArray();
 
         return $comments;
     }

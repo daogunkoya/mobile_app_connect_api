@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class sender_validation extends FormRequest
 {
-  
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,26 +28,26 @@ class sender_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
-        return [  
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
+        return [
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'sender_title'=>'required',
-       'sender_fname'=>'required',
-       'sender_lname'=>'required',
-       'sender_dob'=>'required',
-       'sender_email'=>'required|email',
-       'sender_address'=>'required',
-       'sender_postcode'=>'required',
-        
-    
+        'sender_title' => 'required',
+        'sender_fname' => 'required',
+        'sender_lname' => 'required',
+        'sender_dob' => 'required',
+        'sender_email' => 'required|email',
+        'sender_address' => 'required',
+        'sender_postcode' => 'required',
+
+
         ];
     }
 
     public function messages()
     {
         return [
-            
+
             'customer_title.required' => 'title is required!',
             'customer_fname.required' => 'first name is required!',
             'customer_lname.required' => 'last name is required!',
@@ -56,7 +55,7 @@ class sender_validation extends FormRequest
             'customer_dob.required' => 'Date of birth is required!',
             'customer_address.required' => 'address is required!',
             'customer_postcode.required' => 'postcode is required!',
-          
+
         ];
     }
 

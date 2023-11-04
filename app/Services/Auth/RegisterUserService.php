@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Interfaces\Auth\RegisterServiceInterface;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\PersonalAccessTokenResult;
+
 //use Laravel\Sanctum\NewAccessToken;
 
 class RegisterUserService implements RegisterServiceInterface
@@ -30,7 +31,7 @@ class RegisterUserService implements RegisterServiceInterface
             'last_name' => $last_name,
             'email' => $email,
             'password' => Hash::make($password),
-            'store_id'=>'$2y$10$VpVDzy8gIINv1fWRGHpAx.7e/Y3XSruR8OtUn3qUrjM9x9VGo5rIS'
+            'store_id' => '$2y$10$VpVDzy8gIINv1fWRGHpAx.7e/Y3XSruR8OtUn3qUrjM9x9VGo5rIS'
         ]);
 
         // $token = $user->createToken('auth_token')->plainTextToken;

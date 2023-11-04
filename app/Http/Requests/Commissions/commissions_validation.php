@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class commissions_validation extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,7 +28,7 @@ class commissions_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
 
 
 
@@ -38,11 +37,11 @@ class commissions_validation extends FormRequest
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 
        //'user_id'=>'exists:mm_user,id_user',
-       'start_from'=>'required',
-       'end_at'=>'required',
-       'value'=>'required',
-       'agent_quota'=>'required',
-       'currency_id'=>'required|exists:mm_currency,id_currency',
+        'start_from' => 'required',
+        'end_at' => 'required',
+        'value' => 'required',
+        'agent_quota' => 'required',
+        'currency_id' => 'required|exists:mm_currency,id_currency',
 
 
 

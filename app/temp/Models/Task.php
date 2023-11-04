@@ -71,11 +71,11 @@ class Task extends Model
 
     //format due_data
 
-    public function getDueDateAttribute($value){
-        
+    public function getDueDateAttribute($value)
+    {
+
 
                 $date = Carbon::parse($value);
                 return  $date->format('d / m / Y');
-
     }
 }

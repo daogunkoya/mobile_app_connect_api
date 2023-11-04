@@ -7,7 +7,6 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-
 class LoginUserRequest extends FormRequest
 {
     /**
@@ -28,7 +27,7 @@ class LoginUserRequest extends FormRequest
     public function rules()
     {
         return [
-            
+
             'email' => ['required', 'string', 'email'],
             'password' => ['required'],
         ];
@@ -44,10 +43,10 @@ class LoginUserRequest extends FormRequest
     public function messages()
     {
         return [
-            
+
             'email.required' => 'The email field is required.',
             'password.required' => 'The password field is required.',
-            
+
         ];
     }
 

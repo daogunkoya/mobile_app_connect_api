@@ -10,10 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
-
 class Domain extends Model
 {
-
             protected $table = "mm_domain";
             protected $primaryKey = 'id_domain';
 
@@ -56,13 +54,15 @@ class Domain extends Model
 
                     //domain host
                     $url = \parse_url($model->domain_name);
-                    $domain_host = $url['host']??'';
-                    $model->domain_host =$domain_host;
+                    $domain_host = $url['host'] ?? '';
+                    $model->domain_host = $domain_host;
 
                       // generate uniqu slug
-                      $slug = str_slug($model->domain_name).mt_rand(100,1000);
-                      while(bd_domain::where('domain_slug',$slug)->exists() ) $slug = str_slug($model->domain_name).mt_rand(100,1000);
-                      $model->domain_slug =$slug;
+                      $slug = str_slug($model->domain_name) . mt_rand(100, 1000);
+                    while (bd_domain::where('domain_slug', $slug)->exists()) {
+                        $slug = str_slug($model->domain_name) . mt_rand(100, 1000);
+                    }
+                      $model->domain_slug = $slug;
                 });
             }
 
@@ -78,15 +78,12 @@ class Domain extends Model
                 return 'string';
             }
 
-            public function getCreatedAtAttribute($value){
+            public function getCreatedAtAttribute($value)
+            {
                 return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             }
 
             // public function getCreatedAtAttribute($value){
             //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             // }
-
-
-
 }
-

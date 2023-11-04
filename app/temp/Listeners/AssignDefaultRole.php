@@ -4,9 +4,6 @@ namespace App\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-
-
-
 use Illuminate\Auth\Events\UserCreated;
 use Spatie\Permission\Models\Role;
 

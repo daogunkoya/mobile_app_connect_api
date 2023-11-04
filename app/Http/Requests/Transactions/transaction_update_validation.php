@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class transaction_update_validation extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,17 +28,17 @@ class transaction_update_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
         return [
 
-            'receiver_name'=>'required',
-            'receiver_phone'=>'required',
-            'receiver_bank'=>'required',
-            'receiver_bank_id'=>'exists:mm_bank,id_bank',
-            'receiver_identity_id'=>'required_if:receiver_transfer_type_key,2',
-            'receiver_transfer_type_key'=>'required',
-            'receiver_account_no'=>'required_if:receiver_transfer_type_key,1',
-            'receiver_transfer_type'=>'required',
+            'receiver_name' => 'required',
+            'receiver_phone' => 'required',
+            'receiver_bank' => 'required',
+            'receiver_bank_id' => 'exists:mm_bank,id_bank',
+            'receiver_identity_id' => 'required_if:receiver_transfer_type_key,2',
+            'receiver_transfer_type_key' => 'required',
+            'receiver_account_no' => 'required_if:receiver_transfer_type_key,1',
+            'receiver_transfer_type' => 'required',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 

@@ -11,19 +11,18 @@ use Illuminate\Support\Facades\Log;
 use App\Logging\DatabaseLogger;
 use Monolog\Logger;
 
-
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    
-     public function register()
+
+    public function register()
     {
         // $this->app->bind('App\Contracts\LoggerInterface', function ($app) {
         //     return new DatabaseLogger($app['db']->connection(), 'logs', MonologLogger::DEBUG);
         // });
-        
+
         // Log::extend('database', function ($app, $config) {
         //     return $app->make('App\Contracts\LoggerInterface');
         // });
@@ -35,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-      
+
         $this->app->bind(LoginServiceInterface::class, LoginUserService::class);
         $this->app->bind(RegisterServiceInterface::class, RegisterUserService::class);
     }

@@ -6,13 +6,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Hasone;
 //use Laravel\Sanctum\HasApiTokens;
 use Laravel\Passport\HasApiTokens;
 use Ramsey\Uuid\Uuid;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -20,17 +24,18 @@ class User extends Authenticatable
      * @var array<int, string>
      */
 
-    protected $table = 'users';
+    protected $table = 'mm_user';
     protected $keyType = 'string';
     public $incrementing = false;
-    protected $primaryKey = 'id'; // Set the primary key column name
+    protected $primaryKey = 'id_user'; // Set the primary key column name
 
     protected $fillable = [
+      //  'id',
         'first_name',
         'last_name',
-       // 'store_id',
         'email',
         'password',
+        'active_currency_id'
     ];
 
     /**
@@ -59,7 +64,17 @@ class User extends Authenticatable
 
         // Generate a UUID for new records
         static::creating(function ($model) {
-            $model->id = (string) Uuid::uuid4();
+            $model->id_user = (string) Uuid::uuid4();
         });
+    }
+
+    public function rate(): HasMany
+    {
+        return $this->hasMany(Rate::class, 'user_id');
+    }
+
+    public function currency(): HasOne
+    {
+        return $this->hasOne(Currency::class, 'active_currency_id');
     }
 }

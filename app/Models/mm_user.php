@@ -1,16 +1,16 @@
 <?php
 
 namespace App\Models;
+
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
-
 use Illuminate\Database\Eloquent\Model;
 
-class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
+class mm_user extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     //
 
@@ -60,13 +60,13 @@ class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
         'user_email_status',
         'user_password_token',
         'list_access',
-        'moderation_status' 
+        'moderation_status'
 
-        
-         
-         
-         
-         
+
+
+
+
+
 
     ];
 
@@ -111,7 +111,7 @@ class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
     }
 
 
-   
+
 
     public function getJWTIdentifier()
     {
@@ -124,28 +124,28 @@ class mm_user extends Authenticatable implements JWTSubject,MustVerifyEmail
     }
     public function setPasswordAttribute($password)
     {
-        if ( !empty($password) ) {
+        if (!empty($password)) {
             $this->attributes['user_password_hash'] = bcrypt($password);
         }
-    } 
+    }
 
     public function getAuthPassword()
-{
-    return $this->user_password_hash;
-}
+    {
+        return $this->user_password_hash;
+    }
 
 
-public function getNameAttribute()
-{
-    return "{$this->user_name}";
-}
+    public function getNameAttribute()
+    {
+        return "{$this->user_name}";
+    }
 
 
 
-public function getValueAttribute($value)
-{
-    return strtoupper($value);
-}
+    public function getValueAttribute($value)
+    {
+        return strtoupper($value);
+    }
 
 
 
@@ -187,12 +187,13 @@ public function getValueAttribute($value)
 // }
 
 
-public function getUserImageUrlAttribute($value){
+    public function getUserImageUrlAttribute($value)
+    {
 
-    $image_id = !empty($value)?$value:'default.png' ;
+        $image_id = !empty($value) ? $value : 'default.png' ;
 
-    return image_url().'user/profile/small/'.$image_id;
-}
+        return image_url() . 'user/profile/small/' . $image_id;
+    }
 
 
 
@@ -200,18 +201,20 @@ public function getUserImageUrlAttribute($value){
 
 //relationships
 
-public function deal(){
-    return $this->hasMany('App\Models\bd_item_deal','user_id');
-}
+    public function deal()
+    {
+        return $this->hasMany('App\Models\bd_item_deal', 'user_id');
+    }
 
-public function connects(){
-    return $this->hasMany('App\Models\mm_user_connect');
-    
-}
+    public function connects()
+    {
+        return $this->hasMany('App\Models\mm_user_connect');
+    }
 
-public function mm_user_confirm(){
-    return $this->hasOne('mm_user_confirm', 'user_email');
-}
+    public function mm_user_confirm()
+    {
+        return $this->hasOne('mm_user_confirm', 'user_email');
+    }
 
 
 
@@ -228,4 +231,4 @@ public function mm_user_confirm(){
 //     {
 //         return $this->user_email;
 //     }
- }
+}

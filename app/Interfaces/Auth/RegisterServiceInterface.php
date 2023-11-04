@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Interfaces\Auth;
+
 use Laravel\Passport\PersonalAccessTokenResult;
+
 //use Laravel\Sanctum\NewAccessToken;
 
 interface RegisterServiceInterface

@@ -18,47 +18,46 @@ class TaskService implements TaskServiceInterface
     }
 
 
-     public function getAllTasks(?string $status = '', ?string $priority = '', ?string $created_at = ''): array
+    public function getAllTasks(?string $status = '', ?string $priority = '', ?string $created_at = ''): array
+    {
 
-        {
-            
-            
-            // Create a base query to fetch all tasks for the authenticated user
-            $query = $this->task->where('user_id', Auth::id())
-                ->with('assignedUsers')
-                ->select('id as task_id', 'title', 'description', 'due_date', 'status', 'priority', 'created_at')
-                ->orderBy('created_at', 'desc');
-        
-            // Apply filters if provided
-            if (!empty($status)) {
-                $query = $query->where('status', $status);
-            }
-            if (!empty($priority)) {
-                $query = $query->where('priority', $priority);
-            }
-            if (!empty($created_at)) {
-                //$created_at_dt = Carbon::createFromFormat('d/m/Y', $created_at);
-                $created_at_dt = Carbon::createFromFormat('Y-m-d', $created_at);
-                if ($created_at_dt) {
-                    $query = $query->whereDate('due_date', $created_at_dt->format('Y-m-d'));
-                }
-            }
-        
-            // Execute the query and return the result
-            $tasks = optional($query->get())->toArray();
-            $count = count($tasks);
-            return [
-                'count' => $count,
-                'tasks' => $tasks
-            ];
+
+           // Create a base query to fetch all tasks for the authenticated user
+           $query = $this->task->where('user_id', Auth::id())
+               ->with('assignedUsers')
+               ->select('id as task_id', 'title', 'description', 'due_date', 'status', 'priority', 'created_at')
+               ->orderBy('created_at', 'desc');
+
+           // Apply filters if provided
+        if (!empty($status)) {
+            $query = $query->where('status', $status);
         }
-        
-    
+        if (!empty($priority)) {
+            $query = $query->where('priority', $priority);
+        }
+        if (!empty($created_at)) {
+            //$created_at_dt = Carbon::createFromFormat('d/m/Y', $created_at);
+            $created_at_dt = Carbon::createFromFormat('Y-m-d', $created_at);
+            if ($created_at_dt) {
+                $query = $query->whereDate('due_date', $created_at_dt->format('Y-m-d'));
+            }
+        }
+
+           // Execute the query and return the result
+           $tasks = optional($query->get())->toArray();
+           $count = count($tasks);
+           return [
+               'count' => $count,
+               'tasks' => $tasks
+           ];
+    }
+
+
 
     public function getTaskById(string $id): ?Task
     {
         return optional($this->task->where('user_id', Auth::id())
-                            ->select('id as task_id', 'title', 'description', 'due_date', 'status', 'priority','created_at')
+                            ->select('id as task_id', 'title', 'description', 'due_date', 'status', 'priority', 'created_at')
                             ->with('comments')
                             ->get())->toArray();
     }
@@ -66,7 +65,7 @@ class TaskService implements TaskServiceInterface
     public function getById(string $id): ?array
     {
         return optional($this->task->where('user_id', Auth::id())
-                        ->select('id as task_id', 'title', 'description', 'due_date', 'status','priority','created_at')
+                        ->select('id as task_id', 'title', 'description', 'due_date', 'status', 'priority', 'created_at')
                     ->with('comments')
                     ->find($id))->toArray();
     }
@@ -90,7 +89,9 @@ class TaskService implements TaskServiceInterface
         $formattedDate = $date->format('Y-m-d H:i:s');
         $data['due_date'] = $formattedDate;
 
-        if (!$task) return null;
+        if (!$task) {
+            return null;
+        }
 
 
         $task->update($data);

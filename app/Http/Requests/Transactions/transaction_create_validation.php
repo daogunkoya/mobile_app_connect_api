@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class transaction_create_validation extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,12 +28,12 @@ class transaction_create_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
         return [
 
-            'conversion_type'=>'numeric|required|between:1,2',
-            'receiver_id'=>'required|exists:mm_receiver,id_receiver',
-            'amount_sent'=>'required',
+            'conversion_type' => 'numeric|required|between:1,2',
+            'receiver_id' => 'required|exists:mm_receiver,id_receiver',
+            'amount_sent' => 'required',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 

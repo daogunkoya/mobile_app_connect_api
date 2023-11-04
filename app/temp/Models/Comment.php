@@ -40,9 +40,5 @@ class Comment extends Model
         static::creating(function ($model) {
             $model->id = (string) Uuid::uuid4();
         });
-
     }
-
-
-    
 }

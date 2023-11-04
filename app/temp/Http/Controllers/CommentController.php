@@ -10,9 +10,9 @@ use Illuminate\Validation\Rule;
 
 class CommentController extends Controller
 {
-    public function index(Request $request,CommentService $commentService, Task $task)
+    public function index(Request $request, CommentService $commentService, Task $task)
     {
-      
+
         $comment = $commentService->fetchComments($task);
 
         return response()->json($comment);

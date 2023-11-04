@@ -9,13 +9,8 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-
 class Store extends Model
 {
-
-
-
-
             protected $table = "mm_store";
             protected $primaryKey = 'id_store';
 
@@ -87,9 +82,11 @@ class Store extends Model
                     $model->id_store = (string) Uuid::uuid4();
 
                     // generate uniqu slug
-                    $slug = str_slug($model->store_name).mt_rand(100,1000);
-                    while(Store::where('store_slug',$slug)->exists() ) $slug = str_slug($model->store_name).mt_rand(100,1000);
-                    $model->store_slug =$slug;
+                    $slug = str_slug($model->store_name) . mt_rand(100, 1000);
+                    while (Store::where('store_slug', $slug)->exists()) {
+                        $slug = str_slug($model->store_name) . mt_rand(100, 1000);
+                    }
+                    $model->store_slug = $slug;
 
                     //$model->record_count_update = $model->count() + 1;
                 });
@@ -108,17 +105,12 @@ class Store extends Model
             }
 
 
-            public function getStoreUserDobAttribute($value){
-               return Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
-
-
+            public function getStoreUserDobAttribute($value)
+            {
+                return Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             }
 
             // public function getCreatedAtAttribute($value){
             //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             // }
-
-
-
 }
-

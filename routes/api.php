@@ -29,20 +29,22 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 
-// Route for user registration
-Route::post('/register', 'App\Http\Controllers\AuthController@register');
 
-// Route for user login
-Route::post('/login', 'App\Http\Controllers\AuthController@login');
 
 
 
 
 Route::prefix('v1')->group(function () {
 
-    Route::post('/users', 'App\Http\Controllers\auth_controller@register');
-    Route::post('/users/login', 'App\Http\Controllers\auth_controller@login');
-    Route::post('/users/logout', 'App\Http\Controllers\aauth_controller@logout');
+//    Route::post('/users', 'App\Http\Controllers\auth_controller@register');
+//    Route::post('/users/login', 'App\Http\Controllers\auth_controller@login');
+//    Route::post('/users/logout', 'App\Http\Controllers\aauth_controller@logout');
+
+    // Route for user registration
+    Route::post('/users', 'App\Http\Controllers\AuthController@register');
+// Route for user login
+    Route::post('/users/login', 'App\Http\Controllers\AuthController@login');
+
     Route::post('/users/refresh', 'App\Http\Controllers\aauth_controller@refresh');
     Route::post('/users/me', 'App\Http\Controllers\aauth_controller@me');
 
@@ -51,13 +53,16 @@ Route::prefix('v1')->group(function () {
 
 
       //fetch todays rate
-      Route::get('/rates/today', 'App\Http\Controllers\RateController@todays_rate');
+      Route::get('/rates/today', 'App\Http\Controllers\RateController@todaysRate');
 
       //calclate commission,total,local from amount
       Route::post('/transactions/calculate', 'App\Http\Controllers\TransactionController@calculateTransaction');
 
       //fetch commission based on amount
-      Route::get('/commissions/value', 'App\Http\Controllers\CommissionController@get_commission');
+      Route::get('/commissions/value', 'App\Http\Controllers\CommissionController@getCommission');
+
+    //fetch currencies and destination
+    Route::get('/currencies/list', 'App\Http\Controllers\CurrencyController@fetchCurrencies');
 
 
     /*
@@ -84,7 +89,8 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
-
+        //landing page
+        Route::get('/', 'App\Http\Controllers\IndexController@index');
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
@@ -97,7 +103,11 @@ Route::prefix('v1')->group(function () {
 
 
         //for Receivers
+        Route::get('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@index');
+        Route::post('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@store');
+        Route::put('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
 
+        //wil be removed on the mobile app
         Route::get('/customer/{id}/receivers', 'App\Http\Controllers\ReceiverController@index');
         Route::post('/customer/{id}/receivers', 'App\Http\Controllers\ReceiverController@store');
         Route::put('/customer/{customer_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
@@ -105,7 +115,7 @@ Route::prefix('v1')->group(function () {
 
 
         Route::resource('/banks', 'App\Http\Controllers\BankController');
-        Route::get('/bank/list', 'App\Http\Controllers\banks_controller@list');
+        Route::get('/bank/list', 'App\Http\Controllers\BankController@list');
         Route::resource('/senders', 'App\Http\Controllers\SenderController');
 
 

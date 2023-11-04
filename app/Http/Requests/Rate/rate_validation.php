@@ -12,7 +12,6 @@ use App\Models\MMUser;
 
 class rate_validation extends FormRequest
 {
-  
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -30,16 +29,16 @@ class rate_validation extends FormRequest
      */
     public function rules()
     {
-        $store_id = session()->get('process_store_id')??request()->process_store_id;
-        return [  
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
+        return [
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-       'user_id'=>'required|exists:mm_user,id_user',
-       'currency_id'=>'required',
-       'main_rate'=>'numeric|required',
-       
-        
-    
+        'user_id' => 'required|exists:mm_user,id_user',
+        'currency_id' => 'required',
+        'main_rate' => 'numeric|required',
+
+
+
         ];
     }
 
@@ -47,8 +46,8 @@ class rate_validation extends FormRequest
     {
         return [
             'receiver_title.required' => 'title is required!',
-           
-          
+
+
         ];
     }
 

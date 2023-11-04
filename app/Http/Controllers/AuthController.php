@@ -11,11 +11,8 @@ use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 
-
-
 class AuthController extends Controller
 {
-
     protected LoginServiceInterface $loginService;
     protected RegisterServiceInterface $registerService;
 
@@ -40,18 +37,13 @@ class AuthController extends Controller
                 $input['email'],
                 $input['password']
             );
-            
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 401);
         }
 
-       
+
         return response()->json($result);
     }
-
-
-
-
 
 
 
@@ -64,11 +56,12 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 401);
         }
-      
-        return response()->json($result??"");
+
+        return response()->json($result ?? "");
     }
 
-    public function test(Request $request){
+    public function test(Request $request)
+    {
         return request()->user()->toArray();
     }
 }

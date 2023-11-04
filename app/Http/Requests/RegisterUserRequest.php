@@ -7,7 +7,6 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-
 class RegisterUserRequest extends FormRequest
 {
     /**

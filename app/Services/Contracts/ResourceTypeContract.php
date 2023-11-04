@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Contracts;
 
-interface ResourceTypeContract{
+interface ResourceTypeContract
+{
     //public function getContent($url);
-    public function getContent($url,$type);
+    public function getContent($url, $type);
     public function fetchResource($json);
 }

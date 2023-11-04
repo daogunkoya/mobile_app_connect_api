@@ -23,22 +23,21 @@ class RateController extends Controller
      */
 
 
-     public function __construct(RateService $rateService, Currency $currency, MMUser $user, Rate $rate)
-     {
+    public function __construct(RateService $rateService, Currency $currency, MMUser $user, Rate $rate)
+    {
 
-         $this->currency = $currency;
-         $this->user = $user;
-         $this->rateService = $rateService;
-         $this->rate = $rate;
-     }
+        $this->currency = $currency;
+        $this->user = $user;
+        $this->rateService = $rateService;
+        $this->rate = $rate;
+    }
 
     public function index(Request $request)
     {
         //
-        $response = $this->rateService->fetch_rate_list( $request->all(),$this->rate, $this->currency, $this->user);
+        $response = $this->rateService->fetchRateList($request->all(), $this->rate, $this->currency, $this->user);
 
-        return response()->json( $response);
-
+        return response()->json($response);
     }
 
 
@@ -51,10 +50,9 @@ class RateController extends Controller
     public function store(rate_validation $request)
     {
 
-        $response = $this->rateService->store_rate($request->all(), $this->rate);
+        $response = $this->rateService->storeRate($request->all(), $this->rate);
 
         return response()->json(['rate_id' => $response]);
-
     }
 
 
@@ -69,25 +67,28 @@ class RateController extends Controller
     {
 
 
-        if(!$this->rate::where('id_rate', $rate_id)->where('rate_status',1)->exists()) return response()->json(['errors'=>['rate never exists']], 422);
+        if (!$this->rate::where('id_rate', $rate_id)->where('rate_status', 1)->exists()) {
+            return response()->json(['errors' => ['rate never exists']], 422);
+        }
 
-        $response = $this->rateService->update_rate($rate_id, $request->all(), $this->rate);
+        $response = $this->rateService->updateRate($rate_id, $request->all(), $this->rate);
 
         return response()->json(['rate_id' => $rate_id]);
-
     }
 
 
-    public function show(Request $request, $rate_id){
+    public function show(Request $request, $rate_id)
+    {
 
 
 
-                if(!$this->rate::where('id_rate', $rate_id)->where('rate_status',1)->exists()) return response()->json(['errors'=>['rate never exists']], 422);
-                        $response = $this->rateService->fetch_rate($rate_id, $this->rate, $this->currency, $this->user);
+        if (!$this->rate::where('id_rate', $rate_id)->where('rate_status', 1)->exists()) {
+            return response()->json(['errors' => ['rate never exists']], 422);
+        }
+                        $response = $this->rateService->fetchRate($rate_id, $this->rate, $this->currency, $this->user);
 
         return response()->json($response);
-
-      }
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -100,22 +101,23 @@ class RateController extends Controller
         //
 
 
-        if(!$this->rate::where('id_rate', $rate_id)->where('rate_status',1)->exists()) return response()->json(['errors'=>['rate never exists']], 422);
-        $response =  $this->rateService->delete_rate($rate_id, $this->rate);
+        if (!$this->rate::where('id_rate', $rate_id)->where('rate_status', 1)->exists()) {
+            return response()->json(['errors' => ['rate never exists']], 422);
+        }
+        $response =  $this->rateService->deleteRate($rate_id, $this->rate);
 
         return response()->json([$response]);
-
     }
 
 
-    public function todays_rate(Request $request){
+    public function todaysRate(Request $request)
+    {
 
 
 
 
-        $response = $this->rateService::todays_rate();
+        $response = $this->rateService::todaysRate();
 
         return response()->json($response, 200);
-
     }
 }

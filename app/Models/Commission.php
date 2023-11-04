@@ -10,10 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
-
 class Commission extends Model
 {
-
             protected $table = "mm_commission";
             protected $primaryKey = 'id_commission';
 
@@ -47,10 +45,8 @@ class Commission extends Model
                 parent::boot();
                 self::creating(function ($model) {
                     $model->id_commission = (string) Uuid::uuid4();
-
                 });
-
-             }
+            }
             public function getRouteKeyName()
             {
                 return 'uuid';
@@ -62,14 +58,16 @@ class Commission extends Model
                 return 'string';
             }
 
-            public function getUserAttribute($user_id){
+            public function getUserAttribute($user_id)
+            {
                 return optional(MMUser::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'email as user_email', 'created_at')->first())->toArray();
             }
 
 
 
 
-            public function getCurrencyAttribute($currency_id){
+            public function getCurrencyAttribute($currency_id)
+            {
 
                 return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
             }
@@ -81,8 +79,4 @@ class Commission extends Model
             // public function getCreatedAtAttribute($value){
             //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             // }
-
-
-
 }
-

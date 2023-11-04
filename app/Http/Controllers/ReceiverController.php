@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\ReceiverRepository;
 use Illuminate\Http\Request;
 use App\Services\Receiver\ReceiverService;
 use App\Http\Requests\Receivers\receiver_validation;
 
 class ReceiverController extends Controller
 {
-
     public $receiverService;
-    public function __construct(ReceiverService $receiverService)
+    public function __construct(ReceiverService $receiverService, public ReceiverRepository $receiverRepository)
     {
         $this->receiverService = $receiverService;
     }
@@ -25,7 +25,7 @@ class ReceiverController extends Controller
     {
         //
 
-        $list = $this->receiverService->fetchReceiver($request, $customer_id);
+        $list = $this->receiverRepository->fetchReceiver($request->all(), $customer_id);
         return response()->json($list);
     }
 
@@ -62,7 +62,6 @@ class ReceiverController extends Controller
      */
     public function show($receiver_id)
     {
-
     }
 
 

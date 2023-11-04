@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\TransactionRepository;
 use Illuminate\Http\Request;
 use App\Services\Transaction\TransactionService;
 use App\Http\Requests\Transactions\calulate_validation;
@@ -15,12 +16,16 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(TransactionService $transaction_service, Request $request)
 
+    public function __construct(public TransactionRepository $transactionRepository)
+    {
+    }
+
+    public function index(TransactionService $transaction_service, Request $request)
     {
         //
-        [$content, $status] = $transaction_service->fetchTransaction(($request->all()));
-        return response()->json($content, $status);
+        $transactionList = $this->transactionRepository->fetchTransaction(($request->all()));
+        return response()->json($transactionList);
     }
 
     /**
@@ -91,7 +96,8 @@ class TransactionController extends Controller
         //
     }
 
-    public function calculateTransaction(calulate_validation $request, TransactionService $transaction_service){
+    public function calculateTransaction(calulate_validation $request, TransactionService $transaction_service)
+    {
 
 
 
@@ -99,11 +105,5 @@ class TransactionController extends Controller
             $res = $transaction_service->showAmountBreakdown($input);
 
             return response()->json($res);
-
-
-
-
-
-
     }
 }

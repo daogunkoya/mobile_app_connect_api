@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 
-
 class mm_user_confirm extends Model
 {
     //
@@ -54,5 +53,4 @@ class mm_user_confirm extends Model
     {
         return 'string';
     }
-
 }

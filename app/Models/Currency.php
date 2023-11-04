@@ -9,11 +9,10 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
-
+use App\Scopes\StoreScope; // Import the scope
 
 class Currency extends Model
 {
-
             protected $table = "mm_currency";
             protected $primaryKey = 'id_currency';
 
@@ -46,11 +45,12 @@ class Currency extends Model
             public static function boot()
             {
                 parent::boot();
+                // Apply the global scope
+                static::addGlobalScope(new StoreScope);
+
                 self::creating(function ($model) {
                     $model->id_currency = (string) Uuid::uuid4();
-
                 });
-
             }
 
 
@@ -72,8 +72,4 @@ class Currency extends Model
             // public function getCreatedAtAttribute($value){
             //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             // }
-
-
-
 }
-

@@ -10,10 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
-
 class Transaction extends Model
 {
-
             protected $table = "mm_transaction";
             protected $primaryKey = 'id_transaction';
 
@@ -73,8 +71,6 @@ class Transaction extends Model
                 parent::boot();
                 self::creating(function ($model) {
                     $model->id_transaction = (string) Uuid::uuid4();
-
-
                 });
             }
 
@@ -90,63 +86,74 @@ class Transaction extends Model
                 return 'string';
             }
 
-            public function getCreatedAtAttribute($value){
+            public function getCreatedAtAttribute($value)
+            {
                 return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
             }
 
-            public function getCountSenderReceiverAttribute($customer_id){
-                return receiver::where('customer_id',$customer_id)->count();
+            public function getCountSenderReceiverAttribute($customer_id)
+            {
+                return receiver::where('customer_id', $customer_id)->count();
             }
 
 
 
-            public function getUserAttribute($user_id){
+            public function getUserAttribute($user_id)
+            {
                 return optional(mm_user::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'user_email', 'created_at')->first())->toArray();
             }
 
 
 
 
-            public function getCurrencyAttribute($currency_id){
+            public function getCurrencyAttribute($currency_id)
+            {
 
                 return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
             }
 
-            public function getAmountSentAttribute($value){
+            public function getAmountSentAttribute($value)
+            {
 
-                return  number_format($value,2);
+                return  number_format($value, 2);
             }
 
 
-            public function getLocalAmountAttribute($value){
+            public function getLocalAmountAttribute($value)
+            {
 
-                return  number_format($value,2);
+                return  number_format($value, 2);
             }
 
-            public function getTotalAmountAttribute($value){
+            public function getTotalAmountAttribute($value)
+            {
 
-                return  number_format($value,2);
+                return  number_format($value, 2);
             }
 
-            public function getExchangeRateAttribute($value){
+            public function getExchangeRateAttribute($value)
+            {
 
-                return  number_format($value,2);
+                return  number_format($value, 2);
             }
-            public function getTotalCommissionAttribute($value){
+            public function getTotalCommissionAttribute($value)
+            {
 
-                return  number_format($value,2);
+                return  number_format($value, 2);
             }
-            public function getSenderNameAttribute($transaction_id){
+            public function getSenderNameAttribute($transaction_id)
+            {
                 $fname = Transaction::where('id_transaction', $transaction_id)->value('sender_fname');
                 $lname = Transaction::where('id_transaction', $transaction_id)->value('sender_lname');
-                return $fname.' '. $lname;
+                return $fname . ' ' . $lname;
             }
 
-            public function getReceiverNameAttribute($transaction_id){
+            public function getReceiverNameAttribute($transaction_id)
+            {
 
                 $fname = Transaction::where('id_transaction', $transaction_id)->value('receiver_fname');
                 $lname = Transaction::where('id_transaction', $transaction_id)->value('receiver_lname');
-                return $fname.' '. $lname;
+                return $fname . ' ' . $lname;
             }
 
             // public function getReceiverTransferTypeAttribute($value){
@@ -159,12 +166,9 @@ class Transaction extends Model
             //    return $value == 'Bank'?1:2;
             // }
 
-            public function setReceiverIdentityTypeIdAttribute($name_value){
+            public function setReceiverIdentityTypeIdAttribute($name_value)
+            {
 
-               return Bank::where('name_bank', $name_value)->value('id_bank');
+                return Bank::where('name_bank', $name_value)->value('id_bank');
             }
-
-
-
 }
-

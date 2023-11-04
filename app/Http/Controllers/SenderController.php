@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Services\Sender\SenderService;
 use App\Http\Requests\Sender\sender_validation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use App\Repositories\SenderRepository;
 
 class SenderController extends Controller
 {
     public $senderService;
-    public function __construct(SenderService $senderService)
+    public function __construct(SenderService $senderService, public SenderRepository $senderRepository)
     {
         $this->senderService = $senderService;
     }
@@ -23,9 +25,8 @@ class SenderController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        $service = new SenderService();
-        $list = $service->fetchSenders($request);
+
+        $list = $this->senderRepository->fetchSenders($request->all());
         return response()->json($list);
     }
 
@@ -45,7 +46,7 @@ class SenderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(sender_validation $request)
+    public function store(sender_validation $request):JsonResponse
     {
         //
         $service = new SenderService();
@@ -65,9 +66,17 @@ class SenderController extends Controller
     public function update(sender_validation $request, $sender_id)
     {
 
+        if(!$sender_id || empty($sender_id)) {
+            return response()->json(["sender_id"=>$sender_id], 400);
+        }
 
-        $agent_customer_id = $this->senderService->updateSender($request->all(), Auth::id(), $sender_id);
-        return response()->json(['agent_customer_id' => $sender_id]);
+       $response =  $this->senderService->updateSender($request->all(), Auth::id(), $sender_id);
+
+        if($response){
+            return response()->json(['agent_customer_id' => $sender_id]);
+        }
+        return response()->json(["sender_id"=>$sender_id], 400);
+
     }
 
     /**

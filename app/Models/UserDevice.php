@@ -51,6 +51,4 @@ class UserDevice extends Model
     {
         return 'string';
     }
-
-
 }

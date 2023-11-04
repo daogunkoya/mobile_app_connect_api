@@ -24,8 +24,8 @@ class MMLogConnect extends Model
         'request_origin',
         'response_code',
         'request_method',
-       
-        
+
+
     ];
 
     protected $keyType = 'string';
@@ -48,6 +48,4 @@ class MMLogConnect extends Model
     {
         return 'string';
     }
-
-
 }

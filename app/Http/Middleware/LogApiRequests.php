@@ -10,7 +10,7 @@ class LogApiRequests
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        
+
         Log::channel('api')->info('API request received', [
             'method' => $request->getMethod(),
             'path' => $request->getPathInfo(),

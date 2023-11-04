@@ -26,12 +26,10 @@ interface TaskServiceInterface
     public function removeUsers(Task $task, array $userIds);
 
     public function deleteTask(string $id): bool;
-   
+
     public function addTaskComment(): ?Task;
-   
-    public function updateProgress():bool;
-    
+
+    public function updateProgress(): bool;
+
     public function getReport(): ?Task;
-
-
 }

@@ -38,6 +38,4 @@ class mm_log_device extends Model
     {
         return 'string';
     }
-
-
 }

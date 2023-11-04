@@ -20,10 +20,10 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-            $status = $request->input('status')??NULL;
-            $assigned_to = $request->input('priority')??NULL;
-            $created_at = $request->input('deadline')??NULL;
-    
+            $status = $request->input('status') ?? null;
+            $assigned_to = $request->input('priority') ?? null;
+            $created_at = $request->input('deadline') ?? null;
+
         $tasks = $this->taskService->getAllTasks($status, $assigned_to, $created_at);
 
         return response()->json($tasks);

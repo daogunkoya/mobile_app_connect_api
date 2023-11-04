@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
-interface HttpClientContract{
+interface HttpClientContract
+{
     public function getRequest();
 }
