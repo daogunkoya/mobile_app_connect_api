@@ -16,6 +16,7 @@ class MMUser extends Authenticatable
     use HasFactory;
     use Notifiable;
 
+
     /**
      * The attributes that are mass assignable.
      *

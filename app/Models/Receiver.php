@@ -11,9 +11,11 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Receiver extends Model
 {
+    use HasFactory;
     protected $table = "mm_receiver";
     protected $primaryKey = 'id_receiver';
 
@@ -23,7 +25,6 @@ class Receiver extends Model
         'user_type',
         'sender_id',
         'receiver_title',
-        'receiver_name',
         'receiver_slug',
         'receiver_fname',
         'receiver_mname',
@@ -38,7 +39,7 @@ class Receiver extends Model
         'bank_id',
         'identity_type_id',
         'transfer_type',
-        'transfer_type_key',
+        //'transfer_type_key',
 //        'identity_type',
 //        'bank',
         'receiver_status',
@@ -46,7 +47,7 @@ class Receiver extends Model
 
     ];
 
-    protected $appends = ['bank','identity_type'];
+    protected $appends = ['receiver_name'];
     protected $keyType = 'string';
 
     public $incrementing = false;
@@ -86,6 +87,7 @@ class Receiver extends Model
         return 'string';
     }
 
+
     public function getCreatedAtAttribute($value)
     {
         return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
@@ -103,30 +105,35 @@ class Receiver extends Model
         return $this->belongsTo(Sender::class);
     }
 
-    public function banks()
+    public function bank()
     {
-        return $this->hasOne(Bank::class, 'id_bank','bank_id');
+        return $this->hasOne(Bank::class, 'id', 'bank_id' );
 
+    }
+
+    public function identity()
+    {
+        return $this->hasOne(AcceptableIdentity::class, 'id', 'identity_type_id');
 
     }
 
     public function getIdentityTypeAttribute($value)
     {
-        if(!$this->banks()->exists()) return ['key'=>"", 'value'=>""];
-        return $this->banks()->select('id_bank as key', 'name as value')->first()->toArray();
+        if (!$this->identity()->exists()) return ['key' => "", 'value' => ""];
+        return $this->identity()->select('id as key', 'name as value')->first()->toArray();
     }
 
 
-    public function getBankAttribute($value)
-    {
-        if(!$this->banks()->exists()) return ['key'=>"", 'value'=>""];
-        return $this->banks()->select('id_bank as key', 'name as value')->first()->toArray();
-    }
+//    public function getBankAttribute($value)
+//    {
+//        if (!$this->banks()->exists()) return ['key' => "", 'value' => ""];
+//        return $this->banks()->select('id as key', 'name as value')->first()->toArray();
+//    }
 
-    public function getTransferTypeAttribute($value): ?TransferType
-
-    {
-       // return TransferType::Bank;
-        return TransferType::tryFrom($value) ?? TransferType::None;
-    }
+//    public function getTransferTypeAttribute($value): ?TransferType
+//
+//    {
+//        // return TransferType::Bank;
+//        return TransferType::tryFrom($value) ?? TransferType::None;
+//    }
 }

@@ -46,7 +46,7 @@ class TransactionController extends Controller
      */
     public function store(transaction_create_validation $request, TransactionService $transaction_service)
     {
-        [$message, $status] = $transaction_service->storeTransaction($request->all());
+        [$message, $status] = $this->transactionRepository->storeTransaction($request->all());
         return response()->json($message, $status);
     }
 
@@ -79,9 +79,9 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(transaction_update_validation $request, TransactionService $transaction_service, $transaction_id)
+    public function update(transaction_update_validation $request, $transaction_id)
     {
-        [$message, $status] = $transaction_service->updateTransaction($request->all(), $transaction_id);
+        [$message, $status] = $this->transactionRepository->updateTransaction($request->all(), $transaction_id);
         return response()->json($message, $status);
     }
 

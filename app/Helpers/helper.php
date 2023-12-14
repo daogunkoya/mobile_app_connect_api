@@ -242,7 +242,7 @@ if (!function_exists('initialize_store_info')) {
     {
 
 
-        $store_id = \App\Models\MMUser::where('id_user', $user_id)->value('store_id');
+        $store_id = \App\Models\User::where('id_user', $user_id)->value('store_id');
 
 
       //resetting store url,store_id and store_name when we know it is admin

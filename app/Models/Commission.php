@@ -60,7 +60,7 @@ class Commission extends Model
 
             public function getUserAttribute($user_id)
             {
-                return optional(MMUser::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'email as user_email', 'created_at')->first())->toArray();
+                return optional(User::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'email as user_email', 'created_at')->first())->toArray();
             }
 
 

@@ -3,7 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
-use App\Models\MMUser;
 use App\Exceptions\InvalidRequestException;
 use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +16,7 @@ class RegisterUserService implements RegisterServiceInterface
 {
     public function registerUser(string $first_name, string $last_name, string $email, string $password): PersonalAccessTokenResult
     {
-        $user = MMUser::where('email', $email)->first();
+        $user = User::where('email', $email)->first();
 
         if ($user) {
             //throw new InvalidRequestException('Email address already exists');
@@ -26,7 +25,7 @@ class RegisterUserService implements RegisterServiceInterface
             ]);
         }
 
-        $user = MMUser::create([
+        $user = User::create([
             'first_name' => $first_name,
             'last_name' => $last_name,
             'email' => $email,

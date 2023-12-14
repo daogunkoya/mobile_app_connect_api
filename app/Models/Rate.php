@@ -10,9 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Rate extends Model
 {
+    use HasFactory;
+
     protected $table = "mm_rate";
     protected $primaryKey = 'id_rate';
 
@@ -62,7 +65,7 @@ class Rate extends Model
 
     public function getUserAttribute($user_id)
     {
-        return optional(MMUser::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'email as user_email', 'created_at')->first())->toArray();
+        return optional(User::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'email as user_email', 'created_at')->first())->toArray();
     }
 
     public function getMainRateAttribute($value)

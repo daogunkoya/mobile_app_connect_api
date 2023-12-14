@@ -31,12 +31,13 @@ class transaction_update_validation extends FormRequest
         $store_id = session()->get('process_store_id') ?? request()->process_store_id;
         return [
 
-            'receiver_name' => 'required',
+            'receiver_fname' => 'required',
+            'receiver_lname' => 'required',
             'receiver_phone' => 'required',
-            'receiver_bank' => 'required',
-            'receiver_bank_id' => 'exists:mm_bank,id_bank',
+//            'receiver_bank' => 'required',
+            //'receiver_bank_id' => 'exists:mm_bank,id',
             'receiver_identity_id' => 'required_if:receiver_transfer_type_key,2',
-            'receiver_transfer_type_key' => 'required',
+            'receiver_transfer_type' => 'required',
             'receiver_account_no' => 'required_if:receiver_transfer_type_key,1',
             'receiver_transfer_type' => 'required',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],

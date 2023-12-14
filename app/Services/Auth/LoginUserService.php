@@ -3,7 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
-use App\Models\MMUser;
 use App\Interfaces\Auth\LoginServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\PersonalAccessTokenResult;
@@ -30,7 +29,7 @@ class LoginUserService implements LoginServiceInterface
 
         $user = Auth::user();
 
-        if (!$user instanceof MMUser) {
+        if (!$user instanceof User) {
             return [];
         }
 

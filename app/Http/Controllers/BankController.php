@@ -32,7 +32,7 @@ class BankController extends Controller
     public function list():JsonResponse
     {
 
-        return response()->json($this->bankRepository->fetchBankIdList());
+        return response()->json($this->bankRepository->fetchBanksIdentityTypesList());
     }
 
     /**

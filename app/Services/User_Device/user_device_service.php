@@ -6,7 +6,7 @@ use App\Models\userDevice;
 use Illuminate\Support\Facades\DB;
 use App\Models\mm_log_device;
 use Illuminate\Support\Facades\Http;
-use App\Models\MMUser;
+use App\Models\User;
 use App\Services\sqs\sqs_service;
 use Carbon\Carbon;
 
@@ -86,7 +86,7 @@ class user_device_service
     public static function location_change_email($request, $user_id, $device_name)
     {
 
-        $user = MMUser::where('id_user', $user_id)->select('user_email', 'user_handle')->first();
+        $user = User::where('id_user', $user_id)->select('user_email', 'user_handle')->first();
         $user = !empty($user) ? $user->toArray() : [];
 
 

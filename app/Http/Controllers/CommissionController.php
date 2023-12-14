@@ -7,7 +7,7 @@ use App\Services\Commission\CommissionService;
 use App\Repositories\CommissionRepository;
 use App\Models\Commission;
 use App\Models\Currency;
-use App\Models\MMUser;
+use App\Models\User;
 use App\Http\Requests\Commissions\commissions_validation;
 
 class CommissionController extends Controller
@@ -27,7 +27,7 @@ class CommissionController extends Controller
     public function __construct(public CommissionRepository $commissionRepository,
                                 CommissionService $comissionService,
                                 Commission $commission,
-                                Currency $currency, MMUser $user)
+                                Currency $currency, User $user)
     {
 
                     $this->comissionService = $comissionService;

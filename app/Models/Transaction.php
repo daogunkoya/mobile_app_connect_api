@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Bank\TransferType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -12,163 +13,187 @@ use Carbon\Carbon;
 
 class Transaction extends Model
 {
-            protected $table = "mm_transaction";
-            protected $primaryKey = 'id_transaction';
+    protected $table = "mm_transaction";
+    protected $primaryKey = 'id_transaction';
 
-            protected $fillable = [
-            'id_transaction',
-            'store_id',
-            'user_id',
-            'currency_id',
-            'sender_id',
-            'receiver_id',
-            'sender_fname',
-            'sender_lname',
-            'receiver_fname',
-            'receiver_lname',
-            'agent_payment_id',
-            'receiver_phone',
-            'amount_sent',
-            'total_amount',
-            'local_amount',
-            'total_commission',
-            'agent_commission',
-            'exchange_rate',
-            'bou_rate',
-            'sold_rate' ,
-            'note',
-            'currency_income',
-            'transaction_status',
-            'transaction_type',
-            'sender_address',
-            'receiver_address',
-            'moderation_status' ,
-            'receiver_bank',
-            'receiver_bank_id',
-            'receiver_identity',
-            'receiver_identity_id',
-            'receiver_transfer_type',
-            'receiver_transfer_type_key',
-            'receiver_account_no',
+    protected $fillable = [
+        'id_transaction',
+        'transaction_code',
+        'store_id',
+        'user_id',
+        'currency_id',
+        'sender_id',
+        'receiver_id',
+        'sender_fname',
+        'sender_lname',
+        'receiver_fname',
+        'receiver_lname',
+        'agent_payment_id',
+        'receiver_phone',
+        'amount_sent',
+        'total_amount',
+        'local_amount',
+        'total_commission',
+        'agent_commission',
+        'exchange_rate',
+        'bou_rate',
+        'sold_rate',
+        'note',
+        'currency_income',
+        'transaction_status',
+        'transaction_type',
+        'sender_address',
+        'receiver_address',
+        'moderation_status',
+        'receiver_bank_id',
+        'receiver_identity_id',
+        'receiver_transfer_type',
+        'receiver_account_no',
 
 
-            ];
+    ];
 
 
-                protected $keyType = 'string';
+    protected $keyType = 'string';
 
-                public $incrementing = false;
+    public $incrementing = false;
 
-            //date serialization undo
-            protected function serializeDate(DateTimeInterface $date)
-            {
-                return $date->format('Y-m-d H:i:s');
-            }
-
-
-            public static function boot()
-            {
-                parent::boot();
-                self::creating(function ($model) {
-                    $model->id_transaction = (string) Uuid::uuid4();
-                });
-            }
+    //date serialization undo
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
 
-            public function getRouteKeyName()
-            {
-                return 'uuid';
-            }
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            $model->id_transaction = (string)Uuid::uuid4();
+        });
+    }
 
 
-            public function getKeyType()
-            {
-                return 'string';
-            }
-
-            public function getCreatedAtAttribute($value)
-            {
-                return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
-            }
-
-            public function getCountSenderReceiverAttribute($customer_id)
-            {
-                return receiver::where('customer_id', $customer_id)->count();
-            }
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
 
 
+    public function getKeyType()
+    {
+        return 'string';
+    }
 
-            public function getUserAttribute($user_id)
-            {
-                return optional(mm_user::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'user_email', 'created_at')->first())->toArray();
-            }
+    public function getCreatedAtAttribute($value)
+    {
+        return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
+    }
 
-
-
-
-            public function getCurrencyAttribute($currency_id)
-            {
-
-                return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
-            }
-
-            public function getAmountSentAttribute($value)
-            {
-
-                return  number_format($value, 2);
-            }
+    public function getCountSenderReceiverAttribute($customer_id)
+    {
+        return receiver::where('customer_id', $customer_id)->count();
+    }
 
 
-            public function getLocalAmountAttribute($value)
-            {
+    public function getUserAttribute($user_id)
+    {
+        return optional(mm_user::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'user_email', 'created_at')->first())->toArray();
+    }
 
-                return  number_format($value, 2);
-            }
 
-            public function getTotalAmountAttribute($value)
-            {
+    public function getCurrencyAttribute($currency_id)
+    {
 
-                return  number_format($value, 2);
-            }
+        return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
+    }
 
-            public function getExchangeRateAttribute($value)
-            {
+    public function getAmountSentAttribute($value)
+    {
 
-                return  number_format($value, 2);
-            }
-            public function getTotalCommissionAttribute($value)
-            {
+        return number_format($value, 2);
+    }
 
-                return  number_format($value, 2);
-            }
-            public function getSenderNameAttribute($transaction_id)
-            {
-                $fname = Transaction::where('id_transaction', $transaction_id)->value('sender_fname');
-                $lname = Transaction::where('id_transaction', $transaction_id)->value('sender_lname');
-                return $fname . ' ' . $lname;
-            }
+    public function getTransactionTypeAttribute($value):string
+    {
+        return $value == 1?'Agent':'Customer';
+    }
 
-            public function getReceiverNameAttribute($transaction_id)
-            {
 
-                $fname = Transaction::where('id_transaction', $transaction_id)->value('receiver_fname');
-                $lname = Transaction::where('id_transaction', $transaction_id)->value('receiver_lname');
-                return $fname . ' ' . $lname;
-            }
+    public function getLocalAmountAttribute($value)
+    {
 
-            // public function getReceiverTransferTypeAttribute($value){
+        return number_format($value, 2);
+    }
 
-            //    return $value == 1? 'Bank':"Pickup";
-            // }
+    public function getTotalAmountAttribute($value)
+    {
 
-            // public function setReceiverTransferTypeAttribute($value){
+        return number_format($value, 2);
+    }
 
-            //    return $value == 'Bank'?1:2;
-            // }
+    public function getExchangeRateAttribute($value)
+    {
 
-            public function setReceiverIdentityTypeIdAttribute($name_value)
-            {
+        return number_format($value, 2);
+    }
 
-                return Bank::where('name_bank', $name_value)->value('id_bank');
-            }
+    public function getTotalCommissionAttribute($value)
+    {
+
+        return number_format($value, 2);
+    }
+
+    public function getSenderNameAttribute($transaction_id)
+    {
+        $fname = Transaction::where('id_transaction', $transaction_id)->value('sender_fname');
+        $lname = Transaction::where('id_transaction', $transaction_id)->value('sender_lname');
+        return $fname . ' ' . $lname;
+    }
+
+    public function getReceiverNameAttribute($transaction_id)
+    {
+
+        $fname = Transaction::where('id_transaction', $transaction_id)->value('receiver_fname');
+        $lname = Transaction::where('id_transaction', $transaction_id)->value('receiver_lname');
+        return $fname . ' ' . $lname;
+    }
+
+
+    public function bank()
+    {
+        return $this->hasOne(Bank::class, 'id', 'receiver_bank_id');
+
+    }
+    public function setReceiverIdentityTypeIdAttribute($name_value)
+    {
+
+        return Bank::where('name_bank', $name_value)->value('id_bank');
+    }
+
+    public function identity()
+    {
+        return $this->hasOne(AcceptableIdentity::class, 'id', 'identity_type_id');
+
+    }
+
+    public function getIdentityTypeAttribute($value)
+    {
+        if (!$this->identity()->exists()) return ['key' => "", 'value' => ""];
+        return $this->identity()->select('id as key', 'name as value')->first()->toArray();
+    }
+
+
+    public function getBankAttribute($value)
+    {
+        if (!$this->banks()->exists()) return ['key' => "", 'value' => ""];
+        return $this->banks()->select('id as key', 'name as value')->first()->toArray();
+    }
+
+    public function getTransferTypeAttribute($value): ?TransferType
+
+    {
+        // return TransferType::Bank;
+        return TransferType::tryFrom($value) ?? TransferType::None;
+    }
 }

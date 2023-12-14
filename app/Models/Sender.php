@@ -10,9 +10,12 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Sender extends Model
 {
+    use HasFactory;
+
     protected $table = "mm_sender";
     protected $primaryKey = 'id_sender';
     protected $appends = ['count_sender_receivers'];
@@ -94,6 +97,11 @@ class Sender extends Model
     public function receiver()
     {
         return $this->hasMany(Receiver::class, 'sender_id', 'sender_id');
+    }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class, 'id','address_id');
     }
 
     public function getTransferTypeAttribute(){

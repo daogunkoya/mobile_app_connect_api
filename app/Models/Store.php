@@ -8,9 +8,12 @@ use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Store extends Model
 {
+    use HasFactory;
+
             protected $table = "mm_store";
             protected $primaryKey = 'id_store';
 

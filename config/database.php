@@ -63,6 +63,16 @@ return [
             ]) : [],
         ],
 
+        'mysql_testing' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST_TEST', '127.0.0.1'), // Use the test-specific host
+            'port' => env('DB_PORT_TEST', '3306'), // Use the test-specific port
+            'database' => env('DB_DATABASE_TEST', 'forge'), // Use the test-specific database name
+            'username' => env('DB_USERNAME_TEST', 'forge'), // Use the test-specific username
+            'password' => env('DB_PASSWORD_TEST', ''), // Use the test-specific password
+            // ... other configuration options for testing
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

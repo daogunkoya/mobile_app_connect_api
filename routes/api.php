@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
-use App\Models\MMUser;
 use Illuminate\Support\Facades\Log;
 
 /*
@@ -22,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 // });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return MMUser::get()->toArray();
+    return User::get()->toArray();
 
 });
 
@@ -106,6 +105,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@index');
         Route::post('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@store');
         Route::put('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
+        Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
+        Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
 
         //wil be removed on the mobile app
         Route::get('/customer/{id}/receivers', 'App\Http\Controllers\ReceiverController@index');

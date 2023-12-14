@@ -39,7 +39,7 @@ class CommissionRepository
 //        ];
 //    }
 
-    public function fetchCommissionValue($input)
+    public function fetchCommissionValue($input):array
     {
         $sendAmount = (float)$input['amount'] ?? 0;
         $conversionType = (integer)$input['conversion_type'] ?? 1;

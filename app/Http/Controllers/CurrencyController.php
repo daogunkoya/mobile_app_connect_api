@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\Currency\CurrencyService;
 use App\Models\Currency;
-use App\Models\MMUser;
+use App\Models\User;
 use App\Http\Requests\currency\currency_validation;
 use Illuminate\Http\JsonResponse;
 
@@ -22,7 +22,7 @@ class CurrencyController extends Controller
      */
 
 
-    public function __construct(CurrencyService $currencyService, Currency $mmCurrency, MMUser $user)
+    public function __construct(CurrencyService $currencyService, Currency $mmCurrency, User $user)
     {
         $this->currencyService = $currencyService;
         $this->mmCurrency = $mmCurrency;

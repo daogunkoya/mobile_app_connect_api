@@ -1,10 +1,9 @@
 <?php
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Currency;
 use App\Models\User;
 use App\Repositories\CurrencyRepository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CurrencyRepositoryTest extends TestCase

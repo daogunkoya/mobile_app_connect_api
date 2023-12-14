@@ -7,7 +7,7 @@ use Exception;
 use App\Models\bd_item_connect;
 use App\Models\MMUser_connect;
 use App\Models\bd_item_deal;
-use App\Models\MMUser;
+use App\Models\User;
 use App\Models\Domain;
 use App\Models\store;
 use App\Models\bd_order;
@@ -102,7 +102,7 @@ class Helper
 
     public static function get_row_user_connect($cursor)
     {
-        if (!MMUser_connect::where('id_connect', $cursor)->exists()) {
+        if (!User_connect::where('id_connect', $cursor)->exists()) {
             return response()->json(['errors' => ['cursor is not valid'], 404]);
         }
         if ($cursor) {
@@ -133,21 +133,21 @@ class Helper
 
     public static function get_row_user($cursor)
     {
-        if (!MMUser::where('id_item', $cursor)->exists()) {
+        if (!User::where('id_item', $cursor)->exists()) {
             return response()->json(['errors' => ['cursor is not valid'], 404]);
         }
         if ($cursor) {
-            return  MMUser::where('id_item', $cursor)->value('row_number');
+            return  User::where('id_item', $cursor)->value('row_number');
         }
     }
 
     public static function get_row_user_alert($cursor)
     {
-        if (!MMUser_alert::where('id_alert', $cursor)->exists()) {
+        if (!User_alert::where('id_alert', $cursor)->exists()) {
             return response()->json(['errors' => ['cursor is not valid'], 404]);
         }
         if ($cursor) {
-            return  MMUser_alert::where('id_alert', $cursor)->value('row_number');
+            return  User_alert::where('id_alert', $cursor)->value('row_number');
         }
     }
 
@@ -466,7 +466,7 @@ class Helper
         $rate_store = !empty($groups['stores'][0]) ? bd_group::where('id_group', $groups['stores'][0])->value('group_rate') : 10.00;
         $rate_store = $rate_store == 0 ? 10 : $rate_store;
 
-        $rate_user = !empty($item_user_id) ? MMUser::where('id_user', $item_user_id)->value('user_rate') : "";
+        $rate_user = !empty($item_user_id) ? User::where('id_user', $item_user_id)->value('user_rate') : "";
 
         $rate_item = $item_rate ?? 10;           //source could be item_rate or item_rate_main
         $rate_item = $rate_item == 0 ? 10 : $rate_item;
@@ -489,7 +489,7 @@ class Helper
     public static function get_discussion_rate($item_rate, $item_user_id, $all = null)
     {
 
-        $rate_user = MMUser::where('id_user', $item_user_id)->value('user_rate');
+        $rate_user = User::where('id_user', $item_user_id)->value('user_rate');
         $rate_item = $item_rate == 0 ? 10 : $item_rate;
         $rate_overall = ($rate_user + $rate_item) / 2;
         $rate_overall = round($rate_overall, 2);
@@ -605,7 +605,7 @@ class Helper
     {
 
 
-                    $store_id = \App\Models\MMUser::where('id_user', $user_id)->value('store_id');
+                    $store_id = \App\Models\User::where('id_user', $user_id)->value('store_id');
 
 
                     //resetting store url,store_id and store_name when we know it is admin
@@ -632,8 +632,8 @@ class Helper
     public static function store_admin($user_email)
     {
 
-        if (MMUser::where('user_role_type', 3)->where('user_email', $request->user_email)->exists()) {
-            $user_id = MMUser::where('user_role_type', 3)->where('user_email', $request->user_email)->value('id_user');
+        if (User::where('user_role_type', 3)->where('user_email', $request->user_email)->exists()) {
+            $user_id = User::where('user_role_type', 3)->where('user_email', $request->user_email)->value('id_user');
             $store = Helper::initialize_store_info($user_id);
         }
     }
@@ -647,8 +647,8 @@ class Helper
         $first_store_id = session()->get('process_store_id') ?? request()->process_store_id;
         $first_store_name = session()->get('process_store_name') ?? request()->process_store_name;
 //initialize session with user store_id
-        if (MMUser::where('user_role_type', 3)->where('user_email', $user_email)->exists()) {
-            $user_id = MMUser::where('user_role_type', 3)->where('user_email', $user_email)->value('id_user');
+        if (User::where('user_role_type', 3)->where('user_email', $user_email)->exists()) {
+            $user_id = User::where('user_role_type', 3)->where('user_email', $user_email)->value('id_user');
             $store = Helper::initialize_store_info($user_id);
         }
 
@@ -657,7 +657,7 @@ class Helper
 
 
             //check if it is admin domain or web page
-        if (MMUser::where('store_admin_type', 1)->where('store_id', $first_store_id)->exists()) {
+        if (User::where('store_admin_type', 1)->where('store_id', $first_store_id)->exists()) {
             return true;
         }
 
@@ -667,7 +667,7 @@ class Helper
         }
 
 
-        if (!MMUser::where('store_id', $user_store_id)->where('user_email', $user_email)->exists()) {
+        if (!User::where('store_id', $user_store_id)->where('user_email', $user_email)->exists()) {
             return false;
         }
 

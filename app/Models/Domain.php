@@ -9,9 +9,11 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Domain extends Model
 {
+    use HasFactory;
             protected $table = "mm_domain";
             protected $primaryKey = 'id_domain';
 

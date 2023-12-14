@@ -26,6 +26,7 @@ class ApiDataLoggerMiddleware
     }
     public function terminate($request, $response)
     {
+        $laravelStart = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
         $origin_referer = request()->headers->get('referer');
         $full_url = $request->fullUrl();
         $origin = parse_url($full_url);
@@ -50,7 +51,7 @@ class ApiDataLoggerMiddleware
         $data['Origin_referer'] = $origin_referer ;
         $data['api-request'] =  $request->fullUrl();
         $data['store_name'] =   $request->process_store_name ?? '';
-        $data['Duration'] = number_format($end_time - LARAVEL_START, 3) ;
+        $data['Duration'] = number_format($end_time -  $laravelStart, 3) ;
         $data['IP Address'] =  $request->ip();
         $data['store_id'] =      $request->process_store_id ?? '';
         $data['response_code'] =   $response->status();

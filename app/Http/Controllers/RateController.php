@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\RateRepository;
 use Illuminate\Http\Request;
 use App\Services\Rate\RateService;
 use App\Models\Rate;
 use App\Models\Currency;
-use App\Models\MMUser;
+use App\Models\User;
 use App\Http\Requests\Rate\rate_validation;
 
 class RateController extends Controller
@@ -23,7 +24,8 @@ class RateController extends Controller
      */
 
 
-    public function __construct(RateService $rateService, Currency $currency, MMUser $user, Rate $rate)
+    public function __construct(public RateRepository $rateRepository,
+        RateService $rateService, Currency $currency, User $user, Rate $rate)
     {
 
         $this->currency = $currency;
@@ -116,7 +118,7 @@ class RateController extends Controller
 
 
 
-        $response = $this->rateService::todaysRate();
+        $response = $this->rateRepository::todaysRate();
 
         return response()->json($response, 200);
     }

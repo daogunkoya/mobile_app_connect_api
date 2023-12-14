@@ -2,85 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\ReceiverRepository;
 use Illuminate\Http\Request;
 use App\Services\Receiver\ReceiverService;
+use App\Facades\ReceiverServiceFacade;
 use App\Http\Requests\Receivers\receiver_validation;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Http\Resources\ReceiverResource;
 
 class ReceiverController extends Controller
 {
-    public $receiverService;
-    public function __construct(ReceiverService $receiverService, public ReceiverRepository $receiverRepository)
+
+
+    public function __construct(public ReceiverService $receiverService)
     {
         $this->receiverService = $receiverService;
     }
 
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request, $customer_id)
+    public function index(Request $request, $customer_id): JsonResponse
     {
-        //
+        $receiverList = ReceiverServiceFacade::fetchReceiver($request->all(), $customer_id);
 
-        $list = $this->receiverRepository->fetchReceiver($request->all(), $customer_id);
-        return response()->json($list);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(receiver_validation $request, $id)
-    {
-        //
-
-
-        $receiver_id = $this->receiverService->createReceiver($request->all(), $id);
-        return response()->json(['receiver_id' => $receiver_id]);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($receiver_id)
-    {
+        return response()->json([
+            'receiver_count' =>  $receiverList['receiver_count'],
+            'receiver' =>  ReceiverResource::collection($receiverList['receiver']),
+            'current_page' =>  $receiverList['current_page'],
+            'last_page' =>  $receiverList['last_page'],
+            'total' =>  $receiverList['total'],
+            'per_page' =>  $receiverList['per_page'],
+            'banks_id_list'=> $receiverList['banks_id_list']
+        ]);
     }
 
 
-    public function update(receiver_validation $request, $customer_id, $receiver_id)
+    public function store(receiver_validation $request, $id): JsonResponse
     {
-
-
-        $response = $this->receiverService->updateReceiver($request->all(), $receiver_id);
-        return response()->json(['receiver_id' => $receiver_id]);
+        $receiver_id = ReceiverServiceFacade::createReceiver($request->all(), $id);
+        return response()->json(['receiver_id' => $receiver_id], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+
+    public function update(receiver_validation $request, $customerId, $receiverId): JsonResponse
     {
-        //
+        $response = $this->receiverService->updateReceiver($request->all(), $receiverId);
+        return response()->json(['receiverId' => $receiverId]);
     }
+
+    public function show(Request $request, $senderId, $receiverId): JsonResponse
+    {
+        $receiver = ReceiverServiceFacade::showReceiver($receiverId);
+        return response()->json( new ReceiverResource(($receiver)));
+    }
+
+    public function destroy(Request $request, $receiverId): JsonResponse
+    {
+        $response = $this->receiverService->deleteReceiver($receiverId);
+        return response()->json(ReceiverServiceFacade::deleteReceiver($receiverId), 204);
+    }
+
 }

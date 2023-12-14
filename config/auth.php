@@ -66,11 +66,11 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\MMUser::class,
+            'model' => App\Models\User::class,
         ],
         'mm_user' => [
             'driver' => 'eloquent',
-            'model' => App\Models\MMUser::class,
+            'model' => App\Models\User::class,
         ],
 
         // 'users' => [
@@ -131,10 +131,10 @@ return [
     //     'refresh_token_ttl' => env('PASSPORT_REFRESH_TOKEN_TTL', 1440),
     //     'routes' => true,
     //     'user' => [
-    //         'model' => App\Models\MMUser::class, // Update the user model here
+    //         'model' => App\Models\User::class, // Update the user model here
     //         'email' => 'email',
     //         'password' => 'password',
     //     ],
-    // ],   
+    // ],
 
 ];

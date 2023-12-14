@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Hasone;
 //use Laravel\Sanctum\HasApiTokens;
 use Laravel\Passport\HasApiTokens;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -33,9 +34,12 @@ class User extends Authenticatable
       //  'id',
         'first_name',
         'last_name',
+        'user_name',
+        'user_handle',
+        'store_id',
         'email',
         'password',
-        'active_currency_id'
+        'user_role_type'
     ];
 
     /**
@@ -65,6 +69,16 @@ class User extends Authenticatable
         // Generate a UUID for new records
         static::creating(function ($model) {
             $model->id_user = (string) Uuid::uuid4();
+
+            $model->user_name = Str::slug($model->first_name . ' ' . $model->last_name, '-');
+
+            // Check if the generated username already exists
+            $count = 1;
+            while (static::where('user_name', $model->user_name)->exists()) {
+                $model->user_name = Str::slug($model->first_name . ' ' . $model->last_name, '-') . '-' . $count;
+                $count++;
+            }
+
         });
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Receiver\ReceiverService;
+use App\Services\Receiver\ReceiverServiceInterface;
 use Illuminate\Support\ServiceProvider;
 use App\Interfaces\Auth\LoginServiceInterface;
 use App\Interfaces\Auth\RegisterServiceInterface;
@@ -10,6 +12,8 @@ use App\Services\Auth\RegisterUserService;
 use Illuminate\Support\Facades\Log;
 use App\Logging\DatabaseLogger;
 use Monolog\Logger;
+use App\Services\Sender\SenderService;
+use App\Services\Sender\SenderServiceInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        $this->app->bind(SenderServiceInterface::class, SenderService::class);
+        $this->app->bind(ReceiverServiceInterface::class, ReceiverService::class);
 
         $this->app->bind(LoginServiceInterface::class, LoginUserService::class);
         $this->app->bind(RegisterServiceInterface::class, RegisterUserService::class);

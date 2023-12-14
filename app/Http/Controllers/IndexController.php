@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sender;
+use App\Repositories\RateRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class IndexController extends Controller
 {
 
     public function __construct(public SenderRepository $senderRepository,
+                               public RateRepository $rateRepository,
                                public TransactionRepository $transactionRepository){
     }
 
@@ -23,8 +25,9 @@ class IndexController extends Controller
 
         $senders = $type !== 'transactions' ? $this->senderRepository->fetchSenders($input) : [];
         $transactions = $type !== 'senders' ? $this->transactionRepository->fetchTransaction($input) : [];
+        $exchangeRate =  $this->rateRepository::todaysRate();
 
-        return response()->json(['senders' => $senders, 'transactions' => $transactions]);
+        return response()->json(['senders' => $senders, 'transactions' => $transactions, 'rate'=>$exchangeRate]);
     }
 
 
