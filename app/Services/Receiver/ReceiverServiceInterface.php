@@ -4,11 +4,12 @@ namespace App\Services\Receiver;
 
 use App\Models\Receiver;
 use App\Repositories\ReceiverRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ReceiverServiceInterface
 {
 
-    public function fetchReceiver($input, $sender_id):array;
+    public function fetchReceiver($sender):LengthAwarePaginator;
 
     public function createReceiver($input, $sender_id): string;
 

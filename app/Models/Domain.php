@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Http\Request;
@@ -60,9 +61,9 @@ class Domain extends Model
                     $model->domain_host = $domain_host;
 
                       // generate uniqu slug
-                      $slug = str_slug($model->domain_name) . mt_rand(100, 1000);
-                    while (bd_domain::where('domain_slug', $slug)->exists()) {
-                        $slug = str_slug($model->domain_name) . mt_rand(100, 1000);
+                      $slug = Str::slug($model->domain_name) . mt_rand(100, 1000);
+                    while (self::where('domain_slug', $slug)->exists()) {
+                        $slug = Str::slug($model->domain_name) . mt_rand(100, 1000);
                     }
                       $model->domain_slug = $slug;
                 });

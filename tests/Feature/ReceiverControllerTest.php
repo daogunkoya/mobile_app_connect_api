@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\AcceptableIdentity;
 use App\Models\Bank;
+use JetBrains\PhpStorm\NoReturn;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -15,11 +17,12 @@ use App\Models\Sender;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Artisan;
 use Database\Seeders\DomainSeeder;
-use Database\Seeders\StoreSeeder;
+use Database\Seeders\RateSeeder;
+use  Faker\Generator;
 
 class ReceiverControllerTest extends TestCase
 {
-    protected $faker;
+    protected Generator $faker;
 
    // use RefreshDatabase;
 
@@ -59,8 +62,10 @@ class ReceiverControllerTest extends TestCase
 
 
     /** @test */
-    public function it_can_create_a_receiver()
+  public function it_can_create_a_receiver():void
     {
+
+        $domain = Domain::factory()->create();
 // Create task data
         $receiverData = [
             "process_store_id"=>"2bda0c37-4eac-44e5-a014-6c029d76dc62",
@@ -87,6 +92,7 @@ class ReceiverControllerTest extends TestCase
         // Make a POST request to create a task
         $response = $this->postJson('v1/sender/1d58e4d4-175c-4f7d-8e57-aa2695127f57/receivers/', $receiverData);
 
+       // dd($response);
         // Assert the response status
         $response->assertStatus(201); // Adjust based on your expected response status
 
@@ -96,7 +102,7 @@ class ReceiverControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_a_receiver()
+    public function it_can_show_a_receiver():void
     {
         // Create a test task
         $receiver = Receiver::factory()->create();
@@ -111,7 +117,7 @@ class ReceiverControllerTest extends TestCase
     }
 //
     /** @test */
-    public function it_can_update_a_receiver()
+    public function it_can_update_a_receiver():void
     {
         // Create a test task
         $receiver = Receiver::factory()->create();
@@ -124,7 +130,7 @@ class ReceiverControllerTest extends TestCase
     }
 //
     /** @test */
-    public function it_can_delete_a_receiver()
+    public function it_can_delete_a_receiver():void
     {
         // Create a test task
         $receiver = Receiver::factory()->create();

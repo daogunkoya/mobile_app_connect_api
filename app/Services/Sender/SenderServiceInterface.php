@@ -11,12 +11,13 @@ use App\Models\mm_user;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\SenderRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface SenderServiceInterface
 {
 
 
-    public function fetchSenders($input):array;
+    public function fetchSenders($input):LengthAwarePaginator;
 
 
     //create new customer

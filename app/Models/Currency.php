@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -13,6 +14,8 @@ use App\Scopes\StoreScope; // Import the scope
 
 class Currency extends Model
 {
+
+    use hasFactory;
             protected $table = "mm_currency";
             protected $primaryKey = 'id_currency';
 

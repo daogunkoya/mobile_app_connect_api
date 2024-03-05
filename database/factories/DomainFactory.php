@@ -37,7 +37,7 @@ class DomainFactory extends Factory
             'aws_ssl_arn' =>  "test",
             'aws_resource_record' =>  "test",
             'domain_ssl_verified' => 1,
-            'domain_cname_verified' =>  "test",
+            'domain_cname_verified' => 1,
             // Add other fields as needed
         ];
     }

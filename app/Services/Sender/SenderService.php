@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\SenderRepository;
 use App\Services\Sender\SenderServiceInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class SenderService implements SenderServiceInterface
 {
@@ -20,7 +22,7 @@ class SenderService implements SenderServiceInterface
 
 }
     //fetch customer
-    public function fetchSenders($input):array
+    public function fetchSenders($input):LengthAwarePaginator
     {
 
         return $this->senderRepository->fetchSenders($input);

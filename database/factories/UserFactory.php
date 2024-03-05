@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
@@ -22,9 +23,10 @@ class UserFactory extends Factory
     {
         return [
            // 'id'=> (string) Uuid::uuid4(),
-            'first_name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'store_id' => Store::factory()->create()->id_store,
             //'name'=>'test',
-            'last_name' => fake()->name(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password

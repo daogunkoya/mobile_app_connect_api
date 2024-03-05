@@ -34,13 +34,17 @@ class receiver_validation extends FormRequest
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
         'receiver_title' => 'required',
         'receiver_fname' => 'required',
-        'receiver_lname' => 'required', 'receiver_address' => 'required',
+        'receiver_mname' => 'required',
+        'receiver_lname' => 'required',
+        'receiver_address' => 'required',
+        'receiver_email' => 'required|email',
         'bank_id' => ['required', Rule::exists('mm_bank','id')],
+        'identity_type_id' => 'string',
+        'currency_id' => 'string',
         'account_number' => 'required',
-        'transfer_type' => 'required',
-//        'receiver_dob' => 'required',
-//        'receiver_email' => 'required|email',
-       // 'transfer_type' => 'required',
+        'receiver_phone' => 'string',
+        'transfer_type' => 'string | required',
+        'photo_id' => 'string',
 
 
 

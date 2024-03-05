@@ -32,13 +32,17 @@ class sender_validation extends FormRequest
         return [
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-        'sender_title' => 'required',
-        'sender_fname' => 'required',
-        'sender_lname' => 'required',
+        'sender_title' => 'required|string',
+        'sender_fname' => 'required|string',
+        'sender_lname' => 'required|string',
+        'sender_mname' => 'string',
         'sender_dob' => 'required',
         'sender_email' => 'required|email',
         'sender_address' => 'required',
         'sender_postcode' => 'required',
+        'sender_phone' => 'required',
+        'sender_mobile' => 'required',
+        'photo_id' => 'string',
 
 
         ];

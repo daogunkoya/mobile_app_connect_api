@@ -22,7 +22,7 @@ class CreateMmUserTable extends Migration
             $table->string('store_id')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
-            $table->integer('user_role_type')->nullable();
+            $table->integer('user_role_type')->default(1);
             $table->string('remember_token', 100)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->timestamps();
             $table->string('user_handle')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();

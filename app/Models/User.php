@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enum\UserRoleType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,7 +33,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user'; // Set the primary key column name
 
     protected $fillable = [
-      //  'id',
+        //  'id',
         'first_name',
         'last_name',
         'user_name',
@@ -59,6 +61,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'user_role_type' => UserRoleType::class
     ];
 
 
@@ -68,7 +71,7 @@ class User extends Authenticatable
 
         // Generate a UUID for new records
         static::creating(function ($model) {
-            $model->id_user = (string) Uuid::uuid4();
+            $model->id_user = (string)Uuid::uuid4();
 
             $model->user_name = Str::slug($model->first_name . ' ' . $model->last_name, '-');
 
@@ -82,6 +85,11 @@ class User extends Authenticatable
         });
     }
 
+    public function sender(): HasMany
+    {
+        return $this->hasMany(Sender::class, 'user_id');
+    }
+
     public function rate(): HasMany
     {
         return $this->hasMany(Rate::class, 'user_id');
@@ -90,5 +98,18 @@ class User extends Authenticatable
     public function currency(): HasOne
     {
         return $this->hasOne(Currency::class, 'active_currency_id');
+    }
+
+    public function receivers():HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Receiver::class,
+            Sender::class,
+            'user_id', // Foreign key on the senders table
+            'sender_id', // Foreign key on the receivers table
+            'id_user', // Local key on the users table
+            'id_sender' // Local key on the senders table
+        );
+
     }
 }

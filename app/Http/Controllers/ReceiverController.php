@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\ReceiverDto;
+use App\Models\Receiver;
+use App\Models\Sender;
 use Illuminate\Http\Request;
 use App\Services\Receiver\ReceiverService;
 use App\Facades\ReceiverServiceFacade;
 use App\Http\Requests\Receivers\receiver_validation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Http\Resources\ReceiverResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReceiverController extends Controller
 {
@@ -19,39 +23,34 @@ class ReceiverController extends Controller
     }
 
 
-    public function index(Request $request, $customer_id): JsonResponse
+    public function index(Request $request,  $senderId): JsonResponse
     {
-        $receiverList = ReceiverServiceFacade::fetchReceiver($request->all(), $customer_id);
 
-        return response()->json([
-            'receiver_count' =>  $receiverList['receiver_count'],
-            'receiver' =>  ReceiverResource::collection($receiverList['receiver']),
-            'current_page' =>  $receiverList['current_page'],
-            'last_page' =>  $receiverList['last_page'],
-            'total' =>  $receiverList['total'],
-            'per_page' =>  $receiverList['per_page'],
-            'banks_id_list'=> $receiverList['banks_id_list']
-        ]);
+        $receiverDataList = ReceiverServiceFacade::fetchReceiver($senderId);
+        $receiverResource = ReceiverResource::collection(ReceiverDto::fromEloquentModelCollection($receiverDataList));
+        return $receiverResource->response()->setStatusCode(Response::HTTP_OK);
     }
 
 
-    public function store(receiver_validation $request, $id): JsonResponse
+    public function store(receiver_validation $request, Sender $sender): JsonResponse
     {
-        $receiver_id = ReceiverServiceFacade::createReceiver($request->all(), $id);
-        return response()->json(['receiver_id' => $receiver_id], 201);
+        $sender->sender_id = $sender->id_sender;
+        $receiver = $sender->receiver()->create($request->validated());
+        return (new ReceiverResource($receiver))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
 
-    public function update(receiver_validation $request, $customerId, $receiverId): JsonResponse
+    public function update( Sender $sender, $receiverId, receiver_validation $request)
     {
-        $response = $this->receiverService->updateReceiver($request->all(), $receiverId);
-        return response()->json(['receiverId' => $receiverId]);
+        $receiver = Receiver::find($receiverId);
+        $receiverUpdated = $receiver->update($request->validated());
+        return (new ReceiverResource($receiver->fresh()))->response()->setStatusCode(Response::HTTP_OK);
     }
 
     public function show(Request $request, $senderId, $receiverId): JsonResponse
     {
-        $receiver = ReceiverServiceFacade::showReceiver($receiverId);
-        return response()->json( new ReceiverResource(($receiver)));
+        $receiver = Receiver::find($receiverId);
+        return (new ReceiverResource($receiver))->response()->setStatusCode(Response::HTTP_OK);
     }
 
     public function destroy(Request $request, $receiverId): JsonResponse

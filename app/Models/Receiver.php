@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\Bank\TransferType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,13 +17,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Receiver extends Model
 {
     use HasFactory;
+
     protected $table = "mm_receiver";
     protected $primaryKey = 'id_receiver';
 
     protected $fillable = [
         'store_id',
-        'user_id',
-        'user_type',
         'sender_id',
         'receiver_title',
         'receiver_slug',
@@ -52,11 +52,17 @@ class Receiver extends Model
 
     public $incrementing = false;
 
+//    public function scopeFilter( Builder $query, array $filter):void
+//    {
+//
+//        $query->when($filter['search']??false, fn($query, $search)=>
+//            $query->where('receiver_fname', 'like', $search)
+//                ->orWhere('receiver_lname', 'like', $search)
+//        );
+//
+//    }
+
     //date serialization undo
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
 
 
     public static function boot()
@@ -64,6 +70,7 @@ class Receiver extends Model
         parent::boot();
         self::creating(function ($model) {
             $model->id_receiver = (string)Uuid::uuid4();
+            $model->store_id = request()->process_store_id ?? '2bda0c37-4eac-44e5-a014-6c029d76dc62';
 
 
             // generate uniqu slug
@@ -73,6 +80,44 @@ class Receiver extends Model
             }
             $model->receiver_slug = $slug;
         });
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    public function scopeFilter(Builder $query, array $filter): void
+    {
+
+        $defaultSelect = [
+            'id_receiver as receiver_id',
+            'created_at',
+            'sender_id',
+            'receiver_title',
+            'receiver_fname', 'receiver_lname',
+            'receiver_phone',
+            'receiver_address',
+            'transfer_type',
+            'account_number',
+            'bank_id',
+            'identity_type_id'
+        ];
+
+        $autoCompleteSelect =
+            [
+            'id_receiver as receiver_id',
+            'receiver_name',
+            'receiver_phone'
+        ];
+
+        $query->select($defaultSelect)
+            ->when($filter['search'] ?? false, fn($query, $search) => $query->where('receiver_fname', 'like', '%' . $search . '%')
+                ->orWhere('receiver_lname', 'like', '%' . $search . '%')
+            )
+            ->when($filter['all'] ?? false, fn() => $query->select($autoCompleteSelect)
+            );
+
     }
 
 
@@ -107,7 +152,7 @@ class Receiver extends Model
 
     public function bank()
     {
-        return $this->hasOne(Bank::class, 'id', 'bank_id' );
+        return $this->hasOne(Bank::class, 'id', 'bank_id');
 
     }
 

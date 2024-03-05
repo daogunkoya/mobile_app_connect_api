@@ -44,8 +44,8 @@ Route::prefix('v1')->group(function () {
 // Route for user login
     Route::post('/users/login', 'App\Http\Controllers\AuthController@login');
 
-    Route::post('/users/refresh', 'App\Http\Controllers\aauth_controller@refresh');
-    Route::post('/users/me', 'App\Http\Controllers\aauth_controller@me');
+//    Route::post('/users/refresh', 'App\Http\Controllers\aauth_controller@refresh');
+//    Route::post('/users/me', 'App\Http\Controllers\aauth_controller@me');
 
 
       //no token required here
@@ -89,7 +89,7 @@ Route::prefix('v1')->group(function () {
     Route::group(['middleware' => ['auth:api','api']], function() {
 
         //landing page
-        Route::get('/', 'App\Http\Controllers\IndexController@index');
+        Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
@@ -102,9 +102,9 @@ Route::prefix('v1')->group(function () {
 
 
         //for Receivers
-        Route::get('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@index');
-        Route::post('/sender/{id}/receivers', 'App\Http\Controllers\ReceiverController@store');
-        Route::put('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
+        Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index');
+        Route::post('/sender/{sender_id}/receivers', 'App\Http\Controllers\ReceiverController@store');
+        Route::put('/sender/{sender:id_sender}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
 
@@ -118,6 +118,7 @@ Route::prefix('v1')->group(function () {
         Route::resource('/banks', 'App\Http\Controllers\BankController');
         Route::get('/bank/list', 'App\Http\Controllers\BankController@list');
         Route::resource('/senders', 'App\Http\Controllers\SenderController');
+        Route::put('/senders/{sender:id_sender}', 'App\Http\Controllers\SenderController@update');
 
 
         Route::resource('/commissions', 'App\Http\Controllers\CommissionController');

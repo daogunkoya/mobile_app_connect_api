@@ -10,8 +10,6 @@ class CreateMmReceiverTable extends Migration
         Schema::create('mm_receiver', function (Blueprint $table) {
             $table->string('id_receiver', 191)->default('');
             $table->string('store_id', 191)->default('2bda0c37-4eac-44e5-a014-6c029d76dc62');
-            $table->string('user_id', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
-            $table->integer('user_type')->nullable();
             $table->string('sender_id', 191)->default('');
             $table->string('receiver_title', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
             $table->string('receiver_slug', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci');

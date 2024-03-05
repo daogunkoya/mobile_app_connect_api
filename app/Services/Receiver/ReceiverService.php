@@ -5,6 +5,7 @@ namespace App\Services\Receiver;
 use App\Models\Receiver;
 use App\Repositories\ReceiverRepository;
 use App\Services\Receiver\ReceiverServiceInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ReceiverService implements ReceiverServiceInterface
 {
@@ -15,9 +16,9 @@ class ReceiverService implements ReceiverServiceInterface
 
     }
 
-    public function fetchReceiver($input, $sender_id): array
+    public function fetchReceiver($sender): LengthAwarePaginator
     {
-        return $this->receiverRepository->fetchReceiver($input, $sender_id);
+        return $this->receiverRepository->fetchReceiver($sender);
     }
 
 

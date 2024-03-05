@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Http\Request;
@@ -56,10 +57,10 @@ class Store extends Model
             'payment_status',
             'payment_url',
 
-            'stripe_count_onboard_refresh',
-            'stripe_count_onboard_return',
-            'stripe_account_id',
-            'stripe_onboard_complete'
+//            'stripe_count_onboard_refresh',
+//            'stripe_count_onboard_return',
+//            'stripe_account_id',
+//            'stripe_onboard_complete'
 
 
 
@@ -84,14 +85,12 @@ class Store extends Model
                 self::creating(function ($model) {
                     $model->id_store = (string) Uuid::uuid4();
 
-                    // generate uniqu slug
-                    $slug = str_slug($model->store_name) . mt_rand(100, 1000);
+                    // Generate unique slug
+                    $slug = Str::slug($model->store_name) . mt_rand(100, 1000);
                     while (Store::where('store_slug', $slug)->exists()) {
-                        $slug = str_slug($model->store_name) . mt_rand(100, 1000);
+                        $slug = Str::slug($model->store_name) . mt_rand(100, 1000);
                     }
                     $model->store_slug = $slug;
-
-                    //$model->record_count_update = $model->count() + 1;
                 });
             }
 

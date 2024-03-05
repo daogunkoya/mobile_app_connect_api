@@ -14,29 +14,29 @@ class SenderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($this->resource instanceof \stdClass) {
-
-            return [
-            ];
-        }
+//        if ($this->resource instanceof \stdClass) {
+//
+//            return [
+//            ];
+//        }
 
         //return parent=>=>toArray($request);
         return [
-            "sender_id" => $this->sender_id??$this->id_sender ,
-            "user_id"=> $this->user_id,
-            "sender_title"=> $this->sender_title,
-            "created_at"=> $this->created_at,
-            "sender_name"=> $this->sender_name,
-            "sender_mname"=> $this->sender_mname,
-            "sender_fname"=> $this->sender_fname,
-            "sender_lname"=> $this->sender_lname,
-            "sender_dob"=> $this->sender_dob,
-            "sender_email"=> $this->sender_email,
-            "sender_phone"=> $this->sender_phone,
-            "sender_mobile"=>$this->sender_mobile,
-            "sender_address"=> $this->sender_address,
-            "sender_postcode"=> $this->sender_postcode,
-            "count_sender_receivers"=>$this->count_sender_receivers,
+            "sender_id" => $this->senderId??$this->id_sender ,
+            "user_id"=> $this->userId,
+            "sender_title"=> $this->senderTitle,
+            "created_at"=> $this->createdAt,
+            "sender_name"=> $this->senderName,
+            "sender_mname"=> $this->senderMname,
+            "sender_fname"=> $this->senderFname,
+            "sender_lname"=> $this->senderLname,
+            "sender_dob"=> $this->senderDob,
+            "sender_email"=> $this->senderEmail,
+            "sender_phone"=> $this->senderPhone,
+            "sender_mobile"=>$this->senderMobile,
+            "sender_address"=> $this->senderAddress,
+            "sender_postcode"=> $this->senderPostcode,
+            "count_sender_receivers"=>$this->countSenderReceiver,
         ];
     }
 }

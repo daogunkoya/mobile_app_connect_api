@@ -18,7 +18,7 @@ class LoginUserService implements LoginServiceInterface
      */
 
 
-    public function loginUser(array $credentials): array
+    public function loginUser(array $credentials): PersonalAccessTokenResult
     {
 
         if (!Auth::attempt($credentials)) {
@@ -33,10 +33,11 @@ class LoginUserService implements LoginServiceInterface
             return [];
         }
 
-        $token = $user->createToken('auth_token');
+        return $user->createToken('auth_token');
+
        // $res = ['token'=>$token, 'user' => $user];
-        $res = $this->authResponse($token, $user);
-        return $res;
+//        $res = $this->authResponse($token, $user);
+//        return $res;
     }
 
 

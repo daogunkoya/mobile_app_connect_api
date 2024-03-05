@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Models\User;
 use App\Exceptions\InvalidRequestException;
 use App\Http\Requests\RegisterUserRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Interfaces\Auth\RegisterServiceInterface;
 use Illuminate\Validation\ValidationException;
@@ -32,10 +33,11 @@ class RegisterUserService implements RegisterServiceInterface
             'password' => Hash::make($password),
             'store_id' => '$2y$10$VpVDzy8gIINv1fWRGHpAx.7e/Y3XSruR8OtUn3qUrjM9x9VGo5rIS'
         ]);
-
+        Auth::attempt(['email' => $email, 'password'=> $password]);
+       // $user->auth();
         // $token = $user->createToken('auth_token')->plainTextToken;
-        $tokenResult = $user->createToken('auth_token');
-        $token = $tokenResult->accessToken;
-        return $tokenResult;
+        return $user->createToken('auth_token');
+//        $token = $tokenResult->accessToken;
+//        return $tokenResult;$tokenResult
     }
 }

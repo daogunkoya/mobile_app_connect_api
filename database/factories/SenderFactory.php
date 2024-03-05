@@ -5,6 +5,7 @@
 namespace Database\Factories;
 
 use App\Models\Sender;
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
 class SenderFactory extends Factory
@@ -23,9 +24,13 @@ class SenderFactory extends Factory
      */
     public function definition()
     {
+      //  $userId =  User::factory()->create()->id_user;
+        $userId = User::inRandomOrder()->first()->id_user;
+        $storeId = "2bda0c37-4eac-44e5-a014-6c029d76dc62";
+
         return [
-            'user_id' => User::factory()->create()->id_user,
-            'store_id'=>'2bda0c37-4eac-44e5-a014-6c029d76dc62',
+            'user_id' => $userId,
+            //'store_id'=> $storeId,
             'sender_dob' => $this->faker->date(),
             'sender_email' => $this->faker->unique()->safeEmail(),
             'sender_fname' => $this->faker->firstName(),

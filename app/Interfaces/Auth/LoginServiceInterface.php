@@ -12,5 +12,5 @@ interface LoginServiceInterface
      * @return array<int,  mixed>
      *  @param array<string,mixed> $credentials The credentials used to log in the user.
      */
-    public function loginUser(array $credentials): array;
+    public function loginUser(array $credentials): PersonalAccessTokenResult;
 }

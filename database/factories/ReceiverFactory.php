@@ -28,8 +28,9 @@ class ReceiverFactory extends Factory
      */
     public function definition()
     {
+        $userId =  User::factory()->create()->id_user;
         return [
-            'user_id' => User::factory()->create()->id_user,
+//            'user_id' => $userId,
             'sender_id' => Sender::factory()->create()->id_sender,
             'store_id'=>'2bda0c37-4eac-44e5-a014-6c029d76dc62',
             'receiver_email' => $this->faker->unique()->safeEmail(),

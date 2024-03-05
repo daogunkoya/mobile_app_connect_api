@@ -2,18 +2,37 @@
 
 namespace App\Repositories;
 
+use App\Enum\UserRoleType;
 use App\Models\Currency;
 use App\Models\Receiver;
 use App\Models\Sender;
 use App\Repositories\BankRepository;
 use App\Services\Helper;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReceiverRepository
 {
 
-    public function fetchReceiver($input, $sender_id): array
+
+    public function fetchReceiver($senderId): LengthAwarePaginator
+    {
+        $receiverQuery = Receiver::query()->where('sender_id',$senderId);
+
+        $query = $receiverQuery->with(['bank:id,name', 'identity:id,name'])
+        ->filter(['search' => request('search'), 'all' => request('fetchall')])
+            ->orderBy('created_at', 'DESC');
+
+        $page = request('page') ?? 1;
+        $limit = request('limit') ?? 6;
+
+        return request('fetchall') ?
+            $query->paginate(PHP_INT_MAX) :
+            $query->paginate($limit, ['*'], 'page', $page);
+    }
+
+    public function ifetchReceiver($input, $sender_id): array
     {
 
         $user_id = Auth::id();
@@ -111,12 +130,11 @@ class ReceiverRepository
 
         if (!empty($input)) {
             $new_receiver =   receiver::create([
-                "user_id" => Auth::id(),
                 "user_type" => 1,
                 'store_id' => session()->get('process_store_id') ?? request()->process_store_id,
                 "sender_id" => $sender_id,
                 "receiver_title" => $input['receiver_title'] ?? '',
-                "receiver_name" =>  $input['receiver_name'] ?? '',
+               // "receiver_name" =>  $input['receiver_name'] ?? '',
                 "receiver_mname" => $input['receiver_name'] ?? '',
                 "receiver_fname" =>  $input['receiver_fname'] ?? '',
                 "receiver_lname" =>  $input['receiver_lname'] ?? '',

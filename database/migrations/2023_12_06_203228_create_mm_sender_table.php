@@ -13,7 +13,6 @@ class CreateMmSenderTable extends Migration
             $table->string('user_id', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->string('store_id', 191)->default('2bda0c37-4eac-44e5-a014-6c029d76dc62');
             $table->string('sender_title', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
-            $table->string('sender_name', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
             $table->string('sender_slug', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
             $table->string('sender_fname', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
             $table->string('sender_mname', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
@@ -25,7 +24,7 @@ class CreateMmSenderTable extends Migration
             $table->string('sender_mobile', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->default('');
             $table->string('sender_address', 200)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('sender_postcode', 200)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
-            $table->string('photo_id', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
+            $table->string('photo_id', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();;
             $table->integer('sender_status')->default(1);
             $table->integer('moderation_status')->default(1);
             $table->timestamps();
