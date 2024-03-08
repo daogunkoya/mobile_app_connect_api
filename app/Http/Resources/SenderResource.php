@@ -22,7 +22,7 @@ class SenderResource extends JsonResource
 
         //return parent=>=>toArray($request);
         return [
-            "sender_id" => $this->senderId??$this->id_sender ,
+            "sender_id" => $this->senderId ,
             "user_id"=> $this->userId,
             "sender_title"=> $this->senderTitle,
             "created_at"=> $this->createdAt,

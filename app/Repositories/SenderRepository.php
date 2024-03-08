@@ -19,6 +19,7 @@ class SenderRepository
             $user->sender();
 
         $query = $senderQuery->withCount('receiver') // Eager load 'receivers' count
+            ->select(self::selectSenderList())
         ->filter(['search' => request('search'), 'all' => request('fetchall')])
             ->orderBy('created_at', 'DESC');
 
@@ -28,6 +29,35 @@ class SenderRepository
         return request('fetchall') ?
             $query->paginate(PHP_INT_MAX) :
             $query->paginate($limit, ['*'], 'page', $page);
+    }
+
+    public static function selectSenderList():array
+    {
+        return request('fetchall') ?
+           [
+                'id_sender',
+                'sender_name',
+                'sender_phone'
+            ]:
+
+            [
+                'id_sender',
+                'user_id',
+                'sender_title',
+                'created_at',
+                //  'sender_name',
+                'sender_mname',
+                'sender_fname',
+                'sender_lname',
+                'sender_dob',
+                'sender_email',
+                'sender_phone',
+                'sender_mobile',
+                'sender_address',
+                'sender_postcode'
+        ];
+
+        ;
     }
 
 

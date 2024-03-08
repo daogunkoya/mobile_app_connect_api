@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use App\Enum\Bank\TransferType;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
@@ -13,6 +16,8 @@ use Carbon\Carbon;
 
 class Transaction extends Model
 {
+    use HasFactory;
+
     protected $table = "mm_transaction";
     protected $primaryKey = 'id_transaction';
 
@@ -58,19 +63,46 @@ class Transaction extends Model
 
     public $incrementing = false;
 
-    //date serialization undo
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
 
+
+    public function scopeFilter(Builder $query, array $filter): void
+    {
+        $query
+            ->when($filter['search'] ?? false, function ($query, $search) {
+                $query->where('sender_fname', 'like', '%' . $search . '%')
+                    ->orWhere('sender_lname', 'like', '%' . $search . '%')
+                    ->orWhere('receiver_fname', 'like', '%' . $search . '%')
+                    ->orWhere('receiver_lname', 'like', '%' . $search . '%');
+            })
+            ->when($filter['date'] ?? false, function ($query, $search_date) {
+
+                $query->when($search_date, function ($query, $date) {
+                    return $query->where(fn ($query) => match ($date) {
+                        'today' => $query->whereDate('created_at', today()),
+                        'yesterday' => $query->whereDate('created_at', today()->subDay()),
+                        'month' => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]),
+                        default => $query->whereBetween('created_at', [
+                            Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
+                            Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
+                        ]),
+                    });
+                });
+            });
+    }
 
     public static function boot()
     {
         parent::boot();
         self::creating(function ($model) {
             $model->id_transaction = (string)Uuid::uuid4();
+            $model->store_id = request()->process_store_id ?? '2bda0c37-4eac-44e5-a014-6c029d76dc62';
         });
+    }
+
+    //date serialization undo
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
 
@@ -83,6 +115,21 @@ class Transaction extends Model
     public function getKeyType()
     {
         return 'string';
+    }
+
+    public function bank()
+    {
+        return $this->hasOne(Bank::class, 'id', 'receiver_bank_id');
+    }
+
+    public function identity()
+    {
+        return $this->hasOne(AcceptableIdentity::class, 'id', 'identity_type_id');
+    }
+
+    public function receiver():BelongsTo
+    {
+        return $this->belongsTo(Receiver::class,'receiver_id');
     }
 
     public function getCreatedAtAttribute($value)
@@ -114,9 +161,9 @@ class Transaction extends Model
         return number_format($value, 2);
     }
 
-    public function getTransactionTypeAttribute($value):string
+    public function getTransactionTypeAttribute($value): string
     {
-        return $value == 1?'Agent':'Customer';
+        return $value == 1 ? 'Agent' : 'Customer';
     }
 
 
@@ -160,22 +207,12 @@ class Transaction extends Model
     }
 
 
-    public function bank()
-    {
-        return $this->hasOne(Bank::class, 'id', 'receiver_bank_id');
-
-    }
     public function setReceiverIdentityTypeIdAttribute($name_value)
     {
 
         return Bank::where('name_bank', $name_value)->value('id_bank');
     }
 
-    public function identity()
-    {
-        return $this->hasOne(AcceptableIdentity::class, 'id', 'identity_type_id');
-
-    }
 
     public function getIdentityTypeAttribute($value)
     {

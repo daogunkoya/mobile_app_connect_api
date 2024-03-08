@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class receiver_validation extends FormRequest
+class ReceiverValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

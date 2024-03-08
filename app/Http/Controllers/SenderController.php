@@ -24,7 +24,7 @@ class SenderController extends Controller
 
     public function index(Request $request)
     {
-
+   //return  auth()->user()->id_user;
         $senderData = SenderServiceFacade::fetchSenders($request->all());
 
     return  SenderResource::collection(
@@ -57,9 +57,11 @@ class SenderController extends Controller
 
     public function show($senderId): JsonResponse
     {
-        $sender = $this->senderService->showSender($senderId);
-        return (new SenderResource($sender))->response()->setStatusCode(Response::HTTP_OK);
-    }
+            return (new SenderResource
+            (SenderDto::fromEloquentModel( Sender::find($senderId ))))
+                ->response()
+                ->setStatusCode(Response::HTTP_OK);
+        }
 
     public function destroy($senderId): JsonResponse
     {

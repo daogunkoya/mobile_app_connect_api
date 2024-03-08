@@ -93,6 +93,7 @@ Route::prefix('v1')->group(function () {
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
+        Route::get('transactions/{transaction:id_transaction}', 'App\Http\Controllers\TransactionController@show');
 
         //for agent customers
 
@@ -103,8 +104,8 @@ Route::prefix('v1')->group(function () {
 
         //for Receivers
         Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index');
-        Route::post('/sender/{sender_id}/receivers', 'App\Http\Controllers\ReceiverController@store');
-        Route::put('/sender/{sender:id_sender}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@update');
+        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store');
+        Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
 

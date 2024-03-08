@@ -32,7 +32,7 @@ class SenderDto
     public static function fromEloquentModel(Sender $sender): SenderDto
     {
         return new self(
-            $sender->sender_id,
+            $sender->id_sender,
             $sender->user_id,
             $sender->sender_title,
             $sender->created_at,

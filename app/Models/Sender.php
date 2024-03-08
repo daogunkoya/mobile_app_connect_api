@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
@@ -69,35 +71,10 @@ class Sender extends Model
     public function scopeFilter(Builder $query, array $filter): void
     {
 
-        $defaultSelect = [
-            'id_sender as sender_id',
-            'user_id',
-            'sender_title',
-            'created_at',
-            //  'sender_name',
-            'sender_mname',
-            'sender_fname',
-            'sender_lname',
-            'sender_dob',
-            'sender_email',
-            'sender_phone',
-            'sender_mobile',
-            'sender_address',
-            'sender_postcode'
-        ];
-
-        $autoCompleteSelect = [
-            'id_sender as sender_id',
-            'sender_name',
-            'sender_phone'];
-
-        $query->select($defaultSelect)
+        $query
             ->when($filter['search'] ?? false, fn($query, $search) => $query->where('sender_fname', 'like', '%' . $search . '%')
                 ->orWhere('sender_lname', 'like', '%' . $search . '%')
-            )
-            ->when($filter['all'] ?? false, fn() => $query->select($autoCompleteSelect)
             );
-
     }
 
 //    public function scopeAll(Builder $query): void
@@ -144,13 +121,23 @@ class Sender extends Model
         return $this->receiver()->where('receiver_status', 1)->count();
     }
 
-
-    public function receiver()
+    public function setSenderIdAttribute($value)
     {
-        return $this->hasMany(Receiver::class, 'sender_id', 'sender_id');
+        $this->attributes['sender_id'] = $this->attributes['id_sender'] = $value;
     }
 
-    public function address()
+
+    public function receiver():HasMany
+    {
+        return $this->hasMany(Receiver::class, 'sender_id', 'id_sender');
+    }
+
+    public function transaction():HasMany
+    {
+        return $this->hasMany(Transaction::class, 'sender_id', 'id_sender');
+    }
+
+    public function address():HasOne
     {
         return $this->hasOne(Address::class, 'id', 'address_id');
     }

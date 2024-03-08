@@ -36,7 +36,7 @@ class ReceiverDto
     {
         return new self(
             $receiver->created_at,
-            $receiver->receiver_id,
+            $receiver->id_receiver,
             $receiver->sender_id,
             $receiver->receiver_title,
             $receiver->receiver_fname,

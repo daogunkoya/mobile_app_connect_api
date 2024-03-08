@@ -16,6 +16,7 @@ class StoreSeeder extends Seeder
      {
 
              Store::factory()->create();
+            // Store::factory()->create(['id_store' => '2bda0c37-4eac-44e5-a014-6c029d76dc62']);
 
      }
 }

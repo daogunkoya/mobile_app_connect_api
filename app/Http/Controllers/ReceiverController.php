@@ -8,7 +8,7 @@ use App\Models\Sender;
 use Illuminate\Http\Request;
 use App\Services\Receiver\ReceiverService;
 use App\Facades\ReceiverServiceFacade;
-use App\Http\Requests\Receivers\receiver_validation;
+use App\Http\Requests\Receivers\ReceiverValidation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Http\Resources\ReceiverResource;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +23,7 @@ class ReceiverController extends Controller
     }
 
 
-    public function index(Request $request,  $senderId): JsonResponse
+    public function index(Request $request, $senderId): JsonResponse
     {
 
         $receiverDataList = ReceiverServiceFacade::fetchReceiver($senderId);
@@ -32,25 +32,34 @@ class ReceiverController extends Controller
     }
 
 
-    public function store(receiver_validation $request, Sender $sender): JsonResponse
+    public function store(ReceiverValidation $request, Sender $sender)
     {
-        $sender->sender_id = $sender->id_sender;
         $receiver = $sender->receiver()->create($request->validated());
-        return (new ReceiverResource($receiver))->response()->setStatusCode(Response::HTTP_CREATED);
+
+        return (new ReceiverResource(
+            ReceiverDto::fromEloquentModel($receiver->fresh())))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
 
-    public function update( Sender $sender, $receiverId, receiver_validation $request)
+    public function update($senderId, Receiver $receiver, ReceiverValidation $request)
     {
-        $receiver = Receiver::find($receiverId);
-        $receiverUpdated = $receiver->update($request->validated());
-        return (new ReceiverResource($receiver->fresh()))->response()->setStatusCode(Response::HTTP_OK);
+        $receiver->update($request->validated());
+
+        return (new ReceiverResource(
+            ReceiverDto::fromEloquentModel($receiver->fresh())))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     public function show(Request $request, $senderId, $receiverId): JsonResponse
     {
         $receiver = Receiver::find($receiverId);
-        return (new ReceiverResource($receiver))->response()->setStatusCode(Response::HTTP_OK);
+        return (new ReceiverResource(
+            ReceiverDto::fromEloquentModel($receiver)))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     public function destroy(Request $request, $receiverId): JsonResponse
