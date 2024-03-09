@@ -19,11 +19,11 @@ class RateSeeder extends Seeder
     {
         Rate::truncate();
 
-        $userId = User::factory()->create()->id_user;
-        $currencyId = Currency::factory()->create()->id_currency;
+        $user = User::inRandomOrder()->first();
 
-        Rate::factory()->create(['user_id' =>'']);
-        Rate::factory(10)->create(['user_id' => $userId, 'currency_id' => $currencyId]);
+
+        Rate::factory(3)->create(['user_id' =>'']);
+        Rate::factory(7)->create(['user_id' => $user->id_user]);
 
     }
 }

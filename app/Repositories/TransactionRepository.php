@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Enum\UserRoleType;
+use App\Exceptions\RateNotSetException;
 use App\Models\Receiver;
 use App\Models\Sender;
 use App\Models\Transaction;
 use App\Services\Helper;
 use App\Services\Rate\RateService;
 use Carbon\Carbon;
+use Dotenv\Exception\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -342,14 +344,23 @@ class TransactionRepository
         $sendAmount = $input['send_amount'] ?? 0;
         $conversionType = $input['conversion_type'] ?? 1;
 
-        $todaysRate = RateService::todaysRate();
-        $rate = $todaysRate['main_rate'] ?? 0;
+        $rateToday = RateRepository::fetchTodaysRate();
+        $rate = $rateToday->main_rate??0;
+
+        if(!$rate)  throw new RateNotSetException("no rate is provided");
+
 
         // Evaluate based on convert type
         $sendAmount = $conversionType == 1 ? $sendAmount : $sendAmount / $rate;
 
-        $resCommission = $this->commissionRepository->fetchCommissionValue(['amount' => $sendAmount, 'conversion_type' => $conversionType]);
-        $commissionValue = $resCommission['commission_value'] < 1 ? $resCommission['value'] * $sendAmount : $resCommission['commission_value'];
+        $resCommission = $this->commissionRepository->fetchCommissionValue(
+            [
+                'amount' => $sendAmount,
+                'conversion_type' => $conversionType
+            ]);
+        $commissionValue = $resCommission['commission_value'] < 1 ?
+            $resCommission['value'] * $sendAmount
+            : $resCommission['commission_value'];
 
         $agentQuota = $resCommission['agent_quota'];
 

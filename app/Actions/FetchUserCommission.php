@@ -1,48 +1,20 @@
 <?php
 
-namespace App\Repositories;
-
+namespace App\Actions;
 
 use App\Models\Commission;
 use App\Repositories\RateRepository;
-use App\Services\Commission\CommissionService;
-use App\Services\Rate\RateService;
 
-class CommissionRepository
+class FetchUserCommission
 {
 
-//    public static function fetchCommissionValue($amount)
-//    {
-//
-//        self::$user_currency = user_currency();
-//        $currency_id = self::$user_currency;
-//        $user_id = store_user_id();
-//        // var_dump($user_id);
-//        $commission_data =   optional(Commission::
-//        whereIn('user_id', [$user_id])
-//            ->whereIn('currency_id', [$currency_id])
-//            ->whereRaw('? between start_from and end_at', [$amount])
-//            ->select('value', 'agent_quota')
-//            ->orderBy('start_from', 'asc')
-//            ->orderBy('end_at', 'asc')
-//            ->first())->toArray();
-//
-//
-//        // return $commission_data;
-//        return [
-//            'value' =>number_format( $commission_data['value'],2) ?? 0,
-//            'agent_quota' => $commission_data['agent_quota'] ?? 50,
-//            'commission_value'=> number_format($commission_data['value'],2) ?? 0,
-//            'total_amount'=> number_format($commission_data['value'] + $amount,2),
-//            'amount_from' => number_format($amount,2),
-//            'amount_to' => number_format($amount * $commission_data['value'], 2)
-//        ];
-//    }
-
-    public function fetchCommissionValue($input):array
+    public function handle($amountToSend, $conversiontype)
     {
-        $sendAmount = (float)$input['amount'] ?? 0;
-        $conversionType = (integer)$input['conversion_type'] ?? 1;
+
+
+        $sendAmount = (float) $amountToSend ?? 0;
+        $conversionType = (integer)$conversiontype ?? 1;
+
         $todaysRate = RateRepository::fetchTodaysRate();
         $rate = $todaysRate['main_rate'] ?? 0;
 

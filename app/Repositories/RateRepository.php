@@ -18,27 +18,21 @@ class RateRepository
             ->latest('created_at')
             ->first();
 
-
     }
-
 
 
     //this is be further review
     public static function todaysRate()
     {
-
-
         $userExistOnRate = Rate::where('user_id', auth()->id())->exists();
-       // var_dump($user_id);
-       return  optional(Rate::query()
-           ->when($userExistOnRate, function($query){
-            return $query->where('user_id', auth()->id());
-        })
+        // var_dump($user_id);
+        return optional(Rate::query()
+            ->when($userExistOnRate, function ($query) {
+                return $query->where('user_id', auth()->id());
+            })
             ->select('main_rate', 'bou_rate', 'sold_rate', 'currency_id as currency')
             ->orderBy('created_at', 'desc')
             ->first())->toArray();
-
-
     }
 
 

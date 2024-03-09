@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AcceptableIdentity;
 use App\Models\Bank;
+use App\Models\Currency;
 use JetBrains\PhpStorm\NoReturn;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -24,7 +25,7 @@ class ReceiverControllerTest extends TestCase
 {
     protected Generator $faker;
 
-   // use RefreshDatabase;
+    use RefreshDatabase;
 
     public static function setUpBeforeClass(): void
     {
@@ -66,31 +67,13 @@ class ReceiverControllerTest extends TestCase
     {
 
         $domain = Domain::factory()->create();
-// Create task data
-        $receiverData = [
-            "process_store_id"=>"2bda0c37-4eac-44e5-a014-6c029d76dc62",
-            'store_id'=>'2bda0c37-4eac-44e5-a014-6c029d76dc62',
-            "receiver_address" => "12 ril street",
-            "receiver_dob" => "2023-11-18",
-            "receiver_email"=> "newma@jio.com",
-            "receiver_fname"=> "lop",
-            "receiver_lname"=> "truck",
-            "receiver_mname"=> "toke",
-            "receiver_mobile"=> "08767890",
-            "receiver_phone"=> "098767890",
-            "receiver_postcode"=> "tyy67",
-            "receiver_title"=> "Mr",
-             'transfer_type' =>"bank",
-            'account_number' => $this->faker->randomNumber(),
-            'currency_id' =>$this->faker->randomNumber(),
-            'bank_id' => Bank::factory()->create()->id,
-            'identity_type_id' => AcceptableIdentity::factory()->create()->id,
-        ];
+        $newReceiver = Receiver::factory()->create();
 
       //  $receiverData = Receiver::factory()->create();
-
+        $sender = Sender::factory()->create();
         // Make a POST request to create a task
-        $response = $this->postJson('v1/sender/1d58e4d4-175c-4f7d-8e57-aa2695127f57/receivers/', $receiverData);
+      //dd("v1/sender/$sender->id_sender/");
+        $response = $this->postJson(route('create_receiver', $sender->id_sender), $newReceiver->toArray());
 
        // dd($response);
         // Assert the response status
@@ -124,7 +107,11 @@ class ReceiverControllerTest extends TestCase
         $sender = Sender::factory()->create();
 
         // Make a PUT request to update the task
-        $response = $this->put("v1/sender/$sender->id_sender/receivers/" . $receiver->id_receiver, $receiver->toArray());
+        $response = $this->put(
+            route('update_receiver', [ $sender->id_sender, $receiver->id_receiver]),
+            $receiver->toArray()
+        );
+
 
         $response->assertStatus(200);
     }

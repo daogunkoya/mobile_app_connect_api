@@ -93,7 +93,8 @@ Route::prefix('v1')->group(function () {
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
-        Route::get('transactions/{transaction:id_transaction}', 'App\Http\Controllers\TransactionController@show');
+        Route::get('transactions/{transaction:id_transaction}',
+            'App\Http\Controllers\TransactionController@show')->name('transactions.show');
 
         //for agent customers
 
@@ -104,8 +105,8 @@ Route::prefix('v1')->group(function () {
 
         //for Receivers
         Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index');
-        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store');
-        Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update');
+        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('create_receiver');
+        Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update')->name('update_receiver');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
 
@@ -119,8 +120,8 @@ Route::prefix('v1')->group(function () {
         Route::resource('/banks', 'App\Http\Controllers\BankController');
         Route::get('/bank/list', 'App\Http\Controllers\BankController@list');
         Route::resource('/senders', 'App\Http\Controllers\SenderController');
-        Route::put('/senders/{sender:id_sender}', 'App\Http\Controllers\SenderController@update');
-
+        Route::put('/senders/{sender:id_sender}', 'App\Http\Controllers\SenderController@update')->name('update_sender');
+//        Route::post('/senders/{sender:id_sender}/receiver', 'App\Http\Controllers\SenderController@store')->name('create_receiver');
 
         Route::resource('/commissions', 'App\Http\Controllers\CommissionController');
 

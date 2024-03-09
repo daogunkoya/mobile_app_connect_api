@@ -4,6 +4,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Currency;
 use App\Models\Receiver;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
@@ -44,7 +45,7 @@ class ReceiverFactory extends Factory
            'receiver_address' => $this->faker->address(),
             'transfer_type' => "bank",
             'account_number' =>$this->faker->randomNumber(),
-            'currency_id' =>$this->faker->randomNumber(),
+            'currency_id' => Currency::factory()->create()->id_currency,
             'bank_id' => Bank::factory()->create()->id,
             'identity_type_id' => AcceptableIdentity::factory()->create()->id,
 //            'photo_id' =>""

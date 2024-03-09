@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateTransaction;
+use App\DTO\ReceiverDto;
 use App\DTO\TransactionDto;
 use App\Http\Resources\TransactionResource;
+use App\Models\Receiver;
 use App\Models\Transaction;
 use App\Repositories\TransactionRepository;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +21,9 @@ use Symfony\Component\HttpFoundation\Response;
 class TransactionController extends Controller
 {
 
-    public function __construct(public TransactionRepository $transactionRepository)
+    public function __construct(public TransactionRepository $transactionRepository,
+    public CreateTransaction $createTransaction
+    )
     {
     }
 
@@ -45,8 +50,12 @@ class TransactionController extends Controller
      */
     public function store(transaction_create_validation $request, TransactionService $transaction_service)
     {
-        [$message, $status] = $this->transactionRepository->storeTransaction($request->all());
-        return response()->json($message, $status);
+        $receiver = ReceiverDto::fromEloquentModel(Receiver::with('sender')->find(request('receiver_id')));
+        $transaction = $this->createTransaction->handle($request->all(), $receiver);
+
+        return (new TransactionResource( TransactionDto::fromEloquentModel($transaction)))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
 
@@ -63,7 +72,6 @@ class TransactionController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
      */
     public function update(transaction_update_validation $request, $transaction_id)
     {

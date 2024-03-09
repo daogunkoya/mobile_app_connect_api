@@ -17,13 +17,12 @@ class CurrencySeeder extends Seeder
     public function run(): void
 
     {
-        Rate::truncate();
+        Currency::truncate();
 
         $userId = User::factory()->create()->id_user;
         $currencyId = Currency::factory()->create()->id_currency;
 
-        Rate::factory()->create(['user_id' =>'']);
-        Rate::factory(10)->create(['user_id' => $userId, 'currency_id' => $currencyId]);
+        Currency::factory(10)->create();
 
     }
 }

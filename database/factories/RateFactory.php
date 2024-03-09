@@ -25,6 +25,7 @@ class RateFactory extends Factory
      */
     public function definition()
     {
+
         return [
             'store_id' => '2bda0c37-4eac-44e5-a014-6c029d76dc62',
             'main_rate'=>  $this->faker->randomElement([500, 400, 900, 670, 994]),

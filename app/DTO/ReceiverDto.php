@@ -5,6 +5,7 @@ namespace App\DTO;
 use App\Models\AcceptableIdentity;
 use App\Models\Bank;
 use App\Models\Receiver;
+use App\Models\Sender;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,6 +27,8 @@ class ReceiverDto
         public string $transferType,
         public string $identityTypeId,
         public string $bankId,
+        public string $currencyId,
+        public ?SenderDto $sender,
         public Bank $bank,
         public AcceptableIdentity  $identity,
     )
@@ -48,6 +51,8 @@ class ReceiverDto
             $receiver->transfer_type,
             $receiver->identity_type_id,
             $receiver->bank_id,
+            $receiver->currency_id,
+            $receiver->sender ? SenderDto::fromEloquentModel($receiver->sender) : null,
             $receiver->bank,
             $receiver->identity,
         );

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 
 class Commission extends Model
 {
+    use HasFactory;
             protected $table = "mm_commission";
             protected $primaryKey = 'id_commission';
 

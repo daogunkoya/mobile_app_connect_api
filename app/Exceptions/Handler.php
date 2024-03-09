@@ -45,4 +45,19 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render( $request, Throwable $exception): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    {
+        if ($exception instanceof RateNotSetException) {
+            // Custom rendering logic for your custom exception
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
+
+        if ($exception instanceof CommissionNotSetException) {
+            // Custom rendering logic for your custom exception
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
+
+        return parent::render($request, $exception);
+    }
 }

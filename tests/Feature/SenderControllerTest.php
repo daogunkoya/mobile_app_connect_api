@@ -50,9 +50,10 @@ class SenderControllerTest extends TestCase
             "sender_mobile"=> "08767890",
             "sender_phone"=> "098767890",
             "sender_postcode"=> "tyy67",
-            "sender_title"=> "Mr"
+            "sender_title"=> "Mr",
+            "photo_id" => "test"
         ];
-        $senderData = Sender::factory()->create();
+        $senderData = Sender::factory()->create(["photo_id" => "test"]);
         // Make a POST request to create a task
         $response = $this->postJson('v1/senders', $senderData->toArray());
 
@@ -82,7 +83,8 @@ class SenderControllerTest extends TestCase
     public function it_can_update_a_sender()
     {
         // Create a test task
-        $sender = Sender::factory()->create();
+        $sender = Sender::factory()->create([
+            "photo_id" => "test"]);
 
 
         // Make a PUT request to update the task
