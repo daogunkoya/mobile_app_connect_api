@@ -11,7 +11,7 @@ class CommissionNotSetException extends \RuntimeException
 
     public static function dueToCommissionNotSet():CommissionNotSetException
     {
-        return new self('rate is not set for this user');
+        return new self('commission values are not set for this user ');
     }
 
 

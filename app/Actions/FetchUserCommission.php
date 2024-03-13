@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Exceptions\CommissionNotSetException;
 use App\Models\Commission;
 use App\Repositories\RateRepository;
 
@@ -53,7 +54,9 @@ class FetchUserCommission
             ->first();
 
         $commissionData = optional($query)->toArray();
-//var_dump($currencyId);
+
+        if(empty(($commissionData))) throw new CommissionNotSetException("Commission not set for this user");
+
         return [
             'value' => $commissionData['value'] ?? 0,
             'agent_quota' => $commissionData['agent_quota'] ?? 50,

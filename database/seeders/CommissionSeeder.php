@@ -18,7 +18,7 @@ class CommissionSeeder extends Seeder
     public function run(): void
 
     {
-        Rate::truncate();
+        Commission::truncate();
 
         $userId = User::factory()->create()->id_user;
 

@@ -31,13 +31,6 @@ class CreateTransaction
         $bouRate = 0;
         $soldRate = 0;
 
-//
-var_dump($receiver->sender);
-        $sender = optional(
-            sender::where('id_sender', $receiver->senderId)
-                ->select('sender_fname', 'sender_lname', 'sender_address')
-                ->first()
-        )->toArray();
 
         if (!empty($input)) {
             $receiverPhone = $receiver->receiverPhone ?? $receiver->receiverMobile;
@@ -49,8 +42,8 @@ var_dump($receiver->sender);
                 'currency_id' => $receiver->currencyId ,
                 'sender_id' => $receiver->senderId,
                 'receiver_id' => $input['receiver_id'],
-                'sender_fname' => $sender['sender_fname'] ?? '',
-                'sender_lname' => $sender['sender_lname'] ?? '',
+                'sender_fname' => $receiver->sender->senderFname,
+                'sender_lname' => $receiver->sender->senderLname,
                 'receiver_fname' => $receiver->receiverFname,
                 'receiver_lname' => $receiver->receiverLname,
                 'receiver_address' => $receiver->receiverAddress,
@@ -58,7 +51,7 @@ var_dump($receiver->sender);
                 'receiver_identity_id' => $receiver->identityTypeId,
                 'receiver_account_no' => $receiver->accountNumber,
                 'receiver_transfer_type' => $receiver->transferType,
-                'sender_address' => $sender['sender_address'],
+                'sender_address' => $receiver->sender->senderAddress,
                 'agent_payment_id' => '',
                 'receiver_phone' => $receiverPhone ?? '',
                 'amount_sent' => $input['amount_sent'],

@@ -147,7 +147,7 @@ class Receiver extends Model
 
     public function sender()
     {
-        return $this->belongsTo(Sender::class);
+        return $this->belongsTo(Sender::class,'sender_id');
     }
 
     public function bank()

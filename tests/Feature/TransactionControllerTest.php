@@ -40,6 +40,9 @@ class TransactionControllerTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
+        $this->artisan('db:seed', ['--class' => 'RateSeeder']);
+        $this->artisan('db:seed', ['--class' => 'CommissionSeeder']);
+
         // Authenticate a user using Passport actingAs()
         $user = User::factory()->create(['user_role_type' => 3]);
         Passport::actingAs($user);
@@ -56,23 +59,30 @@ class TransactionControllerTest extends TestCase
     /** @test */
     public function it_can_create_a_transaction():void
     {
+//        exec('php artisan db:seed --class=RateSeeder');
+//        exec('php artisan db:seed --class=CommissionSeeder');
 
         $domain = Domain::factory()->create();
 
-
         $newReceiver = Receiver::factory()->create();
+        $amountSent = "600.00";
+        $response = $this->postJson(route('transactions.store'),
+            [
+                "receiver_id" =>$newReceiver->id_receiver,
+                "conversion_type" => 1,
+                "amount_sent" =>  $amountSent
+            ]);
 
-        //  $receiverData = Receiver::factory()->create();
-        $sender = Sender::factory()->create();
-        // Make a POST request to create a task
-        //dd("v1/sender/$sender->id_sender/");
-        $response = $this->postJson(route('create_receiver', $sender->id_sender), $newReceiver->toArray());
+            $responseData  = $response->json();
+
 
         // dd($response);
         // Assert the response status
-        $response->assertStatus(201); // Adjust based on your expected response status
+        $response->assertStatus(200); // Adjust based on your expected response status
 
-        // $this->assertDatabaseHas('mm_receiver', ['receiver_title' => 'Mr']);
+        $this->assertEquals( $responseData['data']['amount_sent'], $amountSent);
+
+        $this->assertEquals( Transaction::latest()->value('amount_sent'), $amountSent);
 
 
     }

@@ -29,7 +29,7 @@ class RateFactory extends Factory
         return [
             'store_id' => '2bda0c37-4eac-44e5-a014-6c029d76dc62',
             'main_rate'=>  $this->faker->randomElement([500, 400, 900, 670, 994]),
-            'user_id' => User::latest()->first()->id_user,
+            'user_id' => User::latest()->first()->id_user??User::factory()->create()->id_user,
             'currency_id' =>  '40f85a89-a1fe-42ec-8983-457701ab3bf5',
             'bou_rate'=> $this->faker->randomElement([500, 400, 900, 670, 234]),
             'sold_rate'=>$this->faker->randomElement([500, 400, 900, 670, 234]),

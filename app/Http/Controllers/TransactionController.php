@@ -50,6 +50,7 @@ class TransactionController extends Controller
      */
     public function store(transaction_create_validation $request, TransactionService $transaction_service)
     {
+
         $receiver = ReceiverDto::fromEloquentModel(Receiver::with('sender')->find(request('receiver_id')));
         $transaction = $this->createTransaction->handle($request->all(), $receiver);
 

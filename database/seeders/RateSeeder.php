@@ -19,7 +19,7 @@ class RateSeeder extends Seeder
     {
         Rate::truncate();
 
-        $user = User::inRandomOrder()->first();
+        $user = User::inRandomOrder()->first()??User::factory()->create();
 
 
         Rate::factory(3)->create(['user_id' =>'']);
