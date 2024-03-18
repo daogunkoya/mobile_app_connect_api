@@ -5,12 +5,12 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Currency;
 use App\Models\Rate;
-use App\Models\Receiver;
+use App\Models\Sender;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
 
-class ReceiverSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Seed the application's database.
@@ -18,10 +18,11 @@ class ReceiverSeeder extends Seeder
     public function run(): void
 
     {
-        Receiver::truncate();
+        User::truncate();
 
-        Receiver::factory(10)->create();
-        Receiver::first()->update(['id_receiver' => '01c23b70-895c-4298-b52e-bf95686aa19c']);
+
+        User::factory(10)->create();
+        User::factory()->create(['email' => 'boss.delia@example.org']);
 
     }
 }

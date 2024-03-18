@@ -13,7 +13,7 @@ class CreateMmStoreTable extends Migration
             $table->string('user_id', 36)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('store_name', 36)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('store_admin_type', 36)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
-            $table->string('store_slug', 36)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
+            $table->string('store_slug', )->nullable();
             $table->text('list_image')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('store_user_email', 255)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('store_business_name', 255)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();

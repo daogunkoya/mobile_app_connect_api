@@ -3,17 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateTransaction;
+use App\Collections\TransactionCollection;
+use App\DTO\CommissionDto;
+use App\DTO\RateDto;
 use App\DTO\ReceiverDto;
 use App\DTO\TransactionDto;
+use App\DTO\UserDto;
 use App\Http\Resources\TransactionResource;
+use App\Models\Commission;
+use App\Models\Rate;
 use App\Models\Receiver;
 use App\Models\Transaction;
+use App\Repositories\CommissionRepository;
+use App\Repositories\RateRepository;
 use App\Repositories\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\Transaction\TransactionService;
 use App\Http\Requests\Transactions\calulate_validation;
-use App\Http\Requests\Transactions\transaction_create_validation;
+use App\Http\Requests\Transactions\TransactionCreateValidation;
 use App\Http\Requests\Transactions\transaction_update_validation;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,11 +56,24 @@ class TransactionController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(transaction_create_validation $request, TransactionService $transaction_service)
+    public function store(TransactionCreateValidation $request, TransactionService $transaction_service)
     {
+        $validated = $request->validated();
+
+        $user = UserDto::fromEloquentModel(auth()->user());
+
+        $userCommission = CommissionRepository::getCommissionValue(request('amountSent', $user->userId));
+        $userRate = RateRepository::fetchTodaysRate($user->userId);
+
+        // Process transaction
+        $transactionCollection = TransactionCollection::processTransactionData(
+            RateDto::fromEloquentModel(($userRate)),
+            CommissionDto::fromEloquentModel($userCommission),
+            $validated['amount_sent'],
+            $validated['conversion_type']);
 
         $receiver = ReceiverDto::fromEloquentModel(Receiver::with('sender')->find(request('receiver_id')));
-        $transaction = $this->createTransaction->handle($request->all(), $receiver);
+        $transaction = $this->createTransaction->handle( $transactionCollection , $receiver,  $user );
 
         return (new TransactionResource( TransactionDto::fromEloquentModel($transaction)))
             ->response()

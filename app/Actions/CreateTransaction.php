@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Collections\TransactionCollection;
 use App\DTO\ReceiverDto;
 use App\Exceptions\RateNotSetException;
 use App\Models\Receiver;
@@ -18,30 +19,21 @@ class CreateTransaction
     {
     }
 
-    public function handle($input, ReceiverDto $receiver)
+    public function handle(TransactionCollection $transactionCollection, ReceiverDto $receiver, $user)
     {
-     $userId = $input['user']['id_user'] ?? '';
-
-        $calculateResult = $this->calculateAmountToSend(['conversion_type' => 1, 'send_amount' => $input['amount_sent']]);
-        $totalAmount = (float)($calculateResult['total'] ?? 0);
-        $localAmount = (float)($calculateResult['local'] ?? 0);
-        $totalCommission = (float)($calculateResult['commission'] ?? 0);
-        $agentCommission = (float)$totalCommission * $calculateResult['agent_quota'] / 100;
-        $exchangeRate = (float)($calculateResult['rate'] ?? 0);
-        $bouRate = 0;
-        $soldRate = 0;
 
 
-        if (!empty($input)) {
+
+
             $receiverPhone = $receiver->receiverPhone ?? $receiver->receiverMobile;
 
-            $transaction = transaction::create([
+            $transaction = Transaction::create([
                 'store_id' => store_id(),
-                'user_id' => $userId,
+                'user_id' => $user->userId,
                 'transaction_code' => $this->generateUniqueTransactionCode(),
                 'currency_id' => $receiver->currencyId ,
                 'sender_id' => $receiver->senderId,
-                'receiver_id' => $input['receiver_id'],
+                'receiver_id' => $receiver->receiverId,
                 'sender_fname' => $receiver->sender->senderFname,
                 'sender_lname' => $receiver->sender->senderLname,
                 'receiver_fname' => $receiver->receiverFname,
@@ -54,14 +46,14 @@ class CreateTransaction
                 'sender_address' => $receiver->sender->senderAddress,
                 'agent_payment_id' => '',
                 'receiver_phone' => $receiverPhone ?? '',
-                'amount_sent' => $input['amount_sent'],
-                'total_amount' => $totalAmount,
-                'local_amount' => $localAmount,
-                'total_commission' => $totalCommission,
-                'agent_commission' => $agentCommission,
-                'exchange_rate' => $exchangeRate,
-                'bou_rate' => $bouRate,
-                'sold_rate' => $soldRate,
+                'amount_sent' =>  $transactionCollection->amountSent,
+                'total_amount' => $transactionCollection->totalAmount,
+                'local_amount' => $transactionCollection->localAmount,
+                'total_commission' => $transactionCollection->totalCommission,
+                'agent_commission' => $transactionCollection->agentCommission,
+                'exchange_rate' => $transactionCollection->exchangeRate,
+                'bou_rate' => $transactionCollection->bouRate,
+                'sold_rate' => $transactionCollection->soldRate,
                 'note' => '',
                 'currency_income' => 1,
                 'transaction_status' => 1,
@@ -70,47 +62,10 @@ class CreateTransaction
             ]);
 
             return $transaction;
-        }
 
-        return [['error' => 'Something went wrong'], 422];
+
     }
 
-
-    public function calculateAmountToSend($input)
-    {
-        $sendAmount = $input['send_amount'] ?? 0;
-        $conversionType = $input['conversion_type'] ?? 1;
-
-        $rateToday = RateRepository::fetchTodaysRate();
-        $rate = $rateToday->main_rate??0;
-
-        if(!$rate)  throw new RateNotSetException("no rate is provided");
-
-
-        // Evaluate based on convert type
-        $sendAmount = $conversionType == 1 ? $sendAmount : $sendAmount / $rate;
-
-        $resCommission = $this->fetchUserCommission->handle($sendAmount, $conversionType);
-        $commissionValue = $resCommission['commission_value'] < 1 ?
-            $resCommission['value'] * $sendAmount
-            : $resCommission['commission_value'];
-
-        $agentQuota = $resCommission['agent_quota'];
-
-        $commission = $commissionValue ?? 0;
-        $total = $sendAmount + $commission;
-        $local = $rate * $sendAmount;
-
-        return [
-            'rate' => $rate,
-            'local' => $local,
-            'commission' => $commission,
-            'total' => $total,
-            'send_amount' => $sendAmount,
-            'conversion_type' => $conversionType,
-            'agent_quota' => $agentQuota
-        ];
-    }
 
 
     public function generateUniqueTransactionCode()

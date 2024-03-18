@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Currency;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,7 @@ class CreateMmUserTable extends Migration
             $table->string('last_name')->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->string('user_name')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->string('email')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->unique();
+            $table->foreignIdFor(Currency::class, 'currency_id');
             $table->string('store_id')->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->charset('utf8mb4')->collation('utf8mb4_unicode_ci');

@@ -13,7 +13,7 @@ class RateRepository
     {
 // Use $userId if not null, otherwise use an empty strin
         return Rate::query()
-            ->select('main_rate', 'bou_rate', 'sold_rate', 'currency_id as currency')
+            ->select('id_rate','main_rate','user_id' ,'bou_rate', 'sold_rate', 'currency_id as currency')
             ->where('user_id', $userId ?? '')
             ->latest('created_at')
             ->first();

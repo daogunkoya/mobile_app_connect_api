@@ -11,33 +11,6 @@ use App\Services\Rate\RateService;
 class CommissionRepository
 {
 
-//    public static function fetchCommissionValue($amount)
-//    {
-//
-//        self::$user_currency = user_currency();
-//        $currency_id = self::$user_currency;
-//        $user_id = store_user_id();
-//        // var_dump($user_id);
-//        $commission_data =   optional(Commission::
-//        whereIn('user_id', [$user_id])
-//            ->whereIn('currency_id', [$currency_id])
-//            ->whereRaw('? between start_from and end_at', [$amount])
-//            ->select('value', 'agent_quota')
-//            ->orderBy('start_from', 'asc')
-//            ->orderBy('end_at', 'asc')
-//            ->first())->toArray();
-//
-//
-//        // return $commission_data;
-//        return [
-//            'value' =>number_format( $commission_data['value'],2) ?? 0,
-//            'agent_quota' => $commission_data['agent_quota'] ?? 50,
-//            'commission_value'=> number_format($commission_data['value'],2) ?? 0,
-//            'total_amount'=> number_format($commission_data['value'] + $amount,2),
-//            'amount_from' => number_format($amount,2),
-//            'amount_to' => number_format($amount * $commission_data['value'], 2)
-//        ];
-//    }
 
     public function fetchCommissionValue($input):array
     {
@@ -50,18 +23,18 @@ class CommissionRepository
         $localAmount =  ($conversionType == 2) ? $sendAmount: $sendAmount * $rate;
         $sendAmount = ($conversionType == 2) ? $sendAmount / $rate : $sendAmount;
 
-        $commissionValueData = $this->getCommissionValue($sendAmount);
+        $commissionValueData = self::getCommissionValue($sendAmount);
 
         // Commission value defined based on % of the amount if commission value is decimal
-        $commissionValue = ($commissionValueData['value'] < 1) ?
-            number_format($commissionValueData['value'] * $sendAmount, 2) :
-            number_format($commissionValueData['value'], 2);
+        $commissionValue = ($commissionValueData->value < 1) ?
+            number_format($commissionValueData->value * $sendAmount, 2) :
+            number_format($$commissionValueData->value, 2);
 
         return [
             'rate' => number_format($rate, 2),
             'local' => number_format($localAmount, 2),
             //'value' => number_format($commissionValueData['value'] ?? 0, 2),
-            'agent_quota' => $commissionValueData['agent_quota'] ?? 50,
+            'agent_quota' => $commissionValueData->agent_quota ?? 50,
             'commission_value' => $commissionValue,
             'total_amount' => number_format($commissionValue + $sendAmount, 2),
             'send_amount' => number_format($sendAmount, 2),
@@ -69,27 +42,17 @@ class CommissionRepository
         ];
     }
 
-    public function getCommissionValue($amount, $userId = null, $currencyId = null): array
+    public static function getCommissionValue($amount, $userId = null, $currencyId = null): Commission
     {
-        $query = Commission::query()
+        return  Commission::query()
             ->when(!is_null($currencyId), fn($query) => $query->whereIn('currency_id', [$currencyId]))
             ->when(!is_null($userId), fn($query) => $query->whereIn('user_id', [$userId]))
             ->when(!is_null($amount), fn($query) => $query->whereRaw('? between start_from and end_at', [$amount]))
-            ->select('value', 'agent_quota')
+            ->select('id_commission','user_id','start_from','end_at','value', 'agent_quota')
             ->orderBy('start_from', 'asc')
             ->orderBy('end_at', 'asc')
             ->first();
 
-        $commissionData = optional($query)->toArray();
-//var_dump($currencyId);
-        return [
-            'value' => $commissionData['value'] ?? 0,
-            'agent_quota' => $commissionData['agent_quota'] ?? 50,
-            'commission_value' =>$commissionData['value'] ?? 0,
-            'total_amount' => $commissionData['value'] + $amount,
-            'amount_from' => $amount,
-            'amount_to' =>$amount * $commissionData['value']
-        ];
     }
 
 }

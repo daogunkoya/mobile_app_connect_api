@@ -37,6 +37,7 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'user_name',
+        'currency_id',
         'user_handle',
         'store_id',
         'email',
@@ -94,6 +95,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rate::class, 'user_id');
     }
+    public function userRate(): HasOne
+    {
+
+        return $this->hasOne(Rate::class, 'user_id')->latest();
+    }
+
+
+    public function userCommission(): Hasone
+    {
+        $userId = $this->id_user;
+        return $this->hasOne(Commission::class, 'user_id');
+    }
+
 
     public function currency(): HasOne
     {

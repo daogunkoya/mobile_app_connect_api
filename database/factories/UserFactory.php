@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Currency;
 use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -24,8 +25,8 @@ class UserFactory extends Factory
         return [
            // 'id'=> (string) Uuid::uuid4(),
             'first_name' => fake()->firstName(),
-            'store_id' => Store::factory()->create()->id_store,
-            //'name'=>'test',
+            'store_id' => Store::factory()->create(),
+            'currency_id'=>"",
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
