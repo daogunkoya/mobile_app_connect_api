@@ -46,7 +46,8 @@ class DatabaseSeeder extends Seeder
         Store::factory(10)->create();
         Store::latest()->first()->update(['id_store' => '2bda0c37-4eac-44e5-a014-6c029d76dc62']);
 
-        Receiver::factory(10)->create(['user_id' => $userId]);
+       // Receiver::factory(10)->create(['user_id' => $userId]);
+        Receiver::factory(10)->create();
         Sender::factory(10)->create(['user_id' => $userId]);
         Rate::factory(10)->create();
         Bank::factory(10)->create();

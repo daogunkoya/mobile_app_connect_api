@@ -34,6 +34,7 @@ class TransactionCreateValidation extends FormRequest
             'conversion_type' => 'numeric|required|between:1,2',
             'receiver_id' => 'required|exists:mm_receiver,id_receiver',
             'amount_sent' => 'required',
+            'payment_token' => 'required',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 

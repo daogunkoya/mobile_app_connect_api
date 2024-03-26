@@ -2,10 +2,28 @@
 
 namespace Tests\Feature;
 
+use _PHPStan_cc8d35ffb\Symfony\Component\Console\Exception\CommandNotFoundException;
+use App\Actions\CreateTransaction;
+use App\Actions\TransactionFulfilled;
+use App\Collections\TransactionCollection;
+use App\DTO\CommissionDto;
+use App\DTO\RateDto;
+use App\DTO\ReceiverDto;
+use App\DTO\UserDto;
+use App\Exceptions\RateNotSetException;
 use App\Models\AcceptableIdentity;
 use App\Models\Bank;
+use App\Models\Commission;
 use App\Models\Currency;
+use App\Models\Rate;
 use App\Models\Transaction;
+use App\Payment\Contracts\PendingPayment;
+use App\Payment\InMemoryGateway;
+use App\Payment\PaymentBuddyGateway;
+use App\Repositories\CommissionRepository;
+use App\Repositories\RateRepository;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 use JetBrains\PhpStorm\NoReturn;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -57,38 +75,76 @@ class TransactionControllerTest extends TestCase
 
 
     /** @test */
-    public function it_can_create_a_transaction():void
+    public function it_can_create_a_transaction(): void
     {
 //        exec('php artisan db:seed --class=RateSeeder');
 //        exec('php artisan db:seed --class=CommissionSeeder');
 
         $domain = Domain::factory()->create();
 
+
         $newReceiver = Receiver::factory()->create();
-        $amountSent = "600.00";
+        $amountSent = "90.00";
+
+        $paymentToken = Str::uuid();
         $response = $this->postJson(route('transactions.store'),
             [
-                "receiver_id" =>$newReceiver->id_receiver,
+                "receiver_id" => $newReceiver->id_receiver,
                 "conversion_type" => 1,
-                "amount_sent" =>  $amountSent
+                "amount_sent" => $amountSent,
+                "payment_token" => $paymentToken
+
             ]);
 
-            $responseData  = $response->json();
+        $responseData = $response->json();
+
+
+        $userRate = RateRepository::fetchTodaysRate(auth()->id());
+        $userCommission = CommissionRepository::getCommissionValue($amountSent, auth()->id());
 
 
         // dd($response);
         // Assert the response status
         $response->assertStatus(200); // Adjust based on your expected response status
 
-        $this->assertEquals( $responseData['data']['amount_sent'], $amountSent);
+        $this->assertEquals($responseData['data']['amount_sent'], $amountSent);
 
-        $this->assertEquals( Transaction::latest()->value('amount_sent'), $amountSent);
+        $this->assertEquals(Transaction::latest()->value('exchange_rate'), $userRate->main_rate);
+        $this->assertEquals(Transaction::latest()->value('total_commission'), $userCommission->value);
+        $this->assertEquals(Transaction::latest()->value('amount_sent'), $amountSent);
+
+        // Event::assertDispatched(TransactionFulfilled::class);
 
 
     }
 
     /** @test */
-    public function it_can_fetch_transaction_list():void
+    public function it_can_not_create_a_transaction(): void
+    {
+
+        Rate::truncate();
+        Commission::truncate();
+
+        $newReceiver = Receiver::factory()->create();
+        $amountSent = "90.00";
+        $response = $this->postJson(route('transactions.store'),
+            [
+                "receiver_id" => $newReceiver->id_receiver,
+                "conversion_type" => 1,
+                "amount_sent" => $amountSent,
+                "payment_token" => Str::uuid()
+
+            ]);
+        //  dd($response->json());
+
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectException(RateNotSetException::class);
+
+    }
+
+
+    /** @test */
+    public function it_can_fetch_transaction_list(): void
     {
         // Create a test task
         $transaction = Transaction::factory(5)->create();
@@ -116,7 +172,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_a_transaction():void
+    public function it_can_show_a_transaction(): void
     {
         // Create a test task
         $transaction = Transaction::factory()->create();

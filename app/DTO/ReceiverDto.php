@@ -29,8 +29,8 @@ class ReceiverDto
         public string $bankId,
         public string $currencyId,
         public ?SenderDto $sender,
-        public Bank $bank,
-        public AcceptableIdentity  $identity,
+        public ?Bank $bank,
+        public ?AcceptableIdentity  $identity,
     )
     {
     }
@@ -53,8 +53,8 @@ class ReceiverDto
             $receiver->bank_id,
             $receiver->currency_id,
             $receiver->sender ? SenderDto::fromEloquentModel($receiver->sender) : null,
-            $receiver->bank,
-            $receiver->identity,
+            $receiver->bank??null,
+            $receiver->identity??null,
         );
     }
 

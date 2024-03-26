@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Collection;
 class RateRepository
 {
 
-    public static function fetchTodaysRate($useId = null): ?Rate
+    public static function fetchTodaysRate($userId = null, $currencyId = null): ?Rate
     {
 // Use $userId if not null, otherwise use an empty strin
         return Rate::query()
+            ->forUserAndCurrency($userId, $currencyId) // Apply the scope
             ->select('id_rate','main_rate','user_id' ,'bou_rate', 'sold_rate', 'currency_id as currency')
-            ->where('user_id', $userId ?? '')
             ->latest('created_at')
             ->first();
 

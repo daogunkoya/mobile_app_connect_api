@@ -5,7 +5,7 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.2",
         "itsgoingd/clockwork": "^5.2",
@@ -38,11 +38,11 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-     
+
             "app/Helpers/helper.php",
             "app/Helpers/home_helper.php",
             "app/Helpers/store_helper.php"
-     
+
         ]
     },
     "autoload-dev": {

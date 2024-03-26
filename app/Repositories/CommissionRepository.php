@@ -42,17 +42,16 @@ class CommissionRepository
         ];
     }
 
-    public static function getCommissionValue($amount, $userId = null, $currencyId = null): Commission
+    public static function getCommissionValue($amount, $userId = null, $currencyId = null): ?Commission
     {
-        return  Commission::query()
-            ->when(!is_null($currencyId), fn($query) => $query->whereIn('currency_id', [$currencyId]))
-            ->when(!is_null($userId), fn($query) => $query->whereIn('user_id', [$userId]))
-            ->when(!is_null($amount), fn($query) => $query->whereRaw('? between start_from and end_at', [$amount]))
-            ->select('id_commission','user_id','start_from','end_at','value', 'agent_quota')
+        return Commission::query()
+            ->forUserAndCurrency($userId, $currencyId) // Apply the scope
+            ->whereRaw('? between start_from and end_at', [$amount]) // Include $amount condition directly
+            ->select('id_commission', 'user_id', 'start_from', 'end_at', 'value', 'agent_quota')
             ->orderBy('start_from', 'asc')
             ->orderBy('end_at', 'asc')
             ->first();
-
     }
+
 
 }

@@ -21,6 +21,7 @@ class CommissionSeeder extends Seeder
         Commission::truncate();
 
         $userId = User::factory()->create()->id_user;
+        Commission::factory()->create();
 
         Commission::factory()->create(
             [

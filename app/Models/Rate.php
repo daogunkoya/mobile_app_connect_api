@@ -89,4 +89,15 @@ class Rate extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeForUserAndCurrency($query, $userId = null, $currencyId = null)
+    {
+        return $query
+            ->when(!is_null($currencyId)  &&  self::where('currency_id', $currencyId)->exists(), function ($query) use ($currencyId) {
+                return $query->whereIn('currency_id', [$currencyId]);
+            })
+            ->when(!is_null($userId) &&  self::where('user_id', $userId)->exists(), function ($query) use ($userId) {
+                return $query->whereIn('user_id', [$userId]);
+            });
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use _PHPStan_cc8d35ffb\Symfony\Component\Console\Exception\CommandNotFoundException;
 use App\Actions\CreateTransaction;
 use App\Collections\TransactionCollection;
 use App\DTO\CommissionDto;
@@ -9,11 +10,13 @@ use App\DTO\RateDto;
 use App\DTO\ReceiverDto;
 use App\DTO\TransactionDto;
 use App\DTO\UserDto;
+use App\Exceptions\RateNotSetException;
 use App\Http\Resources\TransactionResource;
 use App\Models\Commission;
 use App\Models\Rate;
 use App\Models\Receiver;
 use App\Models\Transaction;
+use App\Payment\PaymentGateway;
 use App\Repositories\CommissionRepository;
 use App\Repositories\RateRepository;
 use App\Repositories\TransactionRepository;
@@ -24,13 +27,16 @@ use App\Http\Requests\Transactions\calulate_validation;
 use App\Http\Requests\Transactions\TransactionCreateValidation;
 use App\Http\Requests\Transactions\transaction_update_validation;
 use Symfony\Component\HttpFoundation\Response;
+use App\Payment\Contracts\PendingPayment;
 
 
 class TransactionController extends Controller
 {
 
-    public function __construct(public TransactionRepository $transactionRepository,
-    public CreateTransaction $createTransaction
+    public function __construct(
+        public TransactionRepository $transactionRepository,
+        public CreateTransaction $createTransaction,
+        protected PaymentGateway $paymentGateway
     )
     {
     }
@@ -61,9 +67,13 @@ class TransactionController extends Controller
         $validated = $request->validated();
 
         $user = UserDto::fromEloquentModel(auth()->user());
-
-        $userCommission = CommissionRepository::getCommissionValue(request('amountSent', $user->userId));
+        $userCommission = CommissionRepository::getCommissionValue($validated['amount_sent'], $user->userId);
         $userRate = RateRepository::fetchTodaysRate($user->userId);
+
+        if(is_null($userCommission))throw new CommandNotFoundException('commission is not set for.'. $validated['amount_sent']);
+        if(is_null($userRate))throw new RateNotSetException('todays rate  is not set for.');
+
+       // $pendingPayment = new PendingPayment($this->paymentGateway, $validated['payment_token']);
 
         // Process transaction
         $transactionCollection = TransactionCollection::processTransactionData(
@@ -72,12 +82,17 @@ class TransactionController extends Controller
             $validated['amount_sent'],
             $validated['conversion_type']);
 
-        $receiver = ReceiverDto::fromEloquentModel(Receiver::with('sender')->find(request('receiver_id')));
-        $transaction = $this->createTransaction->handle( $transactionCollection , $receiver,  $user );
+        $receiver = ReceiverDto::fromEloquentModel(
+            Receiver::with('sender')
+                ->find( $validated['receiver_id']));
 
-        return (new TransactionResource( TransactionDto::fromEloquentModel($transaction)))
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+        $transaction = $this->createTransaction->handle(
+            $transactionCollection ,
+            new PendingPayment($this->paymentGateway, $validated['payment_token']),
+            $receiver,
+            $user );
+
+        return (new TransactionResource( $transaction))->response()->setStatusCode(Response::HTTP_OK);
     }
 
 

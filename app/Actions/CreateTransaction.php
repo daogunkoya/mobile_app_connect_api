@@ -4,34 +4,53 @@ namespace App\Actions;
 
 use App\Collections\TransactionCollection;
 use App\DTO\ReceiverDto;
+use App\DTO\TransactionDto;
+use App\DTO\UserDto;
 use App\Exceptions\RateNotSetException;
 use App\Models\Receiver;
 use App\Models\Sender;
 use App\Models\Transaction;
+use App\Payment\CreatePaymentForTransactionInterface;
 use App\Repositories\RateRepository;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Payment\Contracts\PendingPayment;
 
 class CreateTransaction
 {
 
-    public function __construct(public FetchUserCommission $fetchUserCommission)
+
+    public function __construct(
+        protected DatabaseManager $databaseManager,
+        protected CreatePaymentForTransactionInterface $createPaymentForTransaction,
+         protected Dispatcher $events
+    )
     {
     }
 
-    public function handle(TransactionCollection $transactionCollection, ReceiverDto $receiver, $user)
+    public function handle(
+        TransactionCollection $transactionCollection,
+                       PendingPayment $pendingPayment,
+                       ReceiverDto $receiver,
+                       UserDto $userDto)
     {
 
 
 
+        $transaction = $this->databaseManager->transaction(function () use (
+            $transactionCollection,
+             $pendingPayment,
+            $receiver,
+            $userDto
+        ) {
 
-            $receiverPhone = $receiver->receiverPhone ?? $receiver->receiverMobile;
-
-            $transaction = Transaction::create([
+            $transaction =  Transaction::create([
                 'store_id' => store_id(),
-                'user_id' => $user->userId,
+                'user_id' => $userDto->userId,
                 'transaction_code' => $this->generateUniqueTransactionCode(),
-                'currency_id' => $receiver->currencyId ,
+                'currency_id' => $receiver->currencyId,
                 'sender_id' => $receiver->senderId,
                 'receiver_id' => $receiver->receiverId,
                 'sender_fname' => $receiver->sender->senderFname,
@@ -45,8 +64,8 @@ class CreateTransaction
                 'receiver_transfer_type' => $receiver->transferType,
                 'sender_address' => $receiver->sender->senderAddress,
                 'agent_payment_id' => '',
-                'receiver_phone' => $receiverPhone ?? '',
-                'amount_sent' =>  $transactionCollection->amountSent,
+                'receiver_phone' => $receiver->receiverPhone ?? $receiver->receiverMobile,
+                'amount_sent' => $transactionCollection->amountSent,
                 'total_amount' => $transactionCollection->totalAmount,
                 'local_amount' => $transactionCollection->localAmount,
                 'total_commission' => $transactionCollection->totalCommission,
@@ -61,6 +80,26 @@ class CreateTransaction
                 'moderation_status' => 1,
             ]);
 
+            $transaction = TransactionDto::fromEloquentModel($transaction);
+
+            $this->createPaymentForTransaction->handle(
+                $pendingPayment->paymentGateway,
+                $pendingPayment->paymentToken,
+                $transactionCollection->totalAmount,
+                $userDto->userId,
+                $transaction->transactionId
+            );
+
+            return  $transaction;
+        });
+
+        $this->events->dispatch(
+            new TransactionFulfilled(
+                $transaction,
+                $userDto
+            )
+
+        );
             return $transaction;
 
 

@@ -25,7 +25,7 @@ class CurrencyFactory extends Factory
         return [
            // 'id'=> (string) Uuid::uuid4(),
             'store_id'=>'2bda0c37-4eac-44e5-a014-6c029d76dc62',
-            'user_id' => User::factory()->create()->id_user,
+            'user_id' => Str::uuid(),
             'currency_origin' => fake()->randomElement(['Nigeria', 'Ghana', 'Benin', 'United-Kingdom']),
             'currency_origin_symbol' => fake()->randomElement(['NG', 'GH', 'BN']),
             'currency_destination'=> fake()->randomElement(['Nigeria', 'Ghana', 'Benin']),

@@ -1,15 +1,13 @@
 <?php
 
-namespace Modules\Payment\Actions;
+namespace App\Payment;
 
+use App\Enum\PaymentProvider;
+use App\Models\Payment;
+use App\Payment\Exceptions\PaymentFailedException;
 use Illuminate\Support\Str;
-use Modules\Payment\Exceptions\PaymentFailedException;
-use Modules\Payment\Payment;
-use Modules\Payment\PaymentDetails;
-use Modules\Payment\PaymentGateway;
-use Modules\Payment\PaymentProvider;
 
-class CreatePaymentForOrderInMemory implements CreatePaymentForOrderInterface
+class CreatePaymentForTransactionInMemory implements CreatePaymentForTransactionInterface
 {
 /**  @var  Payment[] */
 public array $payments = [];
@@ -18,10 +16,10 @@ protected  bool $shouldFail = false;
 
     public function handle(
         PaymentGateway $paymentGateway,
-        string $paymentToken,
-        int $orderTotalInCents ,
-        int $userId,
-        int $orderId):Payment
+        string         $paymentToken,
+        int            $transactionTotalInPence ,
+        string            $userId,
+        string            $transactionId):Payment
     {
 
         if($this->shouldFail){
@@ -30,13 +28,13 @@ protected  bool $shouldFail = false;
 
 
             $charge =  $paymentGateway->charge(
-               new PaymentDetails( $paymentToken, $orderTotalInCents, 'modularization')
+               new PaymentDetails( $paymentToken, $transactionTotalInPence, 'modularization')
             );
 
       $payment =  new Payment([
-          'order_id' => $orderId,
+          'order_id' => $transactionId,
           'user_id' => $userId,
-           'total_in_cents' => $orderTotalInCents,
+           'total_in_pence' => $transactionTotalInPence,
             'payment_gateway' => PaymentProvider::InMemory,
             'payment_id' => (string) Str::uuid(),
 

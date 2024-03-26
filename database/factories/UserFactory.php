@@ -25,7 +25,7 @@ class UserFactory extends Factory
         return [
            // 'id'=> (string) Uuid::uuid4(),
             'first_name' => fake()->firstName(),
-            'store_id' => Store::factory()->create(),
+            'store_id' => Store::factory()->create(['id_store' => '2bda0c37-4eac-44e5-a014-6c029d76dc63']),
             'currency_id'=>"",
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),

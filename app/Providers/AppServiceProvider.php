@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Payment\CreatePaymentForTransactionInterface;
+use App\Payment\PayBuddySdk;
+use App\Payment\PaymentBuddyGateway;
+use App\Payment\PaymentGateway;
 use App\Services\Receiver\ReceiverService;
 use App\Services\Receiver\ReceiverServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -11,6 +15,7 @@ use App\Services\Auth\LoginUserService;
 use App\Services\Auth\RegisterUserService;
 use Illuminate\Support\Facades\Log;
 use App\Logging\DatabaseLogger;
+use App\Payment\CreatePaymentForTransaction;
 use Monolog\Logger;
 use App\Services\Sender\SenderService;
 use App\Services\Sender\SenderServiceInterface;
@@ -43,5 +48,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(LoginServiceInterface::class, LoginUserService::class);
         $this->app->bind(RegisterServiceInterface::class, RegisterUserService::class);
+
+
+        $this->app->bind(PaymentGateway::class,
+        fn()=> new PaymentBuddyGateway(new PayBuddySdk));
+
+         $this->app->bind(CreatePaymentForTransactionInterface::class, fn() => new CreatePaymentForTransaction);
+
     }
 }

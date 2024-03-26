@@ -12,6 +12,7 @@ use App\Models\Bank;
 use App\Models\Sender;
 use App\Models\AcceptableIdentity;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ReceiverFactory extends Factory
 {
@@ -29,7 +30,7 @@ class ReceiverFactory extends Factory
      */
     public function definition()
     {
-        $userId =  User::factory()->create()->id_user;
+       // $userId =  User::factory()->create()->id_user;
         return [
 //            'user_id' => $userId,
             'sender_id' => Sender::factory()->create()->id_sender,
@@ -45,9 +46,9 @@ class ReceiverFactory extends Factory
            'receiver_address' => $this->faker->address(),
             'transfer_type' => "bank",
             'account_number' =>$this->faker->randomNumber(),
-            'currency_id' => Currency::factory()->create()->id_currency,
-            'bank_id' => Bank::factory()->create()->id,
-            'identity_type_id' => AcceptableIdentity::factory()->create()->id,
+            'currency_id' => Str::uuid(),
+            'bank_id' => Str::uuid(),
+            'identity_type_id' => Str::uuid(),
 //            'photo_id' =>""
             // Add other required fields and their fake data
         ];
