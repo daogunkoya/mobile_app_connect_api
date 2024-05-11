@@ -65,7 +65,7 @@ class ApiDataLoggerMiddleware
         $data['Input'] = $data_input;
         $today_req = $data;
     //$data.= '--------------------------------------------------' . "\n";
-    //$data.= 'Response Output: ' . $response->getContent() . "\n";
+    //$data.= 'Responses Output: ' . $response->getContent() . "\n";
     // \File::append(storage_path('logs' . DIRECTORY_SEPARATOR . $filename), $data. "\n" . str_repeat("=", 20) . "\n\n");
 
 
@@ -88,10 +88,10 @@ class ApiDataLoggerMiddleware
         $response_update = !empty($main_content['response_message']) ? json_decode($main_content['response_message'], true) : [];
         $today_res = [];
         $today_res ['separator'] =  '-------------------';
-        $today_resp ['Response Time'] =  gmdate("F j, Y, g:i a");
+        $today_resp ['Responses Time'] =  gmdate("F j, Y, g:i a");
         $data_response =  $response->getContent();
         $data_response =  !empty($data_response) ? substr($data_response, 0, 3000) : $data_response ;
-        $today_resp['Response content'] = $data_response;
+        $today_resp['Responses content'] = $data_response;
 
     //$response_update[]= $today_resp;
         array_unshift($response_update, $today_resp);
@@ -108,7 +108,7 @@ class ApiDataLoggerMiddleware
         $contents = $main_content['content'] ?? [];
         $contents = !empty($main_content['content']) ? json_decode($main_content['content'], true) : [];
         $data['separator'] = '--------------------';
-        $data ['Response Output'] =  $data_response;
+        $data ['Responses Output'] =  $data_response;
 
         $todays_input_output = $data;
     //$contents[] = $data;

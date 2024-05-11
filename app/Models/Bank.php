@@ -61,6 +61,15 @@ class Bank extends Model
         return 'string';
     }
 
+    public function scopeFilter($query, array $filters){
+
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%'.$search.'%');
+            });
+        });
+    }
+
     public function getUserAttribute($user_id)
     {
         return optional(User::where('id_user', $user_id)->select('id_user as user_id', 'user_name', 'user_handle', 'user_email', 'created_at')->first())->toArray();

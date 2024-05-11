@@ -36,6 +36,7 @@ class SenderResource extends JsonResource
             "sender_mobile"=>$this->senderMobile,
             "sender_address"=> $this->senderAddress,
             "sender_postcode"=> $this->senderPostcode,
+            "meta_data"=> $this->metadata,
             "count_sender_receivers"=>$this->countSenderReceiver,
         ];
     }

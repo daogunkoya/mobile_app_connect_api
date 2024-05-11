@@ -37,8 +37,8 @@ class Receiver extends Model
         'receiver_postcode',
         'account_number',
         'bank_id',
-        'identity_type_id',
-        'transfer_type',
+        // 'identity_type_id',
+        // 'transfer_type',
         //'transfer_type_key',
 //        'identity_type',
 //        'bank',
@@ -91,7 +91,7 @@ class Receiver extends Model
     {
 
         $defaultSelect = [
-            'id_receiver as receiver_id',
+            'id_receiver',
             'created_at',
             'sender_id',
             'receiver_title',
@@ -101,7 +101,8 @@ class Receiver extends Model
             'transfer_type',
             'account_number',
             'bank_id',
-            'identity_type_id'
+            'identity_type_id',
+            'currency_id',
         ];
 
         $autoCompleteSelect =

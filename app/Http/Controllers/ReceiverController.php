@@ -27,6 +27,7 @@ class ReceiverController extends Controller
     {
 
         $receiverDataList = ReceiverServiceFacade::fetchReceiver($senderId);
+        //dd($receiverDataList);
         $receiverResource = ReceiverResource::collection(ReceiverDto::fromEloquentModelCollection($receiverDataList));
         return $receiverResource->response()->setStatusCode(Response::HTTP_OK);
     }

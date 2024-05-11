@@ -54,7 +54,8 @@ class SenderRepository
                 'sender_phone',
                 'sender_mobile',
                 'sender_address',
-                'sender_postcode'
+                'sender_postcode',
+                'metadata'
         ];
 
         ;

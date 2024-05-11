@@ -12,18 +12,19 @@ class SenderDto
     public function __construct(
         public string $senderId,
         public string $userId,
-        public string $senderTitle,
+        public string|null $senderTitle,
         public string $createdAt,
         public string $senderName,
-        public string $senderMname,
+        public string|null $senderMname,
         public string $senderFname,
         public string $senderLname,
         public string $senderDob,
         public string $senderEmail,
         public string $senderPhone,
-        public string $senderMobile,
+        public string|null $senderMobile,
         public string $senderAddress,
         public string $senderPostcode,
+        public array|null  $metadata,
         public        $countSenderReceiver
     )
     {
@@ -46,6 +47,7 @@ class SenderDto
             $sender->sender_mobile,
             $sender->sender_address,
             $sender->sender_postcode,
+            $sender->metadata,
             $sender->receiver->count(),
         );
     }

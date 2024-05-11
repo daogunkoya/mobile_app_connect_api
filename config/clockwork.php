@@ -163,7 +163,7 @@ return [
 		// Collect only errors (requests with HTTP 4xx and 5xx responses)
 		'errors_only' => env('CLOCKWORK_REQUESTS_ERRORS_ONLY', false),
 
-		// Response time threshold in milliseconds after which the request will be marked as slow
+		// Responses time threshold in milliseconds after which the request will be marked as slow
 		'slow_threshold' => env('CLOCKWORK_REQUESTS_SLOW_THRESHOLD'),
 
 		// Collect only slow requests

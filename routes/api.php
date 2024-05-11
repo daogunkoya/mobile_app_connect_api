@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressFinderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
@@ -63,6 +64,8 @@ Route::prefix('v1')->group(function () {
     //fetch currencies and destination
     Route::get('/currencies/list', 'App\Http\Controllers\CurrencyController@fetchCurrencies');
 
+    Route::get('/address-finder', [AddressFinderController::class, 'addressFinder'])->name('address-finder');
+    Route::get('/address-by-udprn', [AddressFinderController::class, 'addressByUDPRN'])->name('address-by-udprn');
 
     /*
     |--------------------------------------------------------------------------
@@ -104,9 +107,9 @@ Route::prefix('v1')->group(function () {
 
 
         //for Receivers
-        Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index');
-        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('create_receiver');
-        Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update')->name('update_receiver');
+        Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index')->name('receivers.index');
+        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('receivers.store');
+        Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update')->name('receivers.update');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
 
@@ -117,7 +120,7 @@ Route::prefix('v1')->group(function () {
 
 
 
-        Route::resource('/banks', 'App\Http\Controllers\BankController');
+        // Route::resource('/banks', 'App\Http\Controllers\BankController');
         Route::get('/bank/list', 'App\Http\Controllers\BankController@list');
         Route::resource('/senders', 'App\Http\Controllers\SenderController');
         Route::put('/senders/{sender:id_sender}', 'App\Http\Controllers\SenderController@update')->name('update_sender');

@@ -46,9 +46,9 @@ class ReceiverFactory extends Factory
            'receiver_address' => $this->faker->address(),
             'transfer_type' => "bank",
             'account_number' =>$this->faker->randomNumber(),
-            'currency_id' => Str::uuid(),
-            'bank_id' => Str::uuid(),
-            'identity_type_id' => Str::uuid(),
+            'currency_id' => Currency::factory()->create()->id_currency,
+            'bank_id' =>  Bank::factory()->create()->id,
+            'identity_type_id' => AcceptableIdentity::factory()->create()->id,
 //            'photo_id' =>""
             // Add other required fields and their fake data
         ];

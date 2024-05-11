@@ -44,7 +44,9 @@ class SenderController extends Controller
     {
 
         $sender = auth()->user()->sender()->create($request->validated());
-        return (new SenderResource($sender))->response()->setStatusCode(Response::HTTP_CREATED);
+        return (new SenderResource(
+            (SenderDto::fromEloquentModel( $sender))
+        ))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function update(Sender $sender, sender_validation $request): JsonResponse

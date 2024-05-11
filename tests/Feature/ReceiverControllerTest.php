@@ -6,6 +6,7 @@ use App\Models\AcceptableIdentity;
 use App\Models\Bank;
 use App\Models\Currency;
 use JetBrains\PhpStorm\NoReturn;
+use PHPStan\BetterReflection\Identifier\IdentifierType;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,17 +64,36 @@ class ReceiverControllerTest extends TestCase
 
 
     /** @test */
+    public function it_can_list_receiver():void
+    {
+
+        $domain = Domain::factory()->create();
+        $sender = Sender::factory()->has(Receiver::factory())->create();
+
+        $response = $this->getJson(route('receivers.index', $sender->id_sender));
+        $responseData = $response->json();
+
+        // dd($responseData['data'][0]['sender_id']);
+        // Assert the response status
+        $response->assertStatus(200); // Adjust based on your expected response status
+        $this->assertEquals(  $sender->id_sender, $responseData['data'][0]['sender_id']);
+
+    }
+
+
+    /** @test */
   public function it_can_create_a_receiver():void
     {
 
         $domain = Domain::factory()->create();
         $newReceiver = Receiver::factory()->create();
+        $newReceiver = $newReceiver->toArray();
 
       //  $receiverData = Receiver::factory()->create();
         $sender = Sender::factory()->create();
         // Make a POST request to create a task
       //dd("v1/sender/$sender->id_sender/");
-        $response = $this->postJson(route('create_receiver', $sender->id_sender), $newReceiver->toArray());
+        $response = $this->postJson(route('receivers.store', $sender->id_sender), $newReceiver);
 
        // dd($response);
         // Assert the response status
@@ -105,11 +125,12 @@ class ReceiverControllerTest extends TestCase
         // Create a test task
         $receiver = Receiver::factory()->create();
         $sender = Sender::factory()->create();
+        $receiver = $receiver->toArray();
 
         // Make a PUT request to update the task
         $response = $this->put(
-            route('update_receiver', [ $sender->id_sender, $receiver->id_receiver]),
-            $receiver->toArray()
+            route('receivers.update', [ $sender->id_sender, $receiver['id_receiver'] ]),
+            $receiver
         );
 
 

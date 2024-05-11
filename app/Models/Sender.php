@@ -42,7 +42,8 @@ class Sender extends Model
         'sender_postcode',
         'photo_id',
         'sender_status',
-        'moderation_status'
+        'moderation_status',
+        'metadata'
 
     ];
 
@@ -50,6 +51,10 @@ class Sender extends Model
     protected $keyType = 'string';
 
     public $incrementing = false;
+
+    protected $casts = [
+        'metadata' => 'array', // or 'json'
+    ];
 
     public static function boot()
     {

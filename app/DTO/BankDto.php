@@ -2,6 +2,7 @@
 
 namespace App\DTO;
 
+use App\Models\Bank;
 use App\Models\Sender;
 use Illuminate\Support\Collection;
 
