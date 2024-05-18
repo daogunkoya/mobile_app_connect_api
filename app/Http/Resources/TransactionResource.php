@@ -46,7 +46,7 @@ class TransactionResource extends JsonResource
             'note' => $this->note,
             'currency_income' => $this->currencyIncome,
             'transaction_type' => $this->transactionType,
-            'transaction_status' => $this->transactionStatus
+            'transaction_status' => $this->transactionStatus->label()
         ];
     }
 }

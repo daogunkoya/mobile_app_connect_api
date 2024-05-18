@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use _PHPStan_cc8d35ffb\Symfony\Component\Console\Exception\CommandNotFoundException;
+use App\Exceptions\CommissionNotSetException;
 use App\Actions\CreateTransaction;
 use App\Collections\TransactionCollection;
 use App\DTO\CommissionDto;
@@ -28,6 +28,8 @@ use App\Http\Requests\Transactions\TransactionCreateValidation;
 use App\Http\Requests\Transactions\transaction_update_validation;
 use Symfony\Component\HttpFoundation\Response;
 use App\Payment\Contracts\PendingPayment;
+use App\Http\Resources\TransferBreakDownResource;
+
 
 
 class TransactionController extends Controller
@@ -44,9 +46,10 @@ class TransactionController extends Controller
     public function index(TransactionService $transaction_service, Request $request):JsonResponse
     {
 
-
-        $transactionList = $this->transactionRepository->fetchTransaction($request->all(), auth()->user());
-        $totalTransaction = $this->transactionRepository->calculateTotalAmount($request->all(), auth()->user());
+            
+       [ $transactionList, $totalTransaction ] = $this->transactionRepository
+       ->fetchTransaction($request->all(), UserDto::fromEloquentModel(auth()->user()));
+       // $totalTransaction = $this->transactionRepository->calculateTotalAmount($request->all(), auth()->user());
 
         return (TransactionResource::collection(
             TransactionDto::fromEloquentModelCollection($transactionList)))
@@ -70,7 +73,7 @@ class TransactionController extends Controller
         $userCommission = CommissionRepository::getCommissionValue($validated['amount_sent'], $user->userId);
         $userRate = RateRepository::fetchTodaysRate($user->userId);
 
-        if(is_null($userCommission))throw new CommandNotFoundException('commission is not set for.'. $validated['amount_sent']);
+        if(is_null($userCommission))throw new CommissionNotSetException('commission is not set for '. $validated['amount_sent']);
         if(is_null($userRate))throw new RateNotSetException('todays rate  is not set for.');
 
        // $pendingPayment = new PendingPayment($this->paymentGateway, $validated['payment_token']);
@@ -129,11 +132,28 @@ class TransactionController extends Controller
 
     public function calculateTransaction(calulate_validation $request, TransactionService $transaction_service)
     {
+       
+        
+        $validated = $request->validated();
 
+        $user = UserDto::fromEloquentModel(auth()->user());
 
-        $input = $request->all();
-        $res = $transaction_service->showAmountBreakdown($input);
+        $userRate = RateRepository::fetchTodaysRate($user->userId);
 
-        return response()->json($res);
+        $userSendAmount = $validated['conversion_type'] == 1? $validated['send_amount']
+        :$validated['send_amount'] / $userRate->main_rate;
+
+        $userCommission = CommissionRepository::getCommissionValue($userSendAmount, $user->userId);
+
+        // Process transaction
+        $transactionCollection = TransactionCollection::processTransactionData(
+            RateDto::fromEloquentModel(($userRate)),
+            CommissionDto::fromEloquentModel($userCommission),
+            $validated['send_amount'],
+            $validated['conversion_type']);
+
+        return (new TransferBreakDownResource($transactionCollection))
+        ->response()
+        ->setStatusCode(Response::HTTP_OK);
     }
 }

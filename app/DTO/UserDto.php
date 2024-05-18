@@ -6,6 +6,7 @@ use App\Models\Sender;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Enum\UserRoleType;
 
 
 class UserDto
@@ -17,6 +18,7 @@ class UserDto
         public string $email,
         public ?string $userHandle,
         public ?string $currencyId,
+        public UserRoleType $userRoleType,
 
     )
     {
@@ -30,7 +32,8 @@ class UserDto
             $user->last_name,
             $user->email,
             $user->user_handle,
-            $user->currency_id
+            $user->currency_id,
+            $user->user_role_type
         );
     }
 

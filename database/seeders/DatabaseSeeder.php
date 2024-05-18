@@ -12,6 +12,7 @@ use App\Models\Sender;
 use App\Models\Store;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use App\Models\Commission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
         Bank::truncate();
         Domain::truncate();
         Currency::truncate();
+        Commission::truncate();
 
         Currency::factory(10)->create();
         Currency::factory()->create([
@@ -53,6 +55,7 @@ class DatabaseSeeder extends Seeder
         Bank::factory(10)->create();
         Domain::factory(10)->create();
         Domain::factory(10)->create([]);
+        Commission::factory()->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

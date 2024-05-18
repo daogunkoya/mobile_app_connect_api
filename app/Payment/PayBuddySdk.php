@@ -40,8 +40,14 @@ final class PayBuddySdk
 
     private function validateToken(string $token): void
     {
-        if(! Str::isUuid($token)){
+
+        //this is a temporary solution
+        if(! is_string($token)){
             throw new \RuntimeException('The payment token is not valid');
         }
+
+        // if(! Str::isUuid($token)){
+        //     throw new \RuntimeException('The payment token is not valid');
+        // }
     }
 }

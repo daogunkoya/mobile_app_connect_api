@@ -91,6 +91,8 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
+        Route::post('/transactions/transfer/breakdown', 'App\Http\Controllers\TransactionController@calculateTransaction');
+
         //landing page
         Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
 

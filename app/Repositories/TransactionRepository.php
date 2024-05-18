@@ -17,23 +17,28 @@ use Illuminate\Support\Str;
 class TransactionRepository
 {
 
-    public function __construct(protected CommissionRepository $commissionRepository,
-                                protected BankRepository       $bankRepository)
-    {
-
+    public function __construct(
+        protected CommissionRepository $commissionRepository,
+        protected BankRepository       $bankRepository
+    ) {
     }
 
     public function fetchTransaction($input, $user)
     {
-        $transactionQuery = $user->user_role_type == UserRoleType::ADMIN ?
-            Transaction::query() :
-            Sender::find(request('sender_id'))->transaction();
+            
+            // Transaction::query() :
+            // Sender::find(request('sender_id'))->transaction();
+
+            $isAdmin = $user->userRoleType == UserRoleType::ADMIN;
+
+            $transactionQuery =   Transaction::query();
 
         $query = $transactionQuery->withCount('receiver')
             ->select(self::transactionSelectList())
             ->filter([
-                'search' => $input['search']??'',
-                'date' => $input['date']??''
+                'userId' => !$isAdmin?$user->userId: null,
+                'search' => $input['search'] ?? '',
+                'date' => $input['date'] ?? ''
             ])
             ->orderBy('created_at', 'DESC');
 
@@ -41,8 +46,10 @@ class TransactionRepository
         $page = request('page') ?? 1;
         $limit = request('limit') ?? 6;
 
-        return $query->paginate($limit, ['*'], 'page', $page);
-
+        return [
+            $query->paginate($limit, ['*'], 'page', $page),
+            $query->sum('total_amount')
+        ];
     }
 
 
@@ -54,7 +61,6 @@ class TransactionRepository
             Sender::find($input['sender_id'])->transaction();
 
         return $transactionQuery->sum('total_amount');
-
     }
 
     public static function transactionSelectList()
@@ -88,72 +94,72 @@ class TransactionRepository
         ];
     }
 
-//    public function fetchTransactionOld($input)
-//    {
-//        $user = optional(Auth::user())->toArray();
-//        $user_id = Auth::id();
-//
-//        $select = [
-//            'created_at', 'id_transaction as transaction_id', 'transaction_code', 'user_id', 'sender_id', 'sender_address', 'receiver_address',
-//            'currency_id', 'id_transaction as sender_name', 'id_transaction as receiver_name', 'receiver_fname', 'receiver_lname', 'receiver_phone',
-//            'receiver_bank_id', 'receiver_identity_id', 'receiver_account_no', 'receiver_transfer_type',
-//            'amount_sent', 'total_amount', 'local_amount', 'total_commission', 'agent_commission', 'exchange_rate',
-//            'bou_rate', 'sold_rate', 'note', 'currency_income', 'transaction_type', 'transaction_status'
-//        ];
-//
-//        $input_query = !empty($input['query']) ? (is_string($input['query']) ? json_decode($input['query'], true) : $input['query']) : [];
-//
-//        $whereUser = $user['user_role_type'] == 1 ? [['transaction.user_id', '=', $user_id]] : [];
-//        $limit = $input['limit'] ?? 10;
-//        $moderation_status = !empty($input_query['moderation_status']) ? [$input_query['moderation_status']] : [1, 2, 3, 4];
-//
-//        [$date_start, $date_end] = $this->dateFinder($input);
-//        $search = !empty($input_query['search']) && $input_query['search'] != "null" ? "%" . $input_query['search'] . "%" : '%';
-//
-//        $query = transaction::
-//        with(['bank:id,name', 'identity:id,name'])
-//            ->where('transaction_status', 1)
-//            ->where(function ($query) use ($search) {
-//                $query->orWhere('receiver_fname', 'like', $search)
-//                    ->orWhere('receiver_lname', 'like', $search)
-//                    ->orWhere('sender_lname', 'like', $search)
-//                    ->orWhere('sender_fname', 'like', $search);
-//            })
-//            ->whereIn('moderation_status', $moderation_status)
-//          //  ->where($whereUser)
-//            ->whereBetween('created_at', [$date_start . " 00:00:00", $date_end . " 23:59:59"])
-//            ->orderBy('created_at', 'DESC');
-//
-//        $total_sent = $query->sum('total_amount');
-//        $count = $query->count();
-//        $limit = $input['limit'] ?? 6;
-//
-//        // Pagination
-//        $page = $input['page'] ?? 1;
-//        $perPage = $limit;
-//        $page_start = ($page - 1) * $perPage;
-//
-//        $transactions = $query->select($select)
-//            ->skip($page_start)
-//            ->limit($limit)
-//            ->get()
-//            ->toArray();
-//
-//        $lastPage = ceil($count / $perPage);
-//
-//        $chatData = $this->fetchChartData($query);
-//        return [
-//            'transaction_count' => $count,
-//            'total_sent' => number_format($total_sent, 2),
-//            'transaction' => $transactions,
-//            'current_page' => $page,
-//            'last_page' => $lastPage,
-//            'total' => $count,
-//            'per_page' => $perPage,
-//            'chart_data' => $chatData,
-//            'banks_id_list' => $this->bankRepository->fetchBanksIdentityTypesList()
-//        ];
-//    }
+    //    public function fetchTransactionOld($input)
+    //    {
+    //        $user = optional(Auth::user())->toArray();
+    //        $user_id = Auth::id();
+    //
+    //        $select = [
+    //            'created_at', 'id_transaction as transaction_id', 'transaction_code', 'user_id', 'sender_id', 'sender_address', 'receiver_address',
+    //            'currency_id', 'id_transaction as sender_name', 'id_transaction as receiver_name', 'receiver_fname', 'receiver_lname', 'receiver_phone',
+    //            'receiver_bank_id', 'receiver_identity_id', 'receiver_account_no', 'receiver_transfer_type',
+    //            'amount_sent', 'total_amount', 'local_amount', 'total_commission', 'agent_commission', 'exchange_rate',
+    //            'bou_rate', 'sold_rate', 'note', 'currency_income', 'transaction_type', 'transaction_status'
+    //        ];
+    //
+    //        $input_query = !empty($input['query']) ? (is_string($input['query']) ? json_decode($input['query'], true) : $input['query']) : [];
+    //
+    //        $whereUser = $user['user_role_type'] == 1 ? [['transaction.user_id', '=', $user_id]] : [];
+    //        $limit = $input['limit'] ?? 10;
+    //        $moderation_status = !empty($input_query['moderation_status']) ? [$input_query['moderation_status']] : [1, 2, 3, 4];
+    //
+    //        [$date_start, $date_end] = $this->dateFinder($input);
+    //        $search = !empty($input_query['search']) && $input_query['search'] != "null" ? "%" . $input_query['search'] . "%" : '%';
+    //
+    //        $query = transaction::
+    //        with(['bank:id,name', 'identity:id,name'])
+    //            ->where('transaction_status', 1)
+    //            ->where(function ($query) use ($search) {
+    //                $query->orWhere('receiver_fname', 'like', $search)
+    //                    ->orWhere('receiver_lname', 'like', $search)
+    //                    ->orWhere('sender_lname', 'like', $search)
+    //                    ->orWhere('sender_fname', 'like', $search);
+    //            })
+    //            ->whereIn('moderation_status', $moderation_status)
+    //          //  ->where($whereUser)
+    //            ->whereBetween('created_at', [$date_start . " 00:00:00", $date_end . " 23:59:59"])
+    //            ->orderBy('created_at', 'DESC');
+    //
+    //        $total_sent = $query->sum('total_amount');
+    //        $count = $query->count();
+    //        $limit = $input['limit'] ?? 6;
+    //
+    //        // Pagination
+    //        $page = $input['page'] ?? 1;
+    //        $perPage = $limit;
+    //        $page_start = ($page - 1) * $perPage;
+    //
+    //        $transactions = $query->select($select)
+    //            ->skip($page_start)
+    //            ->limit($limit)
+    //            ->get()
+    //            ->toArray();
+    //
+    //        $lastPage = ceil($count / $perPage);
+    //
+    //        $chatData = $this->fetchChartData($query);
+    //        return [
+    //            'transaction_count' => $count,
+    //            'total_sent' => number_format($total_sent, 2),
+    //            'transaction' => $transactions,
+    //            'current_page' => $page,
+    //            'last_page' => $lastPage,
+    //            'total' => $count,
+    //            'per_page' => $perPage,
+    //            'chart_data' => $chatData,
+    //            'banks_id_list' => $this->bankRepository->fetchBanksIdentityTypesList()
+    //        ];
+    //    }
 
 
     //fetch date by today, yesterday, a month ago or between days
@@ -194,7 +200,7 @@ class TransactionRepository
         return [$date_start, $date_end];
     }
 
-//add a new transaction
+    //add a new transaction
     public function storeTransaction($input)
     {
         $userId = $input['user']['id_user'] ?? '';
@@ -278,9 +284,9 @@ class TransactionRepository
 
     public function updateTransaction($input, $transactionId)
     {
-//        $parts = preg_split('/\s+/', $input['receiver_name']);
-//        $receiverFname = $parts[0] ?? '';
-//        $receiverLname = $parts[1] ?? '';
+        //        $parts = preg_split('/\s+/', $input['receiver_name']);
+        //        $receiverFname = $parts[0] ?? '';
+        //        $receiverLname = $parts[1] ?? '';
 
         if (!empty($input) && transaction::where('id_transaction', $transactionId)->exists()) {
             $transaction = transaction::where('id_transaction', $transactionId)->update([
@@ -312,7 +318,6 @@ class TransactionRepository
         $transactionCode = substr($transactionCode, 0, $maxLength);
 
         return $transactionCode;
-
     }
 
     //update transaction
@@ -345,9 +350,9 @@ class TransactionRepository
         $conversionType = $input['conversion_type'] ?? 1;
 
         $rateToday = RateRepository::fetchTodaysRate();
-        $rate = $rateToday->main_rate??0;
+        $rate = $rateToday->main_rate ?? 0;
 
-        if(!$rate)  throw new RateNotSetException("no rate is provided");
+        if (!$rate)  throw new RateNotSetException("no rate is provided");
 
 
         // Evaluate based on convert type
@@ -357,7 +362,8 @@ class TransactionRepository
             [
                 'amount' => $sendAmount,
                 'conversion_type' => $conversionType
-            ]);
+            ]
+        );
         $commissionValue = $resCommission['commission_value'] < 1 ?
             $resCommission['value'] * $sendAmount
             : $resCommission['commission_value'];
@@ -409,6 +415,4 @@ class TransactionRepository
             'data' => $data,
         ];
     }
-
-
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\Bank\TransferType;
+use App\Enum\TransactionStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,12 @@ class Transaction extends Model
 
     protected $table = "mm_transaction";
     protected $primaryKey = 'id_transaction';
+    protected $casts
+    = [
+        'transaction_status' => TransactionStatus::class
+    ];
+
+    // protected $appends = [ 'receiver_name'];
 
     protected $fillable = [
         'id_transaction',
@@ -68,15 +75,18 @@ class Transaction extends Model
     public function scopeFilter(Builder $query, array $filter): void
     {
         $query
-            ->when($filter['search'] ?? false, function ($query, $search) {
+            ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
+                $search = trim($filter['search']);
                 $query->where('sender_fname', 'like', '%' . $search . '%')
                     ->orWhere('sender_lname', 'like', '%' . $search . '%')
                     ->orWhere('receiver_fname', 'like', '%' . $search . '%')
                     ->orWhere('receiver_lname', 'like', '%' . $search . '%');
             })
-            ->when($filter['date'] ?? false, function ($query, $search_date) {
-
-                $query->when($search_date, function ($query, $date) {
+            ->when($filter['senderId'] ?? false, fn($query) => $query->where('sender_id', $filter['senderId']))
+            ->when(!is_null($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
+            ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
+                $searchDate = $filter['date'];
+                $query->when($searchDate, function ($query, $date) {
                     return $query->where(fn ($query) => match ($date) {
                         'today' => $query->whereDate('created_at', today()),
                         'yesterday' => $query->whereDate('created_at', today()->subDay()),

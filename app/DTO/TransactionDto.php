@@ -6,7 +6,7 @@ use App\Models\Sender;
 use App\Models\Transaction;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-
+use App\Enum\TransactionStatus;
 
 class TransactionDto
 {
@@ -23,9 +23,9 @@ class TransactionDto
         public string $receiverLname,
         public string $receiverPhone,
         public string $receiverBankId,
-        public string $receiverIdentityId,
+        public ?string $receiverIdentityId,
         public string $receiverAccountNumber,
-        public string $receiverTransferType,
+        public ?string $receiverTransferType,
         public string $amountSent,
         public string $localAmount,
         public string $totalAmount,
@@ -35,7 +35,7 @@ class TransactionDto
         public string $currencyIncome,
         public string $note,
         public string $transactionType,
-        public string $transactionStatus,
+        public TransactionStatus $transactionStatus,
 
     )
     {
