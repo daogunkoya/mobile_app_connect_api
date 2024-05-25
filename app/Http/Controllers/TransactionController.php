@@ -11,6 +11,7 @@ use App\DTO\ReceiverDto;
 use App\DTO\TransactionDto;
 use App\DTO\UserDto;
 use App\Exceptions\RateNotSetException;
+use App\Http\Requests\TransactionRequest as RequestsTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Commission;
 use App\Models\Rate;
@@ -23,12 +24,14 @@ use App\Repositories\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\Transaction\TransactionService;
+use App\Http\Requests\Transactions\TransactionRequest;
 use App\Http\Requests\Transactions\calulate_validation;
 use App\Http\Requests\Transactions\TransactionCreateValidation;
 use App\Http\Requests\Transactions\transaction_update_validation;
 use Symfony\Component\HttpFoundation\Response;
 use App\Payment\Contracts\PendingPayment;
 use App\Http\Resources\TransferBreakDownResource;
+use App\Enum\TransactionStatus;
 
 
 
@@ -43,7 +46,7 @@ class TransactionController extends Controller
     {
     }
 
-    public function index(TransactionService $transaction_service, Request $request):JsonResponse
+    public function index(TransactionService $transaction_service, TransactionRequest $request)
     {
 
             

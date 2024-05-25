@@ -7,6 +7,8 @@ use App\Models\Transaction;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Enum\TransactionStatus;
+use App\DTO\BankDto;
+use App\Models\Bank;
 
 class TransactionDto
 {
@@ -22,7 +24,7 @@ class TransactionDto
         public string $receiverFname,
         public string $receiverLname,
         public string $receiverPhone,
-        public string $receiverBankId,
+        public BankDto $receiverBank,
         public ?string $receiverIdentityId,
         public string $receiverAccountNumber,
         public ?string $receiverTransferType,
@@ -55,7 +57,7 @@ class TransactionDto
             $transaction->receiver_fname,
             $transaction->receiver_lname,
             $transaction->receiver_phone,
-            $transaction->receiver_bank_id,
+            BankDto::fromEloquentModel($transaction->bank),
             $transaction->receiver_identity_id,
             $transaction->receiver_account_no,
             $transaction->receiver_transfer_type,

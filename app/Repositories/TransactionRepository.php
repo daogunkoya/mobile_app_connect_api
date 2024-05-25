@@ -38,7 +38,8 @@ class TransactionRepository
             ->filter([
                 'userId' => !$isAdmin?$user->userId: null,
                 'search' => $input['search'] ?? '',
-                'date' => $input['date'] ?? ''
+                'date' => $input['date'] ?? '',
+                'status' => $input['status'] ?? ''
             ])
             ->orderBy('created_at', 'DESC');
 

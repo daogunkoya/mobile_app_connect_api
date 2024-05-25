@@ -83,6 +83,12 @@ class Transaction extends Model
                     ->orWhere('receiver_lname', 'like', '%' . $search . '%');
             })
             ->when($filter['senderId'] ?? false, fn($query) => $query->where('sender_id', $filter['senderId']))
+            ->when($filter['search'] ?? false, fn($query, $search) => $query->where('sender_fname', 'like', '%' . $search . '%')
+                    ->orWhere('sender_lname', 'like', '%' . $search . '%')
+                    ->orWhere('receiver_lname', 'like', '%' . $search . '%')
+                    ->orWhere('sender_fname', 'like', '%' . $search . '%')
+        )
+            ->when($filter['status'] ?? false, fn($query) => $query->where('transaction_status', TransactionStatus::getStatusEnumInstance($filter['status'])))
             ->when(!is_null($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
             ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
                 $searchDate = $filter['date'];
@@ -90,7 +96,8 @@ class Transaction extends Model
                     return $query->where(fn ($query) => match ($date) {
                         'today' => $query->whereDate('created_at', today()),
                         'yesterday' => $query->whereDate('created_at', today()->subDay()),
-                        'month' => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]),
+                        'week' => $query->whereBetween('created_at', [now()->subDays(7)->startOfDay(), now()->endOfDay()]),
+                        'month' => $query->whereBetween('created_at', [now()->subDays(30)->startOfDay(), now()->endOfDay()]),
                         default => $query->whereBetween('created_at', [
                             Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
                             Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
@@ -231,11 +238,11 @@ class Transaction extends Model
     }
 
 
-    public function getBankAttribute($value)
-    {
-        if (!$this->banks()->exists()) return ['key' => "", 'value' => ""];
-        return $this->banks()->select('id as key', 'name as value')->first()->toArray();
-    }
+    // public function getBankAttribute($value)
+    // {
+    //     if (!$this->banks()->exists()) return ['key' => "", 'value' => ""];
+    //     return $this->banks()->select('id as key', 'name as value')->first()->toArray();
+    // }
 
     public function getTransferTypeAttribute($value): ?TransferType
 

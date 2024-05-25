@@ -23,7 +23,7 @@ class TransactionResource extends JsonResource
         //return parent=>=>toArray($request);
         return [
             'created_at' => $this->createdAt,
-            'id_transaction' => $this->transactionId,
+            'transaction_id' => $this->transactionId,
             'transaction_code' => $this->transactionCode,
             'user_id' => $this->userId,
             'sender_id' => $this->senderId,
@@ -33,7 +33,7 @@ class TransactionResource extends JsonResource
             'receiver_fname' => $this->receiverFname,
             'receiver_lname' => $this->receiverLname,
             'receiver_phone' => $this->receiverPhone,
-            'receiver_bank_id' => $this->receiverBankId,
+            'receiver_bank' => $this->receiverBank,
             'receiver_identity_id' => $this->receiverIdentityId,
             'receiver_account_no' => $this->receiverAccountNumber,
             'receiver_transfer_type' => $this->receiverTransferType,

@@ -30,4 +30,15 @@ enum TransactionStatus: int
         };
     }
 
+    public static function getStatusEnumInstance($value): self
+    {
+        return match(strtolower($value))
+        {
+            'pending' => self::PENDING,
+            'paid' => self::PAID,
+            'failed' => self::FAILED,
+            default => throw new \InvalidArgumentException("Invalid status value"),
+        };
+    }
+
 }
