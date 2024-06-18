@@ -35,6 +35,8 @@ class TransactionCreateValidation extends FormRequest
             'receiver_id' => 'required|exists:mm_receiver,id_receiver',
             'amount_sent' => 'required',
             'payment_token' => 'required',
+            'origin_currency_id' => 'required | exists:mm_currency,id_currency',
+            'destination_currency_id' => 'required | exists:mm_currency,id_currency',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 

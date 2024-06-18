@@ -32,6 +32,8 @@ class calulate_validation extends FormRequest
         return [
             'send_amount' => 'required|numeric',
             'conversion_type' => 'numeric|required|between:1,2',
+            'origin_currency_id' => 'required | exists:mm_currency,id_currency',
+            'destination_currency_id' => 'required | exists:mm_currency,id_currency',
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
 

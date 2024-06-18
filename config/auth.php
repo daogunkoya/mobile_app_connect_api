@@ -105,7 +105,13 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        'mm_user' => [
+            'provider' => 'mm_user',
+            'table' => 'password_reset_tokens', // Updated to use the correct table name
+            'expire' => 60,
+            'throttle' => 60,
     ],
+],
 
     /*
     |--------------------------------------------------------------------------

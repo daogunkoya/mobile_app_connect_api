@@ -8,6 +8,8 @@ use App\DTO\RateDto;
 class TransactionCollection
 {
     public function __construct(
+        public string $originCurrencyId,
+        public string $destinationCurrencyId,
         public float $amountSent,
         public float $beneficiaryReceive,
         public float $exchangeRate,
@@ -23,6 +25,8 @@ class TransactionCollection
     public static function processTransactionData(
         RateDto $userRate,
         CommissionDto $userCommission,
+        string $originCurrencyId,
+        string $destinationCurrencyId,
         float $amountSent,
         int $conversionType
     ): self {
@@ -35,6 +39,8 @@ class TransactionCollection
         
 
         return new self(
+            originCurrencyId: $originCurrencyId,
+            destinationCurrencyId: $destinationCurrencyId,
             amountSent: $sendingAmount,
             beneficiaryReceive:$localSendingAmount,
             exchangeRate: $userRate->mainRate,

@@ -10,9 +10,7 @@ class CurrencyRepository
 
     public function fetchCurrencies()
     {
-        return Currency::optional(query()->where('status', 1)
-            ->select('code', 'destination')->get())
-            ->toArray();
+        return Currency::query();
     }
 
     public function fetchUserCurrencyId(string $userId = null): ?string

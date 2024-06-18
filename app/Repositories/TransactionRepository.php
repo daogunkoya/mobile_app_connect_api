@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\DTO\TransactionDTO;
 
 class TransactionRepository
 {
@@ -53,6 +54,11 @@ class TransactionRepository
         ];
     }
 
+    public static function fetchUserTransactions( $filters)
+    {
+       return   Transaction::query()->filter($filters)->get();
+    }
+
 
     public function calculateTotalAmount($input, $user)
     {
@@ -74,7 +80,9 @@ class TransactionRepository
             'sender_id',
             'sender_address',
             'receiver_address',
-            'currency_id',
+            'destination_currency_id',
+            'sender_fname',
+            'sender_lname',
             'receiver_fname',
             'receiver_lname',
             'receiver_phone',

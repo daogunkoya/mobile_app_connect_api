@@ -33,7 +33,8 @@ class Transaction extends Model
         'transaction_code',
         'store_id',
         'user_id',
-        'currency_id',
+        'origin_currency_id',
+        'destination_currency_id',
         'sender_id',
         'receiver_id',
         'sender_fname',
@@ -89,7 +90,7 @@ class Transaction extends Model
                     ->orWhere('sender_fname', 'like', '%' . $search . '%')
         )
             ->when($filter['status'] ?? false, fn($query) => $query->where('transaction_status', TransactionStatus::getStatusEnumInstance($filter['status'])))
-            ->when(!is_null($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
+            ->when(($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
             ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
                 $searchDate = $filter['date'];
                 $query->when($searchDate, function ($query, $date) {
@@ -148,7 +149,12 @@ class Transaction extends Model
     {
         return $this->belongsTo(Receiver::class,'receiver_id');
     }
-
+    
+    public function sender():BelongsTo
+    {
+        return $this->belongsTo(Sender::class,'sender_id');
+    }
+    
     public function getCreatedAtAttribute($value)
     {
         return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');

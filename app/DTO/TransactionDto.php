@@ -6,11 +6,14 @@ use App\Models\Sender;
 use App\Models\Transaction;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use App\Enum\TransactionStatus;
 use App\DTO\BankDto;
 use App\Models\Bank;
+use Illuminate\Contracts\Support\Arrayable;
+use ReflectionClass;
 
-class TransactionDto
+class TransactionDto implements Arrayable
 {
     public function __construct(
         public string $createdAt,
@@ -20,7 +23,10 @@ class TransactionDto
         public string $senderId,
         public string $senderAddress,
         public string $receiverAddress,
-        public string $currencyId,
+        public ?string $originCurrencyId,
+        public string $destinationCurrencyId,
+        public string $senderFname,
+        public string $senderLname,
         public string $receiverFname,
         public string $receiverLname,
         public string $receiverPhone,
@@ -53,7 +59,10 @@ class TransactionDto
             $transaction->sender_id,
             $transaction->sender_address,
             $transaction->receiver_address,
-            $transaction->currency_id,
+            $transaction->origin_currency_id,
+            $transaction->destination_currency_id,
+            $transaction->sender_fname,
+            $transaction->sender_lname,
             $transaction->receiver_fname,
             $transaction->receiver_lname,
             $transaction->receiver_phone,
@@ -85,23 +94,59 @@ class TransactionDto
 //        ]);
 //    }
 
-    public static function fromEloquentModelCollection(LengthAwarePaginator $transactionList):LengthAwarePaginator
-    {
+public static function fromEloquentModelCollection($transactionList)
+{
+    if ($transactionList instanceof LengthAwarePaginator) {
         $mappedItems = collect($transactionList->items())
             ->map(fn(Transaction $transaction) => self::fromEloquentModel($transaction));
 
-                return (new LengthAwarePaginator(
-                            $mappedItems ,
-                            $transactionList->total(),
-                            $transactionList->perPage(),
-                            $transactionList->currentPage(),
-                             ['path' => LengthAwarePaginator::resolveCurrentPath()]
-        ));
-
-
-
-
+        return new LengthAwarePaginator(
+            $mappedItems,
+            $transactionList->total(),
+            $transactionList->perPage(),
+            $transactionList->currentPage(),
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
     }
+
+    if ($transactionList instanceof EloquentCollection) {
+        return $transactionList->map(fn(Transaction $transaction) => self::fromEloquentModel($transaction));
+    }
+
+    throw new \InvalidArgumentException('Unsupported collection type');
+}
+
+    public function toArray(): array
+    {
+        $reflectionClass = new ReflectionClass($this);
+        $properties = $reflectionClass->getProperties();
+        $array = [];
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            $propertyValue = $this->{$propertyName};
+
+            // Check if the property is an object and has a toArray method
+            if (is_object($propertyValue) && method_exists($propertyValue, 'toArray')) {
+                $array[$propertyName] = $propertyValue->toArray();
+            } else {
+                $array[$propertyName] = $propertyValue;
+            }
+        }
+
+        return $array;
+    }
+
+    public static function toArrayCollection($input): array
+    {
+        if ($input instanceof Collection || $input instanceof EloquentCollection || $input instanceof LengthAwarePaginator) {
+            return $input->map(fn($item) => $item->toArray())->toArray();
+        }
+
+        throw new \InvalidArgumentException('Unsupported input type');
+    }
+
+   
 
 
 }

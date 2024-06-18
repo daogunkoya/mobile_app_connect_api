@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use App\Scopes\StoreScope; // Import the scope
+use App\Enum\CurrencyType;
+
 
 class Currency extends Model
 {
@@ -22,11 +24,14 @@ class Currency extends Model
             protected $fillable = [
             'store_id',
             'user_id',
-            'currency_origin',
-            'currency_origin_symbol',
-            'currency_destination',
-            'currency_destination_symbol',
-            'currency_code',
+            // 'currency_origin',
+            // 'currency_origin_symbol',
+            // 'currency_destination',
+            // 'currency_destination_symbol',
+            // 'currency_code',
+            "currency_type",
+            'currency_country',
+            "currency_symbol",
             'default_currency',
             'income_category',
             'currency_status',
@@ -37,6 +42,10 @@ class Currency extends Model
                 protected $keyType = 'string';
 
                 public $incrementing = false;
+
+                protected $casts = [
+                    'currency_type' => CurrencyType::class,
+                ];
 
             //date serialization undo
             protected function serializeDate(DateTimeInterface $date)

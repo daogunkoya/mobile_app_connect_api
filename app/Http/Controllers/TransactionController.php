@@ -32,6 +32,10 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Payment\Contracts\PendingPayment;
 use App\Http\Resources\TransferBreakDownResource;
 use App\Enum\TransactionStatus;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReportTransaction;
+use PDF; // Ensure you import the PDF facade
+use App\Models\UserCurrency;
 
 
 
@@ -85,12 +89,23 @@ class TransactionController extends Controller
         $transactionCollection = TransactionCollection::processTransactionData(
             RateDto::fromEloquentModel(($userRate)),
             CommissionDto::fromEloquentModel($userCommission),
+            $validated['origin_currency_id'],
+            $validated['destination_currency_id'],
             $validated['amount_sent'],
             $validated['conversion_type']);
 
         $receiver = ReceiverDto::fromEloquentModel(
             Receiver::with('sender')
                 ->find( $validated['receiver_id']));
+
+                // $userCurrency = UserCurrency::firstOrCreate(
+                //     ['user_id' => $user->id, 'currency_id' => $currency->id],
+                //     ['last_used_at' => now()]
+                // );
+        
+                // if (!$userCurrency->wasRecentlyCreated) {
+                //     $userCurrency->update(['last_used_at' => now()]);
+                // }
 
         $transaction = $this->createTransaction->handle(
             $transactionCollection ,
@@ -152,11 +167,41 @@ class TransactionController extends Controller
         $transactionCollection = TransactionCollection::processTransactionData(
             RateDto::fromEloquentModel(($userRate)),
             CommissionDto::fromEloquentModel($userCommission),
+            $validated['origin_currency_id'],
+            $validated['destination_currency_id'],
             $validated['send_amount'],
             $validated['conversion_type']);
 
         return (new TransferBreakDownResource($transactionCollection))
         ->response()
         ->setStatusCode(Response::HTTP_OK);
+    }
+
+    public function downloadReceipt(Transaction $transaction)
+    {
+        $transactionDto = TransactionDto::fromEloquentModel($transaction);
+        $transactionData = $transactionDto->toArray();
+       //return $transactionData;
+        $pdf = PDF::loadView('receipts.main', $transactionData);
+        return $pdf->download('receipt.pdf');
+    }
+
+    public function reportTransaction(Request $request,Transaction $transaction){
+        $request->validate([
+            'description' => 'required|string',
+           // 'transactionId' => 'required|integer',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,docx|max:2048',
+        ]);
+
+        $imagePath = $request->file('image')->store('reports', 'public');
+
+        // Send email
+        Mail::to('admin@example.com')->send(new ReportTransaction(
+            $request->description, 
+            $imagePath, 
+            Transactiondto::fromEloquentModel($transaction)));
+
+        return response()->json(['message' => 'Report submitted successfully'], 200);
+
     }
 }

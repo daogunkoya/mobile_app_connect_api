@@ -5,6 +5,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\TransactionReportController;
+// use App\Http\Controllers\Auth\ForgotPasswordController;
+// use App\Http\Controllers\Auth\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +48,13 @@ Route::prefix('v1')->group(function () {
     Route::post('/users', 'App\Http\Controllers\AuthController@register');
 // Route for user login
     Route::post('/users/login', 'App\Http\Controllers\AuthController@login');
+    Route::post('password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
+    // Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.reset');;
+
+    // Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    // Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    // Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    // Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 //    Route::post('/users/refresh', 'App\Http\Controllers\aauth_controller@refresh');
 //    Route::post('/users/me', 'App\Http\Controllers\aauth_controller@me');
@@ -91,7 +102,14 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
+        Route::post('transactions/report/generate', [TransactionReportController::class, 'generateReport']);
+
+
+        Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.reset');;
+
         Route::post('/transactions/transfer/breakdown', 'App\Http\Controllers\TransactionController@calculateTransaction');
+        Route::get('/transaction/{transaction:id_transaction}/download', [\App\Http\Controllers\TransactionController::class, 'downloadReceipt'])->name('transaction.download');
+        Route::post('/transaction/{transaction:id_transaction}/report', 'App\Http\Controllers\TransactionController@reportTransaction');
 
         //landing page
         Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
