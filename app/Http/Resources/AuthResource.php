@@ -9,20 +9,30 @@ use App\DTO\CurrencyDTO;
 
 class AuthResource extends JsonResource
 {
+
+    public function __construct($resource)
+     {
+        parent::__construct($resource);
+        
+     }
+
     public function toArray(Request $request): array
     {
+
+        $user = $this->resource['user'];
+
         return [
 
 
 
             'user' => [
-                'user_id' => auth()->user()->id_user,
-                'user_name' => auth()->user()->user_name,
-                'user_role_type' => 1,
-                'user_email' => auth()->user()->email,
+                'user_id' => $user->userId,
+                'user_name' => $user->userName,
+                'user_role_type' => $user->userRoleType->label(),
+                'user_email' => $user->email,
                 'user_phone' => "0987657",
-                'user_handle' => null,
                 'user_dob' => '12/12/2020',
+                'user_default_currency' => $user->currencyId,
                 'user_postcode' => 'Nw10 3er',
                 'user_address1' => '22 wil street',
                 'user_address2' => 'London',
@@ -38,19 +48,16 @@ class AuthResource extends JsonResource
                 'total_paid' => 340,
                 'count_total_paid' => 12,
                 'notification_status' => 1,
-                'total_order_quantity' => 0,
             ],
             'store' => [
                 'store_id' => store_id(),
                 'store_name' => store_name(),
                 'store_url' => store_url(),
-                'store_version' => 1,
             ],
             // 'user_currencies' => ['USD', 'EUR', 'GBP', 'JPY'],
             // 'available_currencies' => CurrencyDTO::fromEloquentCollection(Currency::all()),
             'access_status' => 1,
-            'available_currencies' => '',
-            'access_token' => $this->accessToken,
+            'access_token' => $this->resource['token']->accessToken,
             'token_type' => 'bearer',
             'expires_in' => ''
         ];

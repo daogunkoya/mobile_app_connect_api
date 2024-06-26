@@ -3,6 +3,8 @@
 namespace App\DTO;
 
 use App\Models\Sender;
+use App\Models\UserCurrency;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -25,6 +27,7 @@ class SenderDto
         public string $senderAddress,
         public string $senderPostcode,
         public array|null  $metadata,
+        public UserCurrencyDto | null $userCurrencies, 
         public        $countSenderReceiver
     )
     {
@@ -48,6 +51,7 @@ class SenderDto
             $sender->sender_address,
             $sender->sender_postcode,
             $sender->metadata,
+            $sender->latestSenderCurrency ? UserCurrencyDto::fromEloquentModel($sender->latestSenderCurrency) : null,
             $sender->receiver->count(),
         );
     }

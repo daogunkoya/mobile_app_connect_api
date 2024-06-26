@@ -114,6 +114,11 @@ class User extends Authenticatable
         return $this->hasOne(Currency::class, 'active_currency_id');
     }
 
+    public function receiver():HasMany
+    {
+        return $this->hasMany(Receiver::class, 'sender_id', 'id_user');
+    }
+
     public function receivers():HasManyThrough
     {
         return $this->hasManyThrough(
@@ -125,5 +130,16 @@ class User extends Authenticatable
             'id_sender' // Local key on the senders table
         );
 
+    }
+
+    public function userCurrencies():HasMany
+    {
+       return $this->hasMany(UserCurrency::class, 'sender_id', 'id_sender');
+    }
+
+    public function latestUserCurrency(): HasOne
+    {
+        return $this->hasOne(UserCurrency::class, 'user_id', 'id_user')
+                    ->latest('created_at');
     }
 }

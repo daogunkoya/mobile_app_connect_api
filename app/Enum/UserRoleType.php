@@ -19,4 +19,14 @@ enum UserRoleType: int
             self::ADMIN => 3,
         };
     }
+
+    public function label(): string
+    {
+        return match($this)
+        {
+            self::CUSTOMER => 'Customer',
+            self::AGENT => 'Agent',
+            self::ADMIN => 'Admin',
+        };
+    }
 }

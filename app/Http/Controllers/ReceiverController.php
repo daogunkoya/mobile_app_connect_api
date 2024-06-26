@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\DTO\ReceiverDto;
 use App\Models\Receiver;
 use App\Models\Sender;
+use App\Models\User;
+use App\DTO\UserDto;
+use App\Enum\UserRoleType;
 use Illuminate\Http\Request;
 use App\Services\Receiver\ReceiverService;
 use App\Facades\ReceiverServiceFacade;
 use App\Http\Requests\Receivers\ReceiverValidation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Http\Resources\ReceiverResource;
+use App\Http\Resources\ErrorResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReceiverController extends Controller
@@ -33,15 +37,38 @@ class ReceiverController extends Controller
     }
 
 
-    public function store(ReceiverValidation $request, Sender $sender)
+    public function store(ReceiverValidation $request,  $sender)
     {
-        $receiver = $sender->receiver()->create($request->validated());
+        // Get validated data from the request
+        $validatedData = $request->validated();
+        $authenticatedUser = UserDto::fromEloquentModel(auth()->user());
+        
+        if($authenticatedUser->userRoleType == UserRoleType::AGENT){
+            $sender = Sender::find($sender);
+        }
+        if ($sender instanceof Sender) {
+            // If sender is an instance of Sender, proceed as usual
+           
+            $receiver = $sender->receiver()->create($validatedData);
+        } else {
+            $user = User::find($sender);
+                    var_dump($sender);
+            if ($user) {
+                $userDto = UserDto::fromEloquentModel($user);
+                $validatedData['sender_id'] = $userDto->userId;
 
+                $receiver = $user->receivers()->create($validatedData);
+            } else {
+                return (new ErrorResource('User not found'))->response()->setStatusCode(Response::HTTP_NOT_FOUND);
+            }
+        }
+    
         return (new ReceiverResource(
-            ReceiverDto::fromEloquentModel($receiver->fresh())))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+            ReceiverDto::fromEloquentModel($receiver->fresh())
+        ))->response()->setStatusCode(Response::HTTP_CREATED);
     }
+    
+
 
 
     public function update($senderId, Receiver $receiver, ReceiverValidation $request)

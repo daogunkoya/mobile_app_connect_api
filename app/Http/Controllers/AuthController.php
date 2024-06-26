@@ -12,6 +12,7 @@ use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use App\DTO\UserDto;
 
 class AuthController extends Controller
 {
@@ -60,7 +61,8 @@ class AuthController extends Controller
         }
 
       //  return response()->json($result ?? "");
-        return (new AuthResource($token))
+      $user = UserDto::fromEloquentModel(auth()->user());
+        return (new AuthResource(compact('token', 'user')))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }

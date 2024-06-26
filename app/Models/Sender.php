@@ -153,4 +153,18 @@ class Sender extends Model
 
         ];
     }
+
+    public function senderCurrencies():HasMany
+    {
+       return $this->hasMany(UserCurrency::class, 'sender_id', 'id_sender');
+    }
+
+    public function latestSenderCurrency(): HasOne
+{
+    return $this->hasOne(UserCurrency::class, 'sender_id', 'id_sender')
+                ->latest('created_at');
+}
+
+
+    
 }

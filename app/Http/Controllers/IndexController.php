@@ -21,6 +21,7 @@ use App\Repositories\TransactionRepository;
 use App\Repositories\CurrencyRepository;
 use App\Http\Resources\IndexControllerResource;
 
+
 class IndexController extends Controller
 {
 
@@ -36,17 +37,23 @@ class IndexController extends Controller
     {
        // return 1;
         $input = $request->all();
-        $user = UserDto::fromEloquentModel(auth()->user());
+        $user = UserDto::fromEloquentModel(auth()->user()->load('latestUserCurrency'));
 
         $senders = $this->senderRepository->fetchSenders($input) ;
-        [ $transactionList, $totalTransaction ] = $this->transactionRepository->fetchTransaction($input, auth()->user()) ;
+        [ $transactionList, $totalTransaction ] = $this->transactionRepository->fetchTransaction($input, $user) ;
+
+        $transactionDtoCollection = TransactionDto::fromEloquentModelCollection($transactionList);
+        $senderDtoCollection = SenderDto::fromEloquentModelCollection($senders);
         $rate = RateDto::fromEloquentModel($this->rateRepository->fetchTodaysRate($user->userId));
-        $currencies = CurrencyDto::fromEloquentCollection($this->currencyRepository->fetchCurrencies()->limit(5)->get());
+        $currencyDtoCollection = CurrencyDto::fromEloquentCollection($this->currencyRepository->fetchCurrencies()->paginate(20));
         //$exchangeRate = "234";
 
 
+        // return (new HomeResource(
+        //     HomeDto::fromEloquentModel($transactionDtoCollection, $senderDtoCollection, $rate, $currencies)))
+        // ->response()->setStatusCode(200);
         return (new HomeResource(
-            HomeDto::fromEloquentModel($transactionList, $senders, $rate, $currencies)))
+        compact('transactionDtoCollection','totalTransaction', 'senderDtoCollection', 'user','rate', 'currencyDtoCollection')))
         ->response()->setStatusCode(200);
     }
 

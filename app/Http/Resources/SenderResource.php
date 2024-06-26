@@ -37,6 +37,7 @@ class SenderResource extends JsonResource
             "sender_address"=> $this->senderAddress,
             "sender_postcode"=> $this->senderPostcode,
             "meta_data"=> $this->metadata,
+            'user_currencies'=> new UserCurrencyResource($this->userCurrencies),
             "count_sender_receivers"=>$this->countSenderReceiver,
         ];
     }

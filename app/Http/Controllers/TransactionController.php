@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ReportTransaction;
 use PDF; // Ensure you import the PDF facade
 use App\Models\UserCurrency;
+use App\Enum\UserRoleType;
+use App\Services\Currency\UserCurrencyService;
 
 
 
@@ -44,8 +46,9 @@ class TransactionController extends Controller
 
     public function __construct(
         public TransactionRepository $transactionRepository,
-        public CreateTransaction $createTransaction,
-        protected PaymentGateway $paymentGateway
+        private CreateTransaction $createTransaction,
+        private UserCurrencyService $userCurrencyService,
+        private PaymentGateway $paymentGateway
     )
     {
     }
@@ -98,20 +101,14 @@ class TransactionController extends Controller
             Receiver::with('sender')
                 ->find( $validated['receiver_id']));
 
-                // $userCurrency = UserCurrency::firstOrCreate(
-                //     ['user_id' => $user->id, 'currency_id' => $currency->id],
-                //     ['last_used_at' => now()]
-                // );
-        
-                // if (!$userCurrency->wasRecentlyCreated) {
-                //     $userCurrency->update(['last_used_at' => now()]);
-                // }
+                $this->userCurrencyService->handleUserCurrency($validated, $user, $receiver);
 
         $transaction = $this->createTransaction->handle(
             $transactionCollection ,
             new PendingPayment($this->paymentGateway, $validated['payment_token']),
             $receiver,
             $user );
+            
 
         return (new TransactionResource( $transaction))->response()->setStatusCode(Response::HTTP_OK);
     }

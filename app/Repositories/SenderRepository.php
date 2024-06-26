@@ -18,7 +18,7 @@ class SenderRepository
             Sender::query() :
             $user->sender();
 
-        $query = $senderQuery->withCount('receiver') // Eager load 'receivers' count
+        $query = $senderQuery->with(['receiver', 'latestSenderCurrency']) // Eager load 'receivers' count
             ->select(self::selectSenderList())
         ->filter(['search' => request('search'), 'all' => request('fetchall')])
             ->orderBy('created_at', 'DESC');

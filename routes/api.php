@@ -128,7 +128,7 @@ Route::prefix('v1')->group(function () {
 
         //for Receivers
         Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index')->name('receivers.index');
-        Route::post('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('receivers.store');
+        Route::post('/sender/{sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('receivers.store');
         Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update')->name('receivers.update');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');

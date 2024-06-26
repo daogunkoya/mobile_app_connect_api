@@ -17,6 +17,8 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Payment\Contracts\PendingPayment;
+use App\Enum\UserRoleType;
+use App\Actions\GenerateUniqueTransactionCode;
 
 class CreateTransaction
 {
@@ -25,7 +27,8 @@ class CreateTransaction
     public function __construct(
         protected DatabaseManager $databaseManager,
         protected CreatePaymentForTransactionInterface $createPaymentForTransaction,
-         protected Dispatcher $events
+         protected Dispatcher $events,
+         protected GenerateUniqueTransactionCode $generateUniqueTransactionCode
     )
     {
     }
@@ -46,16 +49,22 @@ class CreateTransaction
             $userDto
         ) {
 
+            $userRoleType = $userDto->userRoleType;
+            $senderId = $userRoleType === UserRoleType::CUSTOMER ? $userDto->userId : $receiver->senderId;
+            $senderFname = $userRoleType === UserRoleType::CUSTOMER ? $userDto->firstName : $receiver->sender->senderFname;
+            $senderLname = $userRoleType === UserRoleType::CUSTOMER ? $userDto->lastName : $receiver->sender->senderLname;  
+            $senderAddress = $userRoleType === UserRoleType::CUSTOMER ? $userDto->address : $receiver->sender->senderAddress;
+
             $transaction =  Transaction::create([
                 'store_id' => store_id(),
                 'user_id' => $userDto->userId,
-                'transaction_code' => $this->generateUniqueTransactionCode(),
+                'transaction_code' => ($this->generateUniqueTransactionCode)(),
                 'origin_currency_id' => $transactionCollection->originCurrencyId,
                 'destination_currency_id' => $transactionCollection->destinationCurrencyId,
-                'sender_id' => $receiver->senderId,
+                'sender_id' => $senderId,
                 'receiver_id' => $receiver->receiverId,
-                'sender_fname' => $receiver->sender->senderFname,
-                'sender_lname' => $receiver->sender->senderLname,
+                'sender_fname' => $senderFname,
+                'sender_lname' => $senderLname,
                 'receiver_fname' => $receiver->receiverFname,
                 'receiver_lname' => $receiver->receiverLname,
                 'receiver_address' => $receiver->receiverAddress,
@@ -63,7 +72,7 @@ class CreateTransaction
                 'receiver_identity_id' => $receiver->identityTypeId,
                 'receiver_account_no' => $receiver->accountNumber,
                 'receiver_transfer_type' => $receiver->transferType,
-                'sender_address' => $receiver->sender->senderAddress,
+                'sender_address' => $senderAddress,
                 'agent_payment_id' => '',
                 'receiver_phone' => $receiver->receiverPhone ?? $receiver->receiverMobile,
                 'amount_sent' => $transactionCollection->amountSent,
@@ -108,20 +117,20 @@ class CreateTransaction
 
 
 
-    public function generateUniqueTransactionCode()
-    {
-        $maxLength = 9;
-        $transactionCode = '';
-        do {
-            $transactionCode = Str::random($maxLength) . Auth::id();
-        } while (Transaction::where('transaction_code', $transactionCode)->exists());
+    // public function generateUniqueTransactionCode()
+    // {
+    //     $maxLength = 9;
+    //     $transactionCode = '';
+    //     do {
+    //         $transactionCode = Str::random($maxLength) . Auth::id();
+    //     } while (Transaction::where('transaction_code', $transactionCode)->exists());
 
-        // Trim the transaction code to ensure it doesn't exceed the maximum length
-        $transactionCode = substr($transactionCode, 0, $maxLength);
+    //     // Trim the transaction code to ensure it doesn't exceed the maximum length
+    //     $transactionCode = substr($transactionCode, 0, $maxLength);
 
-        return $transactionCode;
+    //     return $transactionCode;
 
-    }
+    // }
 
 
 }
