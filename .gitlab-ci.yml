@@ -1,4 +1,4 @@
-image: $CI_REGISTRY/moneyappGroup/deployment:latest
+image: registry.gitlab.com/moneyappgroup/deployment:latest
 
 variables:
   # Define the user for deployment
