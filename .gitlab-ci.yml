@@ -1,4 +1,4 @@
-image: $CI_REGISTRY/dell-emc-partner-service/infrastructure/deployment-base-image:latest
+image: $CI_REGISTRY/moneyappGroup/deployment:latest
 
 variables:
   # Define the user for deployment
