@@ -1,4 +1,4 @@
-image: $CI_REGISTRY/moneyappgroup/deployment:latest
+image: $CI_REGISTRY/moneyapp3/deployment:latest
 
 variables:
   # Define the user for deployment
