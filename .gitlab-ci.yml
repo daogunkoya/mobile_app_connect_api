@@ -39,9 +39,6 @@ deploy to stage:
       - tags
       - branches
   when: manual
-  tags:
-    - static-ip
-
 stages:
   #  - test
   - deploy
