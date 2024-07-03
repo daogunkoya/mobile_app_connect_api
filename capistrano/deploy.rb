@@ -29,7 +29,7 @@ namespace :deploy do
     after :updated, :build do
         on roles(:app) do
             within release_path do
-                execute :composer, "install --no-dev --no-interaction --quiet --optimize-autoloader --apcu-autoloader" # install dependencies
+              execute :composer, "install --no-dev --no-interaction --quiet --optimize-autoloader --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-gd"
                 execute :chmod, "u+x artisan" # make artisan executable
                 execute :php, "artisan migrate -n --force"
             end

@@ -13,8 +13,8 @@ before_script:
   # AWS setup
   - echo "$AWS_CREDENTIALS" > ~/.aws/credentials
   - chmod 600 ~/.aws/credentials
-  # Composer setup (if required)
-  - php /usr/bin/composer install --no-cache --optimize-autoloader
+ # Composer setup (if required)
+  - php /usr/bin/composer install --no-cache --optimize-autoloader --ignore-platform-reqs
 
 # Run our tests (optional)
 #php-test:
