@@ -60,7 +60,7 @@ class ExportClass implements FromCollection, WithHeadings, WithMapping
             $row['senderId'],
             $row['senderAddress'],
             $row['receiverAddress'],
-            $row['currencyId'],
+            $row['currencyId']??'',
             $row['senderFname'],
             $row['senderLname'],
             $row['receiverFname'],

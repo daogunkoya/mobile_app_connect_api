@@ -5,22 +5,18 @@ variables:
   DEPLOY_USER: deploy
 
 before_script:
-  # ssh setup
+  # SSH setup
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-  # aws setup
+  # Add GitLab to known hosts
+  - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
+  # AWS setup
   - echo "$AWS_CREDENTIALS" > ~/.aws/credentials
-  # Install and run Composer
-  - ssh-keyscan -t rsa git.twogether.io >> ~/.ssh/known_hosts
-  - php /usr/bin/composer config --global http-basic.composer.biteda.com $COMPOSER_USERNAME $COMPOSER_PASSWORD
+  - chmod 600 ~/.aws/credentials
+  # Composer setup (if required)
   - php /usr/bin/composer install --no-cache --optimize-autoloader
-  - echo "PubkeyAcceptedKeyTypes +ssh-rsa" >> $HOME/.ssh/config
-  - echo "Host *.dell.aws" >> $HOME/.ssh/config
-  - echo "ProxyCommand ssh deploy@bstna.dlpd.net -W %h:%p" >> $HOME/.ssh/config
-  - ssh-add -l
-  - ssh-keyscan  -t ed25519 bstna.dlpd.net >> ~/.ssh/known_hosts
-  - ssh -t deploy@bstna.dlpd.net "ssh-keyscan -t rsa stage.dell.aws" >> ~/.ssh/known_hosts
-# Run our tests
+
+# Run our tests (optional)
 #php-test:
 #  stage: test
 #  script:
@@ -39,6 +35,7 @@ deploy to stage:
       - tags
       - branches
   when: manual
+
 stages:
-  #  - test
+  # - test
   - deploy
