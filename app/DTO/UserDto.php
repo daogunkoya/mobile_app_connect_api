@@ -6,7 +6,9 @@ use App\Models\Sender;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use App\Enum\UserRoleType;
+use App\Enum\UserStatus;
 
 
 class UserDto
@@ -21,8 +23,12 @@ class UserDto
         public ?string $currencyId,
         public ?string $address,
         public ?string $postcode,
+        public UserStatus $userStatus,
         public UserRoleType $userRoleType,
-        public UserCurrencyDto | null $userCurrency
+        public UserCurrencyDto | null $userCurrency,
+        public ?string $transactionCount,
+        public int $senderCount,
+        public int $receiverCount
 
     )
     {
@@ -40,10 +46,38 @@ class UserDto
             $user->currency_id,
             $user->address,
             $user->postcode,
+            $user->status,
             $user->user_role_type,
-            $user->latestUserCurrency ?UserCurrencyDto::fromEloquentModel($user->latestUserCurrency):null
+            $user->latestUserCurrency ?UserCurrencyDto::fromEloquentModel($user->latestUserCurrency):null,
+            $user->transaction->count(),
+            $user->sender->count(),
+            $user->receiver->count()
+
         );
     }
 
+    public static function fromEloquentModelCollection($userList)
+    {
+        if ($userList instanceof LengthAwarePaginator) {
+           
+            $mappedItems = collect($userList->items())
+                ->map(fn(User $user) => self::fromEloquentModel($user));
+    
+            return new LengthAwarePaginator(
+                $mappedItems,
+                $userList->total(),
+                $userList->perPage(),
+                $userList->currentPage(),
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
+            );
+        }
+
+        if ($userList instanceof EloquentCollection) {
+            return $userList->map(fn(User $user) => self::fromEloquentModel($user));
+        }
+    
+
+
+}
 
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\TransactionReportController;
+use App\Http\Controllers\MemberController;
 // use App\Http\Controllers\Auth\ForgotPasswordController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 
@@ -102,6 +103,7 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
+        Route::get('/members', [MemberController::class, 'index']);
         Route::post('transactions/report/generate', [TransactionReportController::class, 'generateReport']);
 
 

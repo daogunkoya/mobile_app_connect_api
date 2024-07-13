@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enum\UserRoleType;
+use App\Enum\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\Hasone;
 use Laravel\Passport\HasApiTokens;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable
 {
@@ -42,7 +45,8 @@ class User extends Authenticatable
         'store_id',
         'email',
         'password',
-        'user_role_type'
+        'user_role_type',
+        'status'
     ];
 
     /**
@@ -62,7 +66,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'user_role_type' => UserRoleType::class
+        'user_role_type' => UserRoleType::class,
+        'status' => UserStatus::class
     ];
 
 
@@ -85,6 +90,36 @@ class User extends Authenticatable
 
         });
     }
+
+    public function scopeFilter(Builder $query, array $filter): void
+    {
+        $query
+            ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
+                $search = trim($filter['search']);
+                $query->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                   ;
+            })
+            ->when($filter['userId'] ?? false, fn($query) => $query->where('id_user', $filter['userId']))
+          
+           // ->when($filter['status'] ?? false, fn($query) => $query->where('user_status', Status::getStatusEnumInstance($filter['status'])))  
+            ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
+                $searchDate = $filter['date'];
+                $query->when($searchDate, function ($query, $date) {
+                    return $query->where(fn ($query) => match ($date) {
+                        'today' => $query->whereDate('created_at', today()),
+                        'yesterday' => $query->whereDate('created_at', today()->subDay()),
+                        'week' => $query->whereBetween('created_at', [now()->subDays(7)->startOfDay(), now()->endOfDay()]),
+                        'month' => $query->whereBetween('created_at', [now()->subDays(30)->startOfDay(), now()->endOfDay()]),
+                        default => $query->whereBetween('created_at', [
+                            Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
+                            Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
+                        ]),
+                    });
+                });
+            });
+    }
+
 
     public function sender(): HasMany
     {
@@ -117,6 +152,11 @@ class User extends Authenticatable
     public function receiver():HasMany
     {
         return $this->hasMany(Receiver::class, 'sender_id', 'id_user');
+    }
+
+    public function transaction():HasMany
+    {
+        return $this->hasMany(Transaction::class, 'user_id', 'id_user');
     }
 
     public function receivers():HasManyThrough
