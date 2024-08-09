@@ -13,6 +13,7 @@ class SenderRepository
     //fetch customer
     public function fetchSenders($input): LengthAwarePaginator
     {
+        
         $user = auth()->user();
         $senderQuery = $user->user_role_type == UserRoleType::ADMIN ?
             Sender::query() :
@@ -20,7 +21,7 @@ class SenderRepository
 
         $query = $senderQuery->with(['receiver', 'latestSenderCurrency']) // Eager load 'receivers' count
             ->select(self::selectSenderList())
-        ->filter(['search' => request('search'), 'all' => request('fetchall')])
+        ->filter(['search' => request('search'), 'userId' => request('user_id'),'all' => request('fetchall')])
             ->orderBy('created_at', 'DESC');
 
         $page = request('page') ?? 1;

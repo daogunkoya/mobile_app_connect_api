@@ -76,21 +76,19 @@ class Sender extends Model
     public function scopeFilter(Builder $query, array $filter): void
     {
 
+        
+
         $query
-            ->when($filter['search'] ?? false, fn($query, $search) => $query->where('sender_fname', 'like', '%' . $search . '%')
+        ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
+            $search = trim($filter['search']);
+            $query->where('sender_fname', 'like', '%' . $search . '%')
                 ->orWhere('sender_lname', 'like', '%' . $search . '%')
-            );
+               ;
+        })
+        ->when($filter['userId'] ?? false, fn($query) => $query->where('user_id', $filter['userId']));
     }
 
-//    public function scopeAll(Builder $query): void
-//    {
-//
-//        $query->when(request('fetchall') ?? false, fn() => $query->select('id_sender as sender_id',
-//            'sender_name',
-//            'sender_phone')
-//        );
-//
-//    }
+
 
     //date serialization undo
     protected function serializeDate(DateTimeInterface $date)

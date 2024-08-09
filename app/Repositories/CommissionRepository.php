@@ -7,9 +7,47 @@ use App\Models\Commission;
 use App\Repositories\RateRepository;
 use App\Services\Commission\CommissionService;
 use App\Services\Rate\RateService;
+use illuminate\Http\Request;
+use App\DTO\UserDto;
+use App\Enum\UserRoleType;
+use App\Models\Currency;
+use App\Filters\CommissionFilter;   
 
 class CommissionRepository
 {
+
+    public function __construct(protected CommissionFilter $commissionFilter)
+    {
+        
+    }
+
+    public function fetchCommissions(Request $request, UserDto $user)
+    {
+          
+
+        $isAdmin = $user->userRoleType == UserRoleType::ADMIN;
+      
+        $commissionQuery =   Commission::query();
+        $currencyId = $request->input('currency_id') ?? Currency::whereDefaultCurrency(1)->value('id_currency');
+
+        if(empty($request->input('currency_id'))) $commissionQuery->where('currency_id', $currencyId);
+        if(!$isAdmin) $commissionQuery->where('user_id', $user->userId);
+        
+       $commissionQuery->with(['currency', 'member_user'])->filter($this->commissionFilter)
+            ->select('id_commission', 'start_from', 'end_at', 'value', 'agent_quota','user_id', 'created_at', 'currency_id','member_user_id', 'commission_status');
+
+
+        $commissionQuery->orderBy('start_from', 'asc')->where('commission_status', 1);
+
+        $page = $request->input('page') ?? 1;
+        $limit = $request->input('limit') ?? 6;
+
+        return $commissionQuery->paginate($limit, ['*'], 'page', $page);
+    }
+    public function deleteRate($commissionId)
+    {
+        return Commission::query()->where('id_commission', $commissionId)->update(['commission_status' => 0]);
+    }
 
 
     public function fetchCommissionValue($input):array

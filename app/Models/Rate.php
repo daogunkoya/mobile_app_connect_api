@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Illuminate\Database\Eloquent\Builder;
+use App\Filters\BaseQuery;
 class Rate extends Model
 {
     use HasFactory;
@@ -23,6 +24,7 @@ class Rate extends Model
         'store_id',
         'main_rate',
         'user_id',
+        'member_user_id',
         'currency_id',
         'bou_rate',
         'sold_rate',
@@ -51,6 +53,22 @@ class Rate extends Model
         });
     }
 
+    public function scopeFilter(Builder $query, BaseQuery $filter): void
+    {
+
+         $filter->apply($query);
+
+        // $query
+        // ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
+        //     $search = trim($filter['search']);
+        //     $query->where('sender_fname', 'like', '%' . $search . '%')
+        //         ->orWhere('sender_lname', 'like', '%' . $search . '%')
+        //        ;
+        // })
+        // ->when($filter['userId'] ?? false, fn($query) => $query->where('user_id', $filter['userId']))
+        // ->when($filter['currencyId'] ?? false, fn($query) => $query->where('currency_id', $filter['currencyId']));
+    }
+
 
     public function getRouteKeyName()
     {
@@ -74,11 +92,11 @@ class Rate extends Model
     }
 
 
-    public function getCurrencyAttribute($currency_id)
-    {
+    // public function getCurrencyAttribute($currency_id)
+    // {
 
-        return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
-    }
+    //     return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
+    // }
 
     public function getCreatedAtAttribute($value)
     {
@@ -88,6 +106,12 @@ class Rate extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency_id')
+        ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type','default_currency', 'currency_title');;
     }
 
     public function scopeForUserAndCurrency($query, $userId = null, $currencyId = null)

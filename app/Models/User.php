@@ -130,6 +130,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rate::class, 'user_id');
     }
+
+    public function commission(): HasMany
+    {
+        return $this->hasMany(Commission::class, 'user_id');
+    }
+
     public function userRate(): HasOne
     {
 

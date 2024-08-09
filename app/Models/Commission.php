@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filters\BaseQuery;
 
 class Commission extends Model
 {
@@ -21,6 +24,7 @@ class Commission extends Model
     protected $fillable = [
         'store_id',
         'user_id',
+        'member_user_id',
         'start_from',
         'end_at',
         'value',
@@ -48,8 +52,15 @@ class Commission extends Model
         parent::boot();
         self::creating(function ($model) {
             $model->id_commission = (string)Uuid::uuid4();
+            $model->store_id = session()->get('process_store_id') ?? request()->process_store_id;
         });
     }
+
+    public function scopeFilter(Builder $query, BaseQuery $filter): void
+    {
+         $filter->apply($query);
+    }
+
 
     public function getRouteKeyName()
     {
@@ -68,11 +79,11 @@ class Commission extends Model
     }
 
 
-    public function getCurrencyAttribute($currency_id)
-    {
+    // public function getCurrencyAttribute($currency_id)
+    // {
 
-        return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
-    }
+    //     return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_symbol')->first())->toArray();
+    // }
 
     // public function getCreatedAtAttribute($value){
     //     return \Carbon\Carbon::createFromTimeStamp(strtotime($value))->format('d/m/Y');
@@ -91,5 +102,21 @@ class Commission extends Model
             ->when(!is_null($userId) && self::where('user_id')->exists(), function ($query) use ($userId) {
                 return $query->whereIn('user_id', [$userId]);
             });
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+  
+    public function member_user(): BelongsTo
+    {
+        return $this->belongsTo(User::class,'member_user_id');
+    }
+
+    public function currency(): belongsTo
+    {
+
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 }

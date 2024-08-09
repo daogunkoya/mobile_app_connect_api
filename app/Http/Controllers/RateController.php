@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\RateDto;
+use App\DTO\UserDto;
 use App\Repositories\RateRepository;
 use Illuminate\Http\Request;
 use App\Services\Rate\RateService;
 use App\Models\Rate;
 use App\Models\Currency;
 use App\Models\User;
-use App\Http\Requests\Rate\rate_validation;
+use App\Http\Requests\Rate\RateValidation;
+use App\Http\Resources\RateResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class RateController extends Controller
 {
@@ -37,9 +41,11 @@ class RateController extends Controller
     public function index(Request $request)
     {
         //
-        $response = $this->rateService->fetchRateList($request->all(), $this->rate, $this->currency, $this->user);
-
-        return response()->json($response);
+       // $fetchRated = $this->rateRepository->fetchRate($request->all(), UserDto::fromEloquentModel(auth()->user()));
+       $fetchRated = $this->rateRepository->fetchRate($request, UserDto::fromEloquentModel(auth()->user()));
+        
+        return  RateResource::collection(RateDto::fromEloquentModelCollection($fetchRated))
+        ->response()->setStatusCode(Response::HTTP_OK);
     }
 
 
@@ -49,36 +55,25 @@ class RateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(rate_validation $request)
+    public function store(RateValidation $request)
     {
 
-        $response = $this->rateService->storeRate($request->all(), $this->rate);
+        $rate = auth()->user()->rate()->create($request->validated());
+        return (new RateResource(
+            (RateDto::fromEloquentModel( $rate))
+        ))->response()->setStatusCode(Response::HTTP_CREATED);
+    }
 
-        return response()->json(['rate_id' => $response]);
+    public function update(Rate $rate, RateValidation $request)
+    {
+        return $rate->update($request->validated()) ?
+            response()->json([], Response::HTTP_OK)
+            : response()->json(["error" => 'Something went wrong'], 400);
+
     }
 
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(rate_validation $request, $rate_id)
-    {
-
-
-        if (!$this->rate::where('id_rate', $rate_id)->where('rate_status', 1)->exists()) {
-            return response()->json(['errors' => ['rate never exists']], 422);
-        }
-
-        $response = $this->rateService->updateRate($rate_id, $request->all(), $this->rate);
-
-        return response()->json(['rate_id' => $rate_id]);
-    }
-
-
+   
     public function show(Request $request, $rate_id)
     {
 
@@ -100,13 +95,11 @@ class RateController extends Controller
      */
     public function destroy($rate_id)
     {
-        //
-
-
+        
         if (!$this->rate::where('id_rate', $rate_id)->where('rate_status', 1)->exists()) {
             return response()->json(['errors' => ['rate never exists']], 422);
         }
-        $response =  $this->rateService->deleteRate($rate_id, $this->rate);
+        $response =  $this->rateRepository->deleteRate($rate_id);
 
         return response()->json([$response]);
     }

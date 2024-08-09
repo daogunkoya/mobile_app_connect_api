@@ -149,6 +149,7 @@ Route::prefix('v1')->group(function () {
 //        Route::post('/senders/{sender:id_sender}/receiver', 'App\Http\Controllers\SenderController@store')->name('create_receiver');
 
         Route::resource('/commissions', 'App\Http\Controllers\CommissionController');
+        Route::delete('/commissions/{commission:id_commission}', 'App\Http\Controllers\CommissionController@destroy');
 
 
 

@@ -8,7 +8,12 @@ use App\Repositories\CommissionRepository;
 use App\Models\Commission;
 use App\Models\Currency;
 use App\Models\User;
-use App\Http\Requests\Commissions\commissions_validation;
+use App\DTO\CommissionDto;
+use App\DTO\UserDto;
+use App\Http\Requests\Commissions\CommissionsValidation;
+use App\Http\Resources\CommissionResource;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommissionController extends Controller
 {
@@ -24,7 +29,8 @@ class CommissionController extends Controller
      */
 
 
-    public function __construct(public CommissionRepository $commissionRepository,
+    public function __construct(
+                                public CommissionRepository $commissionRepository,
                                 CommissionService $comissionService,
                                 Commission $commission,
                                 Currency $currency, User $user)
@@ -36,12 +42,13 @@ class CommissionController extends Controller
                     $this->currency = $currency;
 
     }
-    public function index(Request $request)
+    public function index(Request $request):JsonResponse
     {
-        //
-        $response = $this->comissionService->fetchCommissionList($request->all(), $this->commission, $this->currency, $this->user);
-
-        return response()->json($response);
+    
+        $fetchedCommissions = $this->commissionRepository->fetchCommissions($request, UserDto::fromEloquentModel(auth()->user()));
+       // return $fetchedCommissions ;
+        return  CommissionResource::collection(CommissionDto::fromEloquentCollection($fetchedCommissions))
+        ->response()->setStatusCode(Response::HTTP_OK);
     }
 
 
@@ -51,12 +58,13 @@ class CommissionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(commissions_validation $request)
+    public function store(CommissionsValidation $request)
     {
 
-        $response = $this->comissionService->storeCommission($request->all(), $this->commission);
-
-        return response()->json(['commission_id' => $response]);
+        $rate = auth()->user()->commission()->create($request->validated());
+        return (new CommissionResource(
+            (CommissionDto::fromEloquentModel( $rate))
+        ))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
 
@@ -67,7 +75,7 @@ class CommissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(commissions_validation $request, $commission_id)
+    public function update(CommissionsValidation $request, $commission_id)
     {
 
 
@@ -101,19 +109,14 @@ class CommissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($commission_id)
+    public function destroy($commissionId)
     {
-
-        $commission_service   = new CommissionService();
-        $commission = new Commission();
-        //
-        if (!$commission::where('id_commission', $commission_id)->where('commission_status', 1)->exists()) {
-            return response()->json(['errors' => ['commission never exists']], 422);
-        }
-        $response =  $commission_service->deleteCommission($commission_id, $commission);
+        
+        $response =  $this->commissionRepository->deleteRate($commissionId);
 
         return response()->json([$response]);
     }
+
 
     public function getCommission(Request $request)
     {

@@ -15,12 +15,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class RateDto
 {
     public function __construct(
+        public string $createdAt,
         public string $rateId,
         public string $userId,
+        public ?string $memberUserId,
         public string $mainRate,
         public ?string $bouRate,
         public ?string $soldRate,
-        public ?string $currencyId,
+        public CurrencyDto | null $currency,
 
     )
     {
@@ -29,14 +31,31 @@ class RateDto
     public static function fromEloquentModel(Rate $rate): self
     {
         return new self(
+            $rate->created_at,
             $rate->id_rate,
             $rate->user_id,
+            $rate->member_user_id,
             $rate->main_rate,
             $rate->bou_rate,
             $rate->sold_rate,
-            $rate->currency_id,
+            $rate->currency ? CurrencyDto::fromEloquentModel($rate->currency) : null, 
 
         );
+    }
+   
+
+    public static function fromEloquentModelCollection(LengthAwarePaginator $rateList): LengthAwarePaginator
+    {
+
+        return new LengthAwarePaginator(
+            collect($rateList->items())->map(fn( Rate $rate) => self::fromEloquentModel($rate)),
+            $rateList->total(),
+            $rateList->perPage(),
+            $rateList->currentPage(),
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+
     }
 
 

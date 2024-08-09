@@ -12,6 +12,7 @@ class UserResource extends JsonResource
         $userRole = $this->userRoleType === UserRoleType::ADMIN ;
         return [
             'user_id' => $this->userId,
+            'user_name' => "$this->firstName $this->lastName",
             'user_fname' => $this->firstName,
             'user_lname' => $this->lastName,
             'user_email' => $this->email,

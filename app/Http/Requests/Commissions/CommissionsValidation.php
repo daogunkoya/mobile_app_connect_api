@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Requests\Rate;
+namespace App\Http\Requests\Commissions;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Models\User;
+use App\Rules\CommissionRangeOverlap;
 
-class rate_validation extends FormRequest
+class CommissionsValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,14 +29,21 @@ class rate_validation extends FormRequest
     public function rules()
     {
         $store_id = session()->get('process_store_id') ?? request()->process_store_id;
+
+        $store_id = session()->get('process_store_id') ?? request()->process_store_id;
+        $currency_id = $this->input('currency_id');
+        $member_user_id = $this->input('member_user_id');
+        $start_from = $this->input('start_from');
+        $end_at = $this->input('end_at');
+
         return [
-       // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
-       //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-        'user_id' => 'required|exists:mm_user,id_user',
-        'currency_id' => 'required',
-        'main_rate' => 'numeric|required',
-
-
+      
+       'member_user_id'=>'nullable|exists:mm_user,id_user',
+        'start_from' => ['required',new CommissionRangeOverlap($currency_id, $member_user_id, $start_from, $end_at, $store_id)],
+        'currency_id' => 'required|exists:mm_currency,id_currency',
+        'end_at' => 'numeric|required',
+        'value' => 'numeric|required',
+        'agent_quota' => 'numeric|required',
 
         ];
     }

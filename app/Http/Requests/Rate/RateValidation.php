@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Commissions;
+namespace App\Http\Requests\Rate;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -8,8 +8,9 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\User;
 
-class commissions_validation extends FormRequest
+class RateValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,22 +30,14 @@ class commissions_validation extends FormRequest
     public function rules()
     {
         $store_id = session()->get('process_store_id') ?? request()->process_store_id;
-
-
-
         return [
        // 'item_group' => ['required','array','filled',Rule::exists('bd_group','id_group')->where(function ($query)use($store_id) {$query->where('store_id', $store_id); })],
        //'list_group' => 'required|array|filled|exists:bd_group,id_group',
-
-       //'user_id'=>'exists:mm_user,id_user',
-        'start_from' => 'required',
-        'end_at' => 'required',
-        'value' => 'required',
-        'agent_quota' => 'required',
+        'member_user_id' => 'nullable|exists:mm_user,id_user',
         'currency_id' => 'required|exists:mm_currency,id_currency',
-
-
-
+        'main_rate' => 'numeric|required',
+        'bou_rate' => 'nullable|numeric',
+        'sold_rate' => 'nullable|numeric'
 
         ];
     }
