@@ -154,6 +154,13 @@ class Transaction extends Model
     {
         return $this->belongsTo(Sender::class,'sender_id');
     }
+
+
+    public function statusChangeLogs()
+    {
+        return $this->morphMany(StatusChangeLog::class, 'loggable');
+    }
+    
     
     public function getCreatedAtAttribute($value)
     {
@@ -255,5 +262,10 @@ class Transaction extends Model
     {
         // return TransferType::Bank;
         return TransferType::tryFrom($value) ?? TransferType::None;
+    }
+
+    public function payment()
+    {
+        return $this->morphOne(Payment::class, 'paymentable');
     }
 }

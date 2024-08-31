@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use App\Scopes\StoreScope; // Import the scope
 use App\Enum\CurrencyType;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filters\BaseQuery;
 
 
 class Currency extends Model
@@ -63,6 +64,12 @@ class Currency extends Model
                 self::creating(function ($model) {
                     $model->id_currency = (string) Uuid::uuid4();
                 });
+            }
+
+            public function scopeFilter(Builder $query, BaseQuery $filter): void
+            {
+                 $filter->apply($query);
+        
             }
 
 

@@ -5,13 +5,15 @@ namespace App\Repositories;
 use App\Enum\UserRoleType;
 use App\Models\User;
 use App\Exceptions\RateNotSetException;
+use App\Filters\UserFilter;
 
 class UserRepository
 {
 
     public function __construct(
         protected CommissionRepository $commissionRepository,
-        protected BankRepository       $bankRepository
+        protected BankRepository       $bankRepository,
+        protected UserFilter           $userFilter
     ) {
     }
 
@@ -22,14 +24,15 @@ class UserRepository
 
             $userQuery =   User::query();
 
-        $query = $userQuery->with(['transaction','receiver', 'sender'])
-            ->filter([
-                'userId' => !$isAdmin?$user->userId: null,
-                'search' => $input['search'] ?? '',
-                'date' => $input['date'] ?? '',
-                'status' => $input['status'] ?? '',
-                'type' => $input['status'] ?? ''
-            ])
+        $query = $userQuery
+        //->with(['transaction','receiver', 'sender'])
+            ->withCount('transaction')
+            ->withCount('receiver')
+            ->withCount('sender')
+            ->withSum('outstandingCommissions', 'total_commission')
+            ->withSum('outstandingCommissions', 'agent_commission')
+            ->withSum('outstandingPayments', 'amount_sent')
+            ->filter($this->userFilter)
             ->orderBy('created_at', 'DESC');
 
 

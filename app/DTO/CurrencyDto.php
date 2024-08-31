@@ -18,6 +18,7 @@ class CurrencyDto extends BaseDto
         public string $currencyTitle,
         public string $currencySymbol,
         public string $currencyType,
+        public string $currencyStatus,
         public int $currencyDefault,
  
 
@@ -33,6 +34,7 @@ class CurrencyDto extends BaseDto
             $currency->currency_title,
             $currency->currency_symbol,
             $currency->currency_type->label(),
+            $currency->currency_status,
             $currency->default_currency,
 
         );

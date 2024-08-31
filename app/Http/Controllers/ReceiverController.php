@@ -52,7 +52,7 @@ class ReceiverController extends Controller
             $receiver = $sender->receiver()->create($validatedData);
         } else {
             $user = User::find($sender);
-                    var_dump($sender);
+                   // var_dump($sender);
             if ($user) {
                 $userDto = UserDto::fromEloquentModel($user);
                 $validatedData['sender_id'] = $userDto->userId;

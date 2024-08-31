@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('mm_user', function (Blueprint $table) {
             $table->string('address')->nullable()->after('email');
             $table->string('postcode')->nullable()->after('email');
-            $table->string('meta')->nullable()->after('email');
+            $table->json('metadata')->nullable()->after('email');
             $table->string('photo_id')->nullable()->after('email');
         });
     }

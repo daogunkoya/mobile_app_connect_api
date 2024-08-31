@@ -17,6 +17,7 @@ use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use App\Filters\BaseQuery;
 
 class User extends Authenticatable
 {
@@ -37,16 +38,22 @@ class User extends Authenticatable
 
     protected $fillable = [
         //  'id',
+        'title',
         'first_name',
         'last_name',
+        'middle_name',
         'user_name',
         'currency_id',
         'user_handle',
         'store_id',
+        'dob',
         'email',
         'password',
         'user_role_type',
-        'status'
+        'status',
+        'address',
+        'postcode',
+        'metadata'
     ];
 
     /**
@@ -66,6 +73,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'metadata' => 'array', // or 'json'
         'user_role_type' => UserRoleType::class,
         'status' => UserStatus::class
     ];
@@ -91,36 +99,13 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeFilter(Builder $query, array $filter): void
+    public function scopeFilter(Builder $query, BaseQuery $filter): void
     {
-        $query
-            ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
-                $search = trim($filter['search']);
-                $query->where('first_name', 'like', '%' . $search . '%')
-                    ->orWhere('last_name', 'like', '%' . $search . '%')
-                   ;
-            })
-            ->when($filter['userId'] ?? false, fn($query) => $query->where('id_user', $filter['userId']))
-          
-           // ->when($filter['status'] ?? false, fn($query) => $query->where('user_status', Status::getStatusEnumInstance($filter['status'])))  
-            ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
-                $searchDate = $filter['date'];
-                $query->when($searchDate, function ($query, $date) {
-                    return $query->where(fn ($query) => match ($date) {
-                        'today' => $query->whereDate('created_at', today()),
-                        'yesterday' => $query->whereDate('created_at', today()->subDay()),
-                        'week' => $query->whereBetween('created_at', [now()->subDays(7)->startOfDay(), now()->endOfDay()]),
-                        'month' => $query->whereBetween('created_at', [now()->subDays(30)->startOfDay(), now()->endOfDay()]),
-                        default => $query->whereBetween('created_at', [
-                            Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
-                            Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
-                        ]),
-                    });
-                });
-            });
+
+         $filter->apply($query);
     }
 
-
+   
     public function sender(): HasMany
     {
         return $this->hasMany(Sender::class, 'user_id');
@@ -188,4 +173,21 @@ class User extends Authenticatable
         return $this->hasOne(UserCurrency::class, 'user_id', 'id_user')
                     ->latest('created_at');
     }
+
+    public function outstandingPayments()
+    {
+        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')->where('transaction_paid_status', 0);
+    }
+
+    public function outstandingCommissions()
+    {
+        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')->where('commission_paid_status', 0);
+    }
+
+     // Polymorphic relationship
+     public function statusChangeLogs()
+     {
+         return $this->morphMany(StatusChangeLog::class, 'loggable');
+     }
+
 }

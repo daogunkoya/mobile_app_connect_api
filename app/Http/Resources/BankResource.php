@@ -18,6 +18,8 @@ class BankResource extends JsonResource
         return [
             "id"=>$this->id,
             "name"=>$this->name,
+            "bank_category"=>$this->bankCategory,
+            'currency' => new CurrencyResource($this->currency),
 
         ];
     }

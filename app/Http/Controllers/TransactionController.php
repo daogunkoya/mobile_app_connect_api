@@ -38,6 +38,10 @@ use PDF; // Ensure you import the PDF facade
 use App\Models\UserCurrency;
 use App\Enum\UserRoleType;
 use App\Services\Currency\UserCurrencyService;
+use Illuminate\Validation\Rule;
+use App\Enum\updateTransactionStatus;
+use App\Services\Log\LoggingService;
+
 
 
 
@@ -200,5 +204,27 @@ class TransactionController extends Controller
 
         return response()->json(['message' => 'Report submitted successfully'], 200);
 
+    }
+
+    public function updateTransactionStatus(Request $request, Transaction $transaction, LoggingService $loggingService)
+    {
+        // Validate the request
+        $validated = $request->validate([
+          'status' => ['required', 'string', Rule::in(array_map(fn($status) => $status->label(), TransactionStatus::cases()))],
+        ]);
+
+        // Update the user's status
+        $newStatus = TransactionStatus::getStatusEnumInstance($validated['status']);
+       
+        $transaction->transaction_status = $newStatus;
+        $transaction->save();
+
+        $updatedTransaction  = TransactionDto::fromEloquentModel($transaction->fresh());
+
+        $loggingService->logActivity($transaction, "Transaction status changed to {$newStatus->label()}");
+
+        return (new TransactionResource($updatedTransaction))->response()->setStatusCode(Response::HTTP_OK);
+
+       
     }
 }

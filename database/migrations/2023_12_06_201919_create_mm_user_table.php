@@ -16,9 +16,12 @@ class CreateMmUserTable extends Migration
     {
         Schema::create('mm_user', function (Blueprint $table) {
             $table->string('id_user')->primary();
+            $table->string('title')->nullable();
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('middle_name')->nullable();
             $table->string('user_name')->nullable();
+            $table->string('dob')->nullable();
             $table->string('email')->unique();
             $table->foreignIdFor(Currency::class, 'currency_id')->nullable();;
             $table->string('store_id')->nullable();

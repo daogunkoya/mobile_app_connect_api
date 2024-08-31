@@ -52,7 +52,8 @@ class SenderController extends Controller
     public function update(Sender $sender, sender_validation $request): JsonResponse
     {
         return $sender->update($request->validated()) ?
-            response()->json([], Response::HTTP_OK)
+            (new SenderResource(SenderDto::fromEloquentModel($sender->fresh())))->response()->setStatusCode(Response::HTTP_OK)
+           // response()->json([], Response::HTTP_OK)
             : response()->json(["error" => 'Something went wrong'], 400);
 
     }

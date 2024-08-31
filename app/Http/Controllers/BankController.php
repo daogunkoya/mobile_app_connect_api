@@ -7,18 +7,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BankAcceptableIdentityResource;
+use App\Http\Resources\BankResource;
 use App\Models\Bank;
 use App\Models\AcceptableIdentity;
 use App\DTO\BankAcceptableIdentityDto;
+use App\DTO\BankDto;
 use App\Repositories\BankRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Filters\BankFilter;
+use App\Http\Requests\BankRequest;
 
 class BankController extends Controller
 {
 
-    public function __construct(public BankRepository $bankRepository)
+    public function __construct(public BankRepository $bankRepository, public BankFilter $bankFilter)
     {
     }
     /**
@@ -26,10 +30,19 @@ class BankController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        return Bank::get();
+      //  return response()->json($this->bankRepository->fetchBanks($request->all()));
+        // return BankDto::fromEloquentCollection(
+        //     $this->bankRepository->fetchBanks($request->all()) );
+       
+       return ( BankResource::collection(
+        BankDto::fromEloquentCollection(
+            $this->bankRepository->fetchBanks($request->all())
+       )
+        
+    ))->response()->setStatusCode(Response::HTTP_OK);
+
     }
 
 
@@ -40,7 +53,7 @@ class BankController extends Controller
 
         return (new BankAcceptableIdentityResource(
             BankAcceptableIdentityDto::fromEloquentModelCollection(
-                    Bank::query()->filter($seach)->get(),
+                    Bank::query()->filter($this->bankFilter)->get(),
                     AcceptableIdentity::query()->filter($seach)->get()
                 )
         ))->response()->setStatusCode(Response::HTTP_OK);
@@ -53,19 +66,45 @@ class BankController extends Controller
      *
      * @return void
      */
-    public function store(Request $request)
+    // public function store(Request $request)
+    // {
+    //     //
+    //     foreach ($request->bank as $bank) {
+    //         Bank::create([
+    //             'store_id'      => store_id(),
+    //             'name'          => $bank,
+    //             'transfer_type' => 1,
+    //             'status'        => 'b',
+
+    //         ]);
+    //     }
+
+    //     return;
+    // }
+
+    public function store(BankRequest $request): JsonResponse
     {
-        //
-        foreach ($request->bank as $bank) {
-            Bank::create([
-                'store_id'      => store_id(),
-                'name'          => $bank,
-                'transfer_type' => 1,
-                'status'        => 'b',
 
-            ]);
-        }
+        $bank = Bank::create($request->validated());
 
-        return;
+        return (new BankResource(
+            (BankDto::fromEloquentModel( $bank))
+        ))->response()->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function update(BankRequest $request, Bank $bank): JsonResponse
+    {
+        return $bank->update($request->all()) ?
+            (new BankResource(BankDto::fromEloquentModel( $bank->fresh())))->response()->setStatusCode(Response::HTTP_OK)
+            : response()->json(["error" => 'Something went wrong'], 400);
+
+    }
+
+  
+
+    public function destroy(Request $request,Bank $bank): JsonResponse
+    {
+       $update =  $bank->update(['bank_status' => '0']);
+        return response()->json([], 204);
     }
 }

@@ -40,10 +40,10 @@ class sender_validation extends FormRequest
         'sender_email' => 'required|email',
         'sender_address' => 'required',
         'sender_postcode' => 'required',
+        'metadata' => 'required',
         'sender_phone' => 'required',
        'sender_mobile' => 'string',
         'photo_id' => 'string',
-        'metadata' => 'required',
 
 
         ];

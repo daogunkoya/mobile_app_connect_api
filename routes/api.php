@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\OutstandingPaymentController;
 // use App\Http\Controllers\Auth\ForgotPasswordController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 
@@ -103,7 +105,12 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
+        //landing page
+        Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
+
         Route::get('/members', [MemberController::class, 'index']);
+        Route::put('/members/{user:id_user}', [MemberController::class, 'update']);
+        Route::put('/member/{user:id_user}/status', [MemberController::class, 'updateMemberStatus']);
         Route::post('transactions/report/generate', [TransactionReportController::class, 'generateReport']);
 
 
@@ -113,11 +120,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/transaction/{transaction:id_transaction}/download', [\App\Http\Controllers\TransactionController::class, 'downloadReceipt'])->name('transaction.download');
         Route::post('/transaction/{transaction:id_transaction}/report', 'App\Http\Controllers\TransactionController@reportTransaction');
 
-        //landing page
-        Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
+        Route::put('/transaction/{transaction:id_transaction}/status', [TransactionController::class, 'updateTransactionStatus']);
         Route::get('transactions/{transaction:id_transaction}',
             'App\Http\Controllers\TransactionController@show')->name('transactions.show');
 
@@ -144,6 +150,10 @@ Route::prefix('v1')->group(function () {
 
         // Route::resource('/banks', 'App\Http\Controllers\BankController');
         Route::get('/bank/list', 'App\Http\Controllers\BankController@list');
+        Route::put('/bank/{bank:id}', 'App\Http\Controllers\BankController@update')->name('update_bank');
+        Route::delete('/bank/{bank:id}', 'App\Http\Controllers\BankController@destroy');
+        Route::resource('banks', 'App\Http\Controllers\BankController');
+
         Route::resource('/senders', 'App\Http\Controllers\SenderController');
         Route::put('/senders/{sender:id_sender}', 'App\Http\Controllers\SenderController@update')->name('update_sender');
 //        Route::post('/senders/{sender:id_sender}/receiver', 'App\Http\Controllers\SenderController@store')->name('create_receiver');
@@ -155,6 +165,13 @@ Route::prefix('v1')->group(function () {
 
         Route::resource('/rates', 'App\Http\Controllers\RateController');
         Route::resource('/currencies', 'App\Http\Controllers\CurrencyController');
+        Route::put('/currency/{currency:id_currency}/toggle', 'App\Http\Controllers\CurrencyController@toggleCurrencyStatus');
+
+        Route::get('/store/{store:id_store}', 'App\Http\Controllers\StoreController@show');
+        Route::put('/store/{store:id_store}', 'App\Http\Controllers\StoreController@update');
+
+        Route::get('outstanding', 'App\Http\Controllers\OutstandingPaymentController@index');
+
     });
 
 });

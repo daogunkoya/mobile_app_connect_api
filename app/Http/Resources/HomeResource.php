@@ -37,6 +37,7 @@ class HomeResource extends JsonResource
              'receivers' => $userRole == UserRoleType::CUSTOMER ? new ReceiverResourceCollection($this->resource['receiverDtoCollection']):null,
             'currencies' => new CurrencyResourceCollection($this->resource['currencyDtoCollection']),
             'rates' => new RateReSource($this->resource['rate']),
+            'store' => new StoreResource($this->resource['store']),
         ];
     }
 }

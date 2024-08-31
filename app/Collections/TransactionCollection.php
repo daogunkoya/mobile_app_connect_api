@@ -4,6 +4,9 @@ namespace App\Collections;
 
 use App\DTO\CommissionDto;
 use App\DTO\RateDto;
+use App\Models\Transaction;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionCollection
 {
@@ -19,6 +22,7 @@ class TransactionCollection
         public float $localAmount,
         public float $bouRate,
         public float $soldRate,
+        public string $transactionCode
     ) {
     }
 
@@ -49,7 +53,8 @@ class TransactionCollection
             agentCommission: $agentCommission,
             localAmount: $localSendingAmount ,
             bouRate: $userRate->bouRate,
-            soldRate: $userRate->soldRate
+            soldRate: $userRate->soldRate,
+            transactionCode: self::generateTransactionCode()
         );
     }
 
@@ -65,5 +70,21 @@ class TransactionCollection
     private static function calculateAgentCommission(float $agentQuota, float $commission): float
     {
         return $agentQuota / 100 * $commission;
+    }
+
+
+    public static function generateTransactionCode()
+    {
+        $maxLength = 9;
+        $transactionCode = '';
+        do {
+            $transactionCode = Str::random($maxLength) . Auth::id();
+        } while (Transaction::where('transaction_code', $transactionCode)->exists());
+
+        // Trim the transaction code to ensure it doesn't exceed the maximum length
+        $transactionCode = substr($transactionCode, 0, $maxLength);
+
+        return $transactionCode;
+
     }
 }

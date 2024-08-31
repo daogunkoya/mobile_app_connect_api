@@ -16,6 +16,7 @@ use App\DTO\CurrencyDto;
 use App\DTO\HomeDto;
 use App\DTO\RateDto;
 use App\DTO\UserDto;
+use App\DTO\StoreDto;
 use App\Http\Resources\HomeResource;
 use App\Repositories\SenderRepository;
 use App\Repositories\TransactionRepository;
@@ -24,7 +25,9 @@ use App\Repositories\UserRepository;
 use App\Repositories\ReceiverRepository;
 use App\Http\Resources\IndexControllerResource;
 use App\Enum\UserRoleType;
+use App\Http\Requests\Index\IndexRequest;
 use App\Models\Receiver;
+use App\Models\Store;
 
 class IndexController extends Controller
 {
@@ -40,8 +43,9 @@ class IndexController extends Controller
     {
     }
 
-    public function __invoke(Request $request)
+    public function __invoke(IndexRequest $request, Store $store)
     {
+        
        // return 1;
         $input = $request->all();
         $user = UserDto::fromEloquentModel(auth()->user()->load('latestUserCurrency'));
@@ -61,7 +65,8 @@ class IndexController extends Controller
         $senderDtoCollection = $user->userRoleType == UserRoleType::AGENT? SenderDto::fromEloquentModelCollection($senders): [];
         $receiverDtoCollection = $user->userRoleType == UserRoleType::CUSTOMER? ReceiverDto::fromEloquentModelCollection($receivers): [];
         $rate = RateDto::fromEloquentModel($this->rateRepository->fetchTodaysRate($user->userId));
-        $currencyDtoCollection = CurrencyDto::fromEloquentCollection($this->currencyRepository->fetchCurrencies()->paginate(20));
+        $currencyDtoCollection = CurrencyDto::fromEloquentCollection($this->currencyRepository->fetchCurrencies(['limit'=>20,...$request->all()]));
+        $store = StoreDto::fromEloquentModel(Store::find($request->store_id));
         //$exchangeRate = "234";
 
 
@@ -77,7 +82,8 @@ class IndexController extends Controller
             'user',
             'userDtoCollection',
             'rate', 
-            'currencyDtoCollection'
+            'currencyDtoCollection',
+            'store'
             )))
         ->response()->setStatusCode(200);
     }

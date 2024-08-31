@@ -9,6 +9,7 @@ use App\DTO\UserDto;
 use App\Exceptions\RateNotSetException;
 use App\Models\Receiver;
 use App\Models\Sender;
+use App\Models\OutstandingPayment;
 use App\Models\Transaction;
 use App\Payment\CreatePaymentForTransactionInterface;
 use App\Repositories\RateRepository;
@@ -55,42 +56,14 @@ class CreateTransaction
             $senderLname = $userRoleType === UserRoleType::CUSTOMER ? $userDto->lastName : $receiver->sender->senderLname;  
             $senderAddress = $userRoleType === UserRoleType::CUSTOMER ? $userDto->address : $receiver->sender->senderAddress;
 
-            $transaction =  Transaction::create([
-                'store_id' => store_id(),
-                'user_id' => $userDto->userId,
-                'transaction_code' => ($this->generateUniqueTransactionCode)(),
-                'origin_currency_id' => $transactionCollection->originCurrencyId,
-                'destination_currency_id' => $transactionCollection->destinationCurrencyId,
-                'sender_id' => $senderId,
-                'receiver_id' => $receiver->receiverId,
-                'sender_fname' => $senderFname,
-                'sender_lname' => $senderLname,
-                'receiver_fname' => $receiver->receiverFname,
-                'receiver_lname' => $receiver->receiverLname,
-                'receiver_address' => $receiver->receiverAddress,
-                'receiver_bank_id' => $receiver->bankId,
-                'receiver_identity_id' => $receiver->identityTypeId,
-                'receiver_account_no' => $receiver->accountNumber,
-                'receiver_transfer_type' => $receiver->transferType,
-                'sender_address' => $senderAddress,
-                'agent_payment_id' => '',
-                'receiver_phone' => $receiver->receiverPhone ?? $receiver->receiverMobile,
-                'amount_sent' => $transactionCollection->amountSent,
-                'total_amount' => $transactionCollection->totalAmount,
-                'local_amount' => $transactionCollection->localAmount,
-                'total_commission' => $transactionCollection->totalCommission,
-                'agent_commission' => $transactionCollection->agentCommission,
-                'exchange_rate' => $transactionCollection->exchangeRate,
-                'bou_rate' => $transactionCollection->bouRate,
-                'sold_rate' => $transactionCollection->soldRate,
-                'note' => '',
-                'currency_income' => 1,
-                'transaction_status' => 1,
-                'transaction_type' => 1,
-                'moderation_status' => 1,
-            ]);
-
+            $transaction = $this->createTransaction(
+                $transactionCollection, $receiver, $userDto, $senderId, $senderFname, $senderLname, $senderAddress);
+          
             $transaction = TransactionDto::fromEloquentModel($transaction);
+
+            $this->createOustandingPayment(
+                $transactionCollection,  $userDto->userId,  $transaction);
+
 
             $this->createPaymentForTransaction->handle(
                 $pendingPayment->paymentGateway,
@@ -117,20 +90,81 @@ class CreateTransaction
 
 
 
-    // public function generateUniqueTransactionCode()
-    // {
-    //     $maxLength = 9;
-    //     $transactionCode = '';
-    //     do {
-    //         $transactionCode = Str::random($maxLength) . Auth::id();
-    //     } while (Transaction::where('transaction_code', $transactionCode)->exists());
+    private function createTransaction(
+        TransactionCollection $transactionCollection,
+        ReceiverDto $receiver,
+        UserDto $userDto,
+        $senderId,
+        $senderFname,
+        $senderLname, 
+        $senderAddress
+    )
 
-    //     // Trim the transaction code to ensure it doesn't exceed the maximum length
-    //     $transactionCode = substr($transactionCode, 0, $maxLength);
+    {
+        return Transaction::create([
+            'store_id' => store_id(),
+            'user_id' => $userDto->userId,
+            'transaction_code' =>  $transactionCollection->transactionCode,
+            'origin_currency_id' => $transactionCollection->originCurrencyId,
+            'destination_currency_id' => $transactionCollection->destinationCurrencyId,
+            'sender_id' => $senderId,
+            'receiver_id' => $receiver->receiverId,
+            'sender_fname' => $senderFname,
+            'sender_lname' => $senderLname,
+            'receiver_fname' => $receiver->receiverFname,
+            'receiver_lname' => $receiver->receiverLname,
+            'receiver_address' => $receiver->receiverAddress,
+            'receiver_bank_id' => $receiver->bankId,
+            'receiver_identity_id' => $receiver->identityTypeId,
+            'receiver_account_no' => $receiver->accountNumber,
+            'receiver_transfer_type' => $receiver->transferType,
+            'sender_address' => $senderAddress,
+            'agent_payment_id' => '',
+            'receiver_phone' => $receiver->receiverPhone ?? '',
+            'amount_sent' => $transactionCollection->amountSent,
+            'total_amount' => $transactionCollection->totalAmount,
+            'local_amount' => $transactionCollection->localAmount,
+            'total_commission' => $transactionCollection->totalCommission,
+            'agent_commission' => $transactionCollection->agentCommission,
+            'exchange_rate' => $transactionCollection->exchangeRate,
+            'bou_rate' => $transactionCollection->bouRate,
+            'sold_rate' => $transactionCollection->soldRate,
+            'note' => '',
+            'currency_income' => 1,
+            'transaction_status' => 1,
+            'transaction_type' => 1,
+            'moderation_status' => 1,
+        ]);
 
-    //     return $transactionCode;
+    }
+    private function createOustandingPayment(
+         TransactionCollection $transactionCollection,
+         $userId,
+        $transaction
+        
+    )
+    {   
+     return  OutstandingPayment::create([
+            'store_id' => store_id(),
+            'user_id' => $userId,
+            'currency_id' => $transactionCollection->destinationCurrencyId,
+            'sender_name' => "{$transaction->senderFname} {$transaction->senderLname}",
+            'receiver_name' => "{$transaction->receiverFname} {$transaction->receiverLname}",
+            'transaction_code' =>  $transactionCollection->transactionCode,
+            'transaction_id' =>  $transaction->transactionId,
+            'total_amount' => $transactionCollection->totalAmount,
+            'amount_sent' => $transactionCollection->amountSent,
+            'local_amount' => $transactionCollection->localAmount,
+            'total_commission' => $transactionCollection->totalCommission,
+            'agent_commission' => $transactionCollection->agentCommission,
+            'exchange_rate' => $transactionCollection->exchangeRate,
+            'bou_rate' => $transactionCollection->bouRate,
+            'sold_rate' => $transactionCollection->soldRate,
 
-    // }
+            
+
+        ]);
+    }
 
 
 }

@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\CurrencyDto;
 use Illuminate\Http\Request;
 use App\Services\Currency\CurrencyService;
 use App\Models\Currency;
 use App\Models\User;
 use App\Http\Requests\currency\currency_validation;
+use App\Http\Resources\CurrencyResource;
+use App\Repositories\CurrencyRepository;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class CurrencyController extends Controller
 {
-    public $currencyService;
-    public $mmCurrency;
+  
     public $user;
 
     /**
@@ -22,19 +25,30 @@ class CurrencyController extends Controller
      */
 
 
-    public function __construct(CurrencyService $currencyService, Currency $mmCurrency, User $user)
+    public function __construct(
+        protected CurrencyService $currencyService, 
+        protected Currency $mmCurrency, User $user,
+        protected CurrencyRepository $currencyRepository
+    )
     {
-        $this->currencyService = $currencyService;
-        $this->mmCurrency = $mmCurrency;
+       
         $this->user = $user;
     }
 
     public function index(Request $request)
     {
         //
-        $response = $this->currencyService->fetchCurrencyList($request->all(), $this->mmCurrency, $this->mmCurrency, $this->user);
+        $fetchCurrency = $this->currencyRepository->fetchCurrencies($request->all());
+        
+        return  CurrencyResource::collection(CurrencyDto::fromEloquentCollection($fetchCurrency))
+        ->response()->setStatusCode(Response::HTTP_OK);
+    }
 
-        return response()->json($response);
+    public function toggleCurrencyStatus(Currency $currency){
+       $updatedCurrency =  $this->currencyRepository->toggleCurrencyStatus( $currency);
+       return (new CurrencyResource(CurrencyDto::fromEloquentModel($updatedCurrency)))->response()->setStatusCode(Response::HTTP_OK);;
+
+
     }
 
 

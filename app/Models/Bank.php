@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filters\BaseQuery;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bank extends Model
 {
@@ -21,6 +24,10 @@ class Bank extends Model
     protected $fillable = [
         'store_id',
         'name',
+        'bank_status',
+        'moderation_status',
+        'currency_id',
+        'bank_category'
         //'transfer_type',
 //        'transfer_type_key',
 //        'bank_proof_identity',
@@ -48,11 +55,15 @@ class Bank extends Model
             $model->id = (string)Uuid::uuid4();
         });
     }
+    public function scopeFilter(Builder $query, BaseQuery $filter): void
+    {
 
+         $filter->apply($query);
+    }
 
     public function getRouteKeyName()
     {
-        return 'uuid';
+        return 'id';
     }
 
 
@@ -61,14 +72,14 @@ class Bank extends Model
         return 'string';
     }
 
-    public function scopeFilter($query, array $filters){
+    // public function scopeFilter($query, array $filters){
 
-        $query->when($filters['search'] ?? null, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%'.$search.'%');
-            });
-        });
-    }
+    //     $query->when($filters['search'] ?? null, function ($query, $search) {
+    //         $query->where(function ($query) use ($search) {
+    //             $query->where('name', 'like', '%'.$search.'%');
+    //         });
+    //     });
+    // }
 
     public function getUserAttribute($user_id)
     {
@@ -81,11 +92,7 @@ class Bank extends Model
     }
 
 
-    public function getCurrencyAttribute($currency_id)
-    {
-
-        return optional(Currency::where('id_currency', $currency_id)->select('id_currency as currency_id', 'currency_code')->first())->toArray();
-    }
+  
 
     public function getCreatedAtAttribute($value)
     {
@@ -95,5 +102,11 @@ class Bank extends Model
     public function receiver($value)
     {
         return $this->belongsTo(Receiver::class, 'bank_id');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency_id')
+        ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type','default_currency', 'currency_title', 'currency_status');;
     }
 }

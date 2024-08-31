@@ -85,7 +85,7 @@ class CommissionRepository
         return Commission::query()
             ->forUserAndCurrency($userId, $currencyId) // Apply the scope
             ->whereRaw('? between start_from and end_at', [$amount]) // Include $amount condition directly
-            ->select('id_commission', 'user_id', 'start_from', 'end_at', 'value', 'agent_quota')
+            ->select('id_commission', 'user_id', 'start_from', 'end_at', 'value', 'agent_quota','created_at')
             ->orderBy('start_from', 'asc')
             ->orderBy('end_at', 'asc')
             ->first();

@@ -22,32 +22,16 @@ class Store extends Model
             protected $fillable = [
             'user_id',
             'store_slug',
-            'list_image',
-            'store_user_phone',
+          
 
-            'store_admin_type',
             'moderation_status',
             'store_status',
-
-            'store_user_email' ,
             'store_name' ,
-            'store_user_password' ,
-
-            'store_group_revenue_id',
-            'store_group_industry_id',
-
+            'store_slogan',
+            'store_url',
+        
             'store_business_name',
-            'store_business_type_id',
-            'store_business_vat' ,
-            'store_business_crn' ,
-
-            'store_user_first_name',
-            'store_user_last_name',
-            'store_user_address',
-            'store_user_postcode',
-            'store_user_city',
-            'store_user_dob',
-
+            
             'social_facebook',
             'social_twitter',
             'social_linkedin',
@@ -56,6 +40,18 @@ class Store extends Model
 
             'payment_status',
             'payment_url',
+            'store_address',
+            'store_postcode',
+            'store_city',
+            'store_country',
+
+            'store_phone',
+            'store_email',
+            'enable_credit',
+            'enable_multiple_receipt',
+            'enable_sms',
+
+         
 
 //            'stripe_count_onboard_refresh',
 //            'stripe_count_onboard_return',

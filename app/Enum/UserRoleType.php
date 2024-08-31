@@ -7,7 +7,8 @@ enum UserRoleType: int
 {
     case CUSTOMER = 1;
     case AGENT = 2;
-    case ADMIN = 3;
+    case MANAGER = 3;
+    case ADMIN = 4;
 
 
     public function fetchType(): int
@@ -16,7 +17,8 @@ enum UserRoleType: int
         {
             self::CUSTOMER => 1,
             self::AGENT => 2,
-            self::ADMIN => 3,
+            self::MANAGER => 3,
+            self::ADMIN => 4,
         };
     }
 
@@ -26,7 +28,20 @@ enum UserRoleType: int
         {
             self::CUSTOMER => 'Customer',
             self::AGENT => 'Agent',
+            self::MANAGER => 'Manager',
             self::ADMIN => 'Admin',
+        };
+    }
+
+    public static function getRoleTypeEnumInstance($value): self
+    {
+        return match(strtolower($value))
+        {
+            'customer' => self::CUSTOMER,
+            'agent' => self::AGENT,
+            'admin' => self::ADMIN,
+            'manager' => self::MANAGER,
+            default => throw new \InvalidArgumentException("Invalid user role value"),
         };
     }
 }

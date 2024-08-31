@@ -57,16 +57,6 @@ class Rate extends Model
     {
 
          $filter->apply($query);
-
-        // $query
-        // ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
-        //     $search = trim($filter['search']);
-        //     $query->where('sender_fname', 'like', '%' . $search . '%')
-        //         ->orWhere('sender_lname', 'like', '%' . $search . '%')
-        //        ;
-        // })
-        // ->when($filter['userId'] ?? false, fn($query) => $query->where('user_id', $filter['userId']))
-        // ->when($filter['currencyId'] ?? false, fn($query) => $query->where('currency_id', $filter['currencyId']));
     }
 
 
@@ -111,7 +101,7 @@ class Rate extends Model
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_id')
-        ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type','default_currency', 'currency_title');;
+        ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type','default_currency', 'currency_title','currency_status');;
     }
 
     public function scopeForUserAndCurrency($query, $userId = null, $currencyId = null)

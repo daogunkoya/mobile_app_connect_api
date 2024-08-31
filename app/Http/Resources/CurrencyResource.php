@@ -13,6 +13,7 @@ class CurrencyResource extends JsonResource
             'currency_title' => $this->currencyTitle,
             'currency_symbol' => $this->currencySymbol,
             'currency_type' => $this->currencyType,
+            'currency_status' => $this->currencyStatus,
             'currency_default' => $this->currencyDefault,
         ];
     }

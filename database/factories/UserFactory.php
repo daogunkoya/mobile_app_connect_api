@@ -28,6 +28,9 @@ class UserFactory extends Factory
             'store_id' => Store::factory()->create(['id_store' => '2bda0c37-4eac-44e5-a014-6c029d76dc63']),
             'currency_id'=>"",
             'last_name' => fake()->lastName(),
+            'middle_name' => fake()->lastName(),
+            'title' => fake()->title(),
+            'dob' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
