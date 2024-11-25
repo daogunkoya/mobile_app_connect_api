@@ -10,7 +10,7 @@ interface CreatePaymentForTransactionInterface
     public function handle(
         PaymentGateway $paymentGateway,
         string         $paymentToken,
-        int            $transactionTotalInPence ,
+        int            $transactionTotalInPence,
         string            $userId,
         string           $transactionId):Payment;
 

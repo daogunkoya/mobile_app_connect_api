@@ -31,7 +31,8 @@ class ReceiverResource extends JsonResource
             "identity_type_id"=>$this->identityTypeId,
             "receiver_name"=>$this->receiverName,
             "receiver_banks"=> $this->bank,
-          "receiver_identities"=> $this->identity
+          "receiver_identities"=> $this->identity,
+          "receiver_currency"=> new CurrencyResource($this->currency),
         ];
     }
 }

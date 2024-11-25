@@ -11,6 +11,7 @@ use App\DTO\UserDto;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use App\Enum\UserStatus;
+use App\Enum\UserRoleType;
 use App\Models\StatusChangeLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -49,16 +50,32 @@ class MemberController extends Controller
         $user->status = $newStatus;
         $user->save();
 
-        // Log the status change
-       // $this->logStatusChange($user, $newStatus);
+    
 
         $loggingService->logActivity($user, "User status changed to {$newStatus->label()}");
 
         return (new UserResource(UserDto::fromEloquentModel($user->fresh())))->response()->setStatusCode(Response::HTTP_OK);
-        // return response()->json([
-        //     'message' => 'User status updated successfully.',
-        //     'user' => $user,
-        // ], Response::HTTP_OK);
+        
+    }
+
+    public function updateMemberRole(Request $request, User $user, LoggingService $loggingService)
+    {
+        // Validate the request
+        $validated = $request->validate([
+          'role' => ['required', 'string', Rule::in(array_map(fn($status) => $status->label(), UserRoleType::cases()))],
+        ]);
+
+        // Update the user's status
+        $newRoleType = UserRoleType::getRoleTypeEnumInstance($validated['role']);
+        $user->user_role_type = $newRoleType;
+        $user->save();
+
+    
+
+        $loggingService->logActivity($user, "User status changed to {$newRoleType->label()}");
+
+        return (new UserResource(UserDto::fromEloquentModel($user->fresh())))->response()->setStatusCode(Response::HTTP_OK);
+        
     }
 
 

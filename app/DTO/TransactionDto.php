@@ -22,7 +22,7 @@ class TransactionDto implements Arrayable
         public string $userId,
         public string $senderId,
         public string $senderAddress,
-        public string $receiverAddress,
+        public ?string $receiverAddress,
         public ?string $originCurrencyId,
         public string $destinationCurrencyId,
         public string $senderFname,

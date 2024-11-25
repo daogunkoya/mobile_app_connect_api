@@ -15,9 +15,11 @@ use Laravel\Passport\PersonalAccessTokenResult;
 
 class RegisterUserService implements RegisterServiceInterface
 {
-    public function registerUser(string $first_name, string $last_name, string $email, string $password): PersonalAccessTokenResult
+    //public function registerUser(array $validatedInput): PersonalAccessTokenResult
+    public function registerUser(array $validatedInput): User
     {
-        $user = User::where('email', $email)->first();
+        //var_dump($validatedInput);
+        $user = User::where('email', $validatedInput['email'])->first();
 
         if ($user) {
             //throw new InvalidRequestException('Email address already exists');
@@ -26,17 +28,18 @@ class RegisterUserService implements RegisterServiceInterface
             ]);
         }
 
-        $user = User::create([
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'email' => $email,
-            'password' => Hash::make($password),
-            'store_id' => '$2y$10$VpVDzy8gIINv1fWRGHpAx.7e/Y3XSruR8OtUn3qUrjM9x9VGo5rIS'
-        ]);
-        Auth::attempt(['email' => $email, 'password'=> $password]);
+        // $user = User::create([
+        //     'first_name' => $first_name,
+        //     'last_name' => $last_name,
+        //     'email' => $email,
+        //     'password' => Hash::make($password),
+        //     'store_id' => '$2y$10$VpVDzy8gIINv1fWRGHpAx.7e/Y3XSruR8OtUn3qUrjM9x9VGo5rIS'
+        // ]);
+        $user = User::create($validatedInput);
+        Auth::attempt(['email' => $validatedInput['email'], 'password'=> $validatedInput['password']]);
        // $user->auth();
         // $token = $user->createToken('auth_token')->plainTextToken;
-        return $user->createToken('auth_token');
+        return $user;
 //        $token = $tokenResult->accessToken;
 //        return $tokenResult;$tokenResult
     }

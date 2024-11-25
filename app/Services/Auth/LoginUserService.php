@@ -7,6 +7,8 @@ use App\Interfaces\Auth\LoginServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\PersonalAccessTokenResult;
 use Illuminate\Validation\ValidationException;
+use App\Permissions\Abilities;
+use App\DTO\UserDto;
 
 class LoginUserService implements LoginServiceInterface
 {
@@ -32,8 +34,10 @@ class LoginUserService implements LoginServiceInterface
         if (!$user instanceof User) {
             return [];
         }
-
-        return $user->createToken('auth_token');
+        $userDto = UserDto::fromEloquentModel($user);
+       // var_dump(Abilities::getAbilities($userDto));
+       
+        return $user->createToken('auth_token', Abilities::getAbilities($userDto));
 
        // $res = ['token'=>$token, 'user' => $user];
 //        $res = $this->authResponse($token, $user);
@@ -73,6 +77,7 @@ class LoginUserService implements LoginServiceInterface
 
             'access_token' => $token->accessToken,
             'token_type' => 'bearer',
+            'abilities' => Abilities::getAbilities($user),
             'expires_in' => $now
                 ];
     }

@@ -29,8 +29,12 @@ class UserRepository
             ->withCount('transaction')
             ->withCount('receiver')
             ->withCount('sender')
-            ->withSum('outstandingCommissions', 'total_commission')
-            ->withSum('outstandingCommissions', 'agent_commission')
+            ->withSum(['outstandingPayments' => function ($query) {
+                $query->where('transaction_paid_status', 0); // Or any condition you want
+            }], 'total_commission')
+            ->withSum(['outstandingPayments' => function ($query) {
+                $query->where('commission_paid_status', 0); // Or any condition you want
+            }], 'agent_commission')
             ->withSum('outstandingPayments', 'amount_sent')
             ->filter($this->userFilter)
             ->orderBy('created_at', 'DESC');

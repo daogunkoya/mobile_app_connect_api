@@ -35,7 +35,9 @@ class OutstandingPayment extends Model
         'exchange_rate',
         'bou_rate',
         'sold_rate',
-        'transaction_code'
+        'transaction_code',
+        'transaction_paid_status',
+        'commission_paid_status',
 
     ];
 

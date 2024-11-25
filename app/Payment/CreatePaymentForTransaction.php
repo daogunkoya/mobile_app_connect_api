@@ -4,6 +4,7 @@ namespace App\Payment;
 
 use App\Payment\Exceptions\PaymentFailedException;
 use App\Models\Payment;
+use App\Models\Transaction;
 use App\Payment\PaymentDetails;
 use App\Payment\PaymentGateway;
 
@@ -27,7 +28,8 @@ class CreatePaymentForTransaction implements CreatePaymentForTransactionInterfac
             new PaymentDetails($paymentToken, $transactionTotalInPence, 'modularization')
         );
 
-        return Payment::query()->create([
+        
+      return  Transaction::find($transactionId)->payment()->create([
             'total_in_pence' => $transactionTotalInPence,
             'status' => 'paid',
             'payment_gateway' => $charge->paymentProvider,
@@ -35,6 +37,16 @@ class CreatePaymentForTransaction implements CreatePaymentForTransactionInterfac
             'transaction_id' => $transactionId,
             'user_id' => $userId
         ]);
+        
+
+        // return Payment::query()->create([
+        //     'total_in_pence' => $transactionTotalInPence,
+        //     'status' => 'paid',
+        //     'payment_gateway' => $charge->paymentProvider,
+        //     'payment_id' => $charge->id,
+        //     'transaction_id' => $transactionId,
+        //     'user_id' => $userId
+        // ]);
 
 
     }

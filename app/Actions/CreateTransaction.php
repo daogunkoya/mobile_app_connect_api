@@ -61,6 +61,8 @@ class CreateTransaction
           
             $transaction = TransactionDto::fromEloquentModel($transaction);
 
+            $this->updateReceiverCurrencyId($receiver->receiverId , $transactionCollection->destinationCurrencyId );
+
             $this->createOustandingPayment(
                 $transactionCollection,  $userDto->userId,  $transaction);
 
@@ -165,6 +167,13 @@ class CreateTransaction
 
         ]);
     }
+
+    private function updateReceiverCurrencyId($receiverId, $currencyId):void
+    {
+        $receiver = Receiver::find($receiverId);
+        $receiver->currency_id = $currencyId;
+        $receiver->save();
+    }   
 
 
 }

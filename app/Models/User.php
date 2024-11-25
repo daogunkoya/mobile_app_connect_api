@@ -48,6 +48,7 @@ class User extends Authenticatable
         'store_id',
         'dob',
         'email',
+        'phone',
         'password',
         'user_role_type',
         'status',
@@ -95,17 +96,16 @@ class User extends Authenticatable
                 $model->user_name = Str::slug($model->first_name . ' ' . $model->last_name, '-') . '-' . $count;
                 $count++;
             }
-
         });
     }
 
     public function scopeFilter(Builder $query, BaseQuery $filter): void
     {
 
-         $filter->apply($query);
+        $filter->apply($query);
     }
 
-   
+
     public function sender(): HasMany
     {
         return $this->hasMany(Sender::class, 'user_id');
@@ -140,17 +140,17 @@ class User extends Authenticatable
         return $this->hasOne(Currency::class, 'active_currency_id');
     }
 
-    public function receiver():HasMany
+    public function receiver(): HasMany
     {
         return $this->hasMany(Receiver::class, 'sender_id', 'id_user');
     }
 
-    public function transaction():HasMany
+    public function transaction(): HasMany
     {
         return $this->hasMany(Transaction::class, 'user_id', 'id_user');
     }
 
-    public function receivers():HasManyThrough
+    public function receivers(): HasManyThrough
     {
         return $this->hasManyThrough(
             Receiver::class,
@@ -160,34 +160,47 @@ class User extends Authenticatable
             'id_user', // Local key on the users table
             'id_sender' // Local key on the senders table
         );
-
     }
 
-    public function userCurrencies():HasMany
+    public function userCurrencies(): HasMany
     {
-       return $this->hasMany(UserCurrency::class, 'sender_id', 'id_sender');
+        return $this->hasMany(UserCurrency::class, 'sender_id', 'id_sender');
     }
 
     public function latestUserCurrency(): HasOne
     {
         return $this->hasOne(UserCurrency::class, 'user_id', 'id_user')
-                    ->latest('created_at');
+            ->latest('created_at');
     }
 
-    public function outstandingPayments()
+    public function outstandingPayments($type = 'transaction', $status = 0)
     {
-        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')->where('transaction_paid_status', 0);
+        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')
+                    ->when($type === 'transaction', function ($query) use ($status) {
+                        return $query->where('transaction_paid_status', $status);
+                    })
+                    ->when($type === 'commission', function ($query) use ($status) {
+                        return $query->where('commission_paid_status', $status);
+                    });
     }
+    
 
-    public function outstandingCommissions()
+    public function outstandingTransactionPayments()
     {
-        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')->where('commission_paid_status', 0);
+        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')
+            ->where('transaction_paid_status', 0);
     }
 
-     // Polymorphic relationship
-     public function statusChangeLogs()
-     {
-         return $this->morphMany(StatusChangeLog::class, 'loggable');
-     }
+    public function outstandingCommissionPayments()
+    {
+        return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')
+            ->where('commission_paid_status', 0);
+    }
 
+
+    // Polymorphic relationship
+    public function statusChangeLogs()
+    {
+        return $this->morphMany(StatusChangeLog::class, 'loggable');
+    }
 }

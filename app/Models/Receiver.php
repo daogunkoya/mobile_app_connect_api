@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Receiver extends Model
 {
@@ -167,6 +168,17 @@ class Receiver extends Model
     {
         if (!$this->identity()->exists()) return ['key' => "", 'value' => ""];
         return $this->identity()->select('id as key', 'name as value')->first()->toArray();
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency_id')
+            ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type', 'default_currency', 'currency_title', 'currency_status')
+            ->withDefault(function () {
+                return Currency::where('default_currency', 1)
+                    ->where('currency_type', 1)
+                    ->first();
+            });
     }
 
 

@@ -17,7 +17,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Filters\BankFilter;
-use App\Http\Requests\BankRequest;
+use App\Http\Requests\Bank\BankRequest;
+use App\Http\Requests\Bank\BankVerifyRequest;
+use App\Interfaces\Bank\BanksSyncInterface;
+use App\Actions\Bank\VerifyBankAction;
+use App\http\Resources\BankAccountNumberResource;
 
 class BankController extends Controller
 {
@@ -106,5 +110,23 @@ class BankController extends Controller
     {
        $update =  $bank->update(['bank_status' => '0']);
         return response()->json([], 204);
+    }
+
+    public function syncBanks(BanksSyncInterface $bankSyncService)
+    {
+        $bankSyncService->syncBankData();
+
+        return response()->json(['message' => 'Bank data synchronized successfully']);
+    }
+
+    public function fetchAccountdetails(BankVerifyRequest $request, VerifyBankAction $verifyBankAction)
+    {
+        $input = $request->validated();
+        $bankCode = Bank::where('id', $input['bank_id'])->value('bank_code');
+
+        $bankAccountDetails = $verifyBankAction->handle($bankCode,$input['account_number']);
+
+        return (new BankAccountNumberResource($bankAccountDetails))->response()->setStatusCode(Response::HTTP_OK);
+
     }
 }

@@ -23,6 +23,7 @@ class CreateMmUserTable extends Migration
             $table->string('user_name')->nullable();
             $table->string('dob')->nullable();
             $table->string('email')->unique();
+            $table->string('phone')->nullable();
             $table->foreignIdFor(Currency::class, 'currency_id')->nullable();;
             $table->string('store_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();

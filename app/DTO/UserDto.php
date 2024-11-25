@@ -22,13 +22,14 @@ class UserDto
         public ?string $dob,
         public string $userName,
         public string $email,
+        public ?string $phone,
         public ?string $userHandle,
         public ?string $currencyId,
         public ?string $address,
         public ?string $postcode,
         public ?array $metaData,
-        public UserStatus $userStatus,
-        public UserRoleType $userRoleType,
+        public ?UserStatus $userStatus,
+        public ?UserRoleType $userRoleType,
         public UserCurrencyDto | null $userCurrency,
         public ?string $transactionCount,
         public int $senderCount,
@@ -40,7 +41,13 @@ class UserDto
     }
 
     public static function fromEloquentModel(User $user): UserDto
+
     {
+        $totalCommissionSum = $user->outstandingPayments('commission', 0)->sum('total_commission');
+        $totalAgentCommission = $user->outstandingPayments('commission', 0)->sum('agent_commission');
+        $totalBusinessCommission =  $totalCommissionSum - $totalAgentCommission;
+        $amountSentSum = $user->outstandingPayments('transaction', 0)->sum('amount_sent');
+
         return new self(
             $user->id_user,
             $user->first_name,
@@ -50,22 +57,24 @@ class UserDto
             $user->dob,
           "$user->first_name $user->last_name",
             $user->email,
+            $user->phone,
             $user->user_handle,
             $user->currency_id,
             $user->address,
             $user->postcode,
             $user->metadata,
-            $user->status,
-            $user->user_role_type,
+            $user->status??UserStatus::ACTIVE,
+            $user->user_role_type??UserRoleType::CUSTOMER,
             $user->latestUserCurrency ?UserCurrencyDto::fromEloquentModel($user->latestUserCurrency):null,
             $user->transaction()->count(),
             $user->sender->count(),
             $user->receiver->count(),
             [
-                'total_commission_sum' => $user->outstandingPayments()->sum('total_commission'), // Total commission sum
-                'total_agent_commission_sum' => $user->outstandingCommissions()->sum('agent_commission'), // Total commission sum
-                'total_business_commission_sum' => $user->outstandingCommissions()->sum('total_commission') - $user->outstandingCommissions()->sum('agent_commission') , // Total commission sum
-                'amount_sent_sum' => $user->outstandingPayments()->sum('amount_sent'),          // Total amount sum
+                'total_commission_sum' => $totalCommissionSum,
+                'total_agent_commission_sum' => $totalAgentCommission,
+                'total_business_commission_sum' => $totalBusinessCommission,
+                'amount_sent_sum' => $amountSentSum,
+                'count' => $user->outstandingPayments('transaction', 0)->count() 
             ]
 
 

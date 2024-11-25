@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Currency;
 use App\DTO\CurrencyDTO;
+use App\Permissions\Abilities;
+use App\Enum\UserRoleType;
+use App\Enum\UserStatus;
 
 class AuthResource extends JsonResource
 {
@@ -38,7 +41,7 @@ class AuthResource extends JsonResource
                 'user_address2' => 'London',
                 'user_city' => 'England',
                 'user_country' => 'London',
-                'user_status' => 1,
+                'user_status' => $user->userStatus->label(),
                 'user_image_url' => null,
                 'user_access_type' => 1,
                 'rate' => 980,
@@ -54,8 +57,7 @@ class AuthResource extends JsonResource
                 'store_name' => store_name(),
                 'store_url' => store_url(),
             ],
-            // 'user_currencies' => ['USD', 'EUR', 'GBP', 'JPY'],
-            // 'available_currencies' => CurrencyDTO::fromEloquentCollection(Currency::all()),
+           // 'abilities' => Abilities::getAbilities($user),
             'access_status' => 1,
             'access_token' => $this->resource['token']->accessToken,
             'token_type' => 'bearer',

@@ -21,7 +21,8 @@ class CurrencyRepository
         $currencyQuery =   Currency::query();
        
        $currencyQuery->filter($this->currencyFilter)
-            ->select('id_currency', 'currency_country', 'currency_title', 'currency_symbol', 'currency_type', 'default_currency', 'currency_status');
+            ->select('id_currency', 'currency_country', 'currency_title', 'currency_symbol', 'currency_type', 'default_currency', 'currency_status')
+            ->orderBy('default_currency', 'DESC');
 
 
         $currencyQuery->orderBy('created_at', 'DESC');

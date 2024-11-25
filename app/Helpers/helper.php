@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Session;
-use App\Models\store;
+use App\Models\Store;
 use App\Models\Domain;
 use App\Models\Currency;
 use App\Services\Helper;
@@ -55,7 +55,7 @@ if (!function_exists('check_store_exists')) {
 
 
                 $store_exist = $domain_exists;
-                $store_name = store::where('id_store', $store_id)->value('store_name');
+                $store_name = Store::where('id_store', $store_id)->value('store_name');
             }
         }
         $data = [];

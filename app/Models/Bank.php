@@ -24,17 +24,17 @@ class Bank extends Model
     protected $fillable = [
         'store_id',
         'name',
+        'bank_code',
+        'currency_id',
+        'bank_category',
+        'transfer_type',
         'bank_status',
         'moderation_status',
-        'currency_id',
-        'bank_category'
-        //'transfer_type',
-//        'transfer_type_key',
-//        'bank_proof_identity',
-//        'bank_category'
+        'transfer_type_key',
+        'bank_proof_identity',
+];
 
-
-    ];
+    protected $guarded = [];
 
 
     protected $keyType = 'string';

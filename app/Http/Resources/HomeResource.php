@@ -4,7 +4,12 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\TransactionResourceCollection;
+use App\Http\Resources\SenderResourceCollection;
+use App\Http\Resources\CurrencyResourceCollection;
 use App\Http\Resources\TransactionResource;
+use App\Http\Resources\RateResource;
+use App\Http\Resources\StoreResource;
 use App\Http\Resources\SenderResource;
 use App\Http\Resources\CurrencyResource;
 use App\Http\Resources\UserResource;
@@ -36,7 +41,7 @@ class HomeResource extends JsonResource
              new SenderResourceCollection($this->resource['senderDtoCollection']):null,
              'receivers' => $userRole == UserRoleType::CUSTOMER ? new ReceiverResourceCollection($this->resource['receiverDtoCollection']):null,
             'currencies' => new CurrencyResourceCollection($this->resource['currencyDtoCollection']),
-            'rates' => new RateReSource($this->resource['rate']),
+            'rates' => new RateResource($this->resource['rate']),
             'store' => new StoreResource($this->resource['store']),
         ];
     }

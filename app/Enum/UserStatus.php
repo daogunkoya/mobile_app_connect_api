@@ -28,7 +28,7 @@ enum UserStatus: int
         {
             self::INACTIVE => 'inactive',
             self::ACTIVE => 'active',
-            self::SUSPENDED => 'ssuspended',
+            self::SUSPENDED => 'suspended',
             self::DELETED => 'deleted',
         };
     }

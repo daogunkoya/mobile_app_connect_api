@@ -35,9 +35,10 @@ class UserRequest extends FormRequest
             'title' => 'nullable|string', // Added nullable
             'dob' => 'nullable|string', // Added nullable
             'email' => 'required|email',
+            'phone' => 'nullable|string', // Added nullable
             // 'status' => ['required', Rule::in(array_column(UserStatus::cases(), 'value'))],
-            'status' => ['required', Rule::in(array_map(fn($status) => $status->label(), UserStatus::cases()))],
-            'user_role_type' => ['required', Rule::in(array_map(fn($status) => $status->label(), UserRoleType::cases()))],
+            // 'status' => ['required', Rule::in(array_map(fn($status) => $status->label(), UserStatus::cases()))],
+            // 'user_role_type' => ['required', Rule::in(array_map(fn($status) => $status->label(), UserRoleType::cases()))],
             'address' => 'nullable|string', // Added nullable
             'postcode' => 'nullable|string', // Added nullable
             'metadata' => 'nullable|array', // Added nullable
@@ -86,8 +87,9 @@ class UserRequest extends FormRequest
             'title' => $validatedData['title'] ?? null,
             'dob' => $validatedData['dob'] ?? null,
             'email' => $validatedData['email'],
-            'status' => UserStatus::getStatusEnumInstance($validatedData['status'])->value,
-            'user_role_type' => UserRoleType::getRoleTypeEnumInstance($validatedData['user_role_type'])->value,
+            'phone' => $validatedData['phone'] ?? null,
+            // 'status' => UserStatus::getStatusEnumInstance($validatedData['status'])->value,
+            // 'user_role_type' => UserRoleType::getRoleTypeEnumInstance($validatedData['user_role_type'])->value,
             'address' => $validatedData['address'] ?? null,
             'postcode' => $validatedData['postcode'] ?? null,
             'metadata' => $validatedData['metadata'] ?? [],

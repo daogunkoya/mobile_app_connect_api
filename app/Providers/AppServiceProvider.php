@@ -19,6 +19,8 @@ use App\Payment\CreatePaymentForTransaction;
 use Monolog\Logger;
 use App\Services\Sender\SenderService;
 use App\Services\Sender\SenderServiceInterface;
+use App\Interfaces\Bank\BanksSyncInterface;
+use App\Actions\Bank\BanksSyncService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
         // Log::extend('database', function ($app, $config) {
         //     return $app->make('App\Contracts\LoggerInterface');
         // });
+
+
+    $this->app->bind(BanksSyncInterface::class, BanksSyncService::class);
     }
 
     /**

@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\models\OutstandingPayment;
+use App\Models\Currency;
 use App\Models\User;
 use App\Filters\OutstandingPaymentFilter;
+
 
 class OutstandingPaymentRepository
 {
@@ -18,7 +20,15 @@ class OutstandingPaymentRepository
     {
         
       
-        $outstandingPayment =   OutstandingPayment::query();
+        $outstandingPayment =   OutstandingPayment::query()
+        ->where(function($query) {
+            $query->where('transaction_paid_status', 0)
+                  ->where('total_amount', '>', 0);
+        })
+        ->orWhere(function($query) {
+            $query->where('commission_paid_status', 0)
+                  ->where('total_commission', '>', 0);
+        });
        
         $select = ['id_outstanding','user_id','sender_name','receiver_name','transaction_id','currency_id','total_amount','amount_sent', 'local_amount', 'total_commission',
         'agent_commission','exchange_rate','bou_rate', 'sold_rate','transaction_code', 'commission_paid_status',
@@ -55,6 +65,28 @@ class OutstandingPaymentRepository
             return User::where('id_user', $userId)->value('active_currency_id');
         }
         return Currency::where('default_currency', 1)->value('id_currency');
+    }
+
+    public function createOutstandingPayment($input)
+    {
+        return      OutstandingPayment::create([
+            'total_amount' => $input['total_amount'],
+            'store_id' => store_id(),
+            'user_id' => $input['user_id'],
+            'currency_id' => "",
+            'sender_name' => $input['sender_name'],
+            'receiver_name' => $input['receiver_name'],
+            'transaction_code' =>   $input['transaction_code'],
+            'transaction_id' =>   $input['transaction_id'],
+            'total_amount' =>  $input['total_amount'],
+            'amount_sent' =>    $input['amount_sent'],
+            'local_amount' =>   $input['local_amount'],
+            'total_commission' =>   $input['total_commission'],
+            'agent_commission' =>   $input['agent_commission'],
+            'exchange_rate' =>   $input['exchange_rate'],
+            'bou_rate' =>      $input['bou_rate'],
+            'sold_rate' =>      $input['sold_rate'],
+        ]); 
     }
 
 }

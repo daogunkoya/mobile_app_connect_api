@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterUserRequest extends FormRequest
 {
@@ -31,6 +32,17 @@ class RegisterUserRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
+
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'middle_name' => 'nullable|string', // Added nullable
+            'title' => 'nullable|string', // Added nullable
+            'dob' => 'nullable|string', // Added nullable
+            'email' => 'required|email',
+            'phone' => 'nullable|string', // Added nullable
+            'address' => 'nullable|string', // Added nullable
+            'postcode' => 'nullable|string', // Added nullable
+            'metadata' => 'nullable|array', // Added nullable
         ];
     }
 
@@ -53,6 +65,28 @@ class RegisterUserRequest extends FormRequest
             'password.min' => 'The password must be at least :min characters.',
             'password.letters' => 'The password must contain at least one letter.',
             'password.numbers' => 'The password must contain at least one number.',
+        ];
+    }
+
+    public function mapToAttributes()
+    {
+        $validatedData = $this->validated();
+
+        // Here, you can transform or map the data as needed for your model.
+        return [
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'middle_name' => $validatedData['middle_name'] ?? null,
+            'title' => $validatedData['title'] ?? null,
+            'dob' => $validatedData['dob'] ?? null,
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'phone' => $validatedData['phone'] ?? null,
+            // 'status' => UserStatus::getStatusEnumInstance($validatedData['status'])->value,
+            // 'user_role_type' => UserRoleType::getRoleTypeEnumInstance($validatedData['user_role_type'])->value,
+            'address' => $validatedData['address'] ?? null,
+            'postcode' => $validatedData['postcode'] ?? null,
+            'metadata' => $validatedData['metadata'] ?? [],
         ];
     }
 

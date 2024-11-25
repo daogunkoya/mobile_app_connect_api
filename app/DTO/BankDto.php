@@ -15,6 +15,7 @@ class BankDto implements Arrayable
     public function __construct(
         public string $id,
         public string $name,
+        public string $bankCode,
         public string $createdAt,
         public string $bankCategory,
         public CurrencyDto | null $currency,
@@ -28,6 +29,7 @@ class BankDto implements Arrayable
         return new self(
             $bank->id,
             $bank->name,
+            $bank->bank_code,
             $bank->created_at,
             $bank->bank_category,
             $bank->currency ? CurrencyDto::fromEloquentModel($bank->currency) : null, 

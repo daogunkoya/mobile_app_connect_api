@@ -9,7 +9,9 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\OutstandingPaymentController;
+use App\Http\Controllers\PaymentController;
 // use App\Http\Controllers\Auth\ForgotPasswordController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 
@@ -81,6 +83,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/address-finder', [AddressFinderController::class, 'addressFinder'])->name('address-finder');
     Route::get('/address-by-udprn', [AddressFinderController::class, 'addressByUDPRN'])->name('address-by-udprn');
 
+    Route::get('/banks/sync-banks', [BankController::class, 'syncBanks']);
+
+    Route::get('/banks/verify/account', [BankController::class, 'fetchAccountdetails']);
+
     /*
     |--------------------------------------------------------------------------
     | Authenticated Routed
@@ -109,8 +115,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
 
         Route::get('/members', [MemberController::class, 'index']);
-        Route::put('/members/{user:id_user}', [MemberController::class, 'update']);
+        Route::put('/member/{user:id_user}', [MemberController::class, 'update']);
         Route::put('/member/{user:id_user}/status', [MemberController::class, 'updateMemberStatus']);
+        Route::put('/member/{user:id_user}/role', [MemberController::class, 'updateMemberRole']);
         Route::post('transactions/report/generate', [TransactionReportController::class, 'generateReport']);
 
 
@@ -123,6 +130,7 @@ Route::prefix('v1')->group(function () {
 
         //transactions
         Route::resource('transactions', 'App\Http\Controllers\TransactionController');
+        Route::post('transactions', 'App\Http\Controllers\TransactionController@store')->middleware(['auth:api', 'scope:AgentCreateTransaction,CustomerCreateTransaction']);;
         Route::put('/transaction/{transaction:id_transaction}/status', [TransactionController::class, 'updateTransactionStatus']);
         Route::get('transactions/{transaction:id_transaction}',
             'App\Http\Controllers\TransactionController@show')->name('transactions.show');
@@ -136,7 +144,7 @@ Route::prefix('v1')->group(function () {
 
         //for Receivers
         Route::get('/sender/{sender:id_sender}/receivers', 'App\Http\Controllers\ReceiverController@index')->name('receivers.index');
-        Route::post('/sender/{sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('receivers.store');
+        Route::post('/sender/{sender}/receivers', 'App\Http\Controllers\ReceiverController@store')->name('receivers.store')->middleware(['auth:api', 'scope:AgentCreateReceiver,CustomerCreateOwnReceiver']);;;
         Route::put('/sender/{sender_id}/receivers/{receiver:id_receiver}', 'App\Http\Controllers\ReceiverController@update')->name('receivers.update');
         Route::get('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@show');
         Route::delete('/sender/{sender_id}/receivers/{receiver_id}', 'App\Http\Controllers\ReceiverController@destroy');
@@ -171,6 +179,12 @@ Route::prefix('v1')->group(function () {
         Route::put('/store/{store:id_store}', 'App\Http\Controllers\StoreController@update');
 
         Route::get('outstanding', 'App\Http\Controllers\OutstandingPaymentController@index');
+        Route::patch('/outstanding/payment', 'App\Http\Controllers\OutstandingPaymentController@makePayment');
+
+
+        //payments
+        Route::post('/payment-intent', [PaymentController::class, 'createPaymentIntent']);
+
 
     });
 

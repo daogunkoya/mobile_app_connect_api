@@ -20,7 +20,11 @@ return new class extends Migration
             // Changed to string for flexibility in future additions
             $table->string('status');  
             $table->string('payment_gateway');
-            $table->morphs('paymentable'); // Creates paymentable_id and paymentable_type
+            $table->string('payment_id');
+           // $table->morphs('paymentable'); // Creates paymentable_id and paymentable_type
+           // Manually define the paymentable columns as strings and nullable
+            $table->string('paymentable_id')->nullable();
+            $table->string('paymentable_type')->nullable();
             $table->integer('payment_for')->default(1);  // Assuming this remains categorical but flexible
             $table->boolean('fully_paid_status')->default(false); 
 

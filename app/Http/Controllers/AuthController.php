@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use App\DTO\UserDto;
+use App\Permissions\Abilities;
 
 class AuthController extends Controller
 {
@@ -32,18 +33,14 @@ class AuthController extends Controller
         //$credentials = $request->only('email', 'password');
         $input = $request->all();
         try {
-            $token = $this->registerService->registerUser(
-                $input['first_name'],
-                $input['last_name'],
-                $input['email'],
-                $input['password']
-            );
+            $userData = $this->registerService->registerUser($request->mapToAttributes());
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 401);
         }
-
+        $user = UserDto::fromEloquentModel($userData);
+        $token = $userData->createToken('auth_token', Abilities::getAbilities($user));
 //return $token;
-        return (new AuthResource($token))
+        return (new AuthResource(compact('token', 'user')))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }

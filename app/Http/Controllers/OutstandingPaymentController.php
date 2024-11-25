@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\OutstandingPayment;
 use App\Repositories\OutstandingPaymentRepository;
 
 use App\DTO\OutstandingPaymentDto;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\OutstandingPaymentResource;
+use App\Services\Log\LoggingService; 
+use App\Http\Requests\Outstanding\OutstandingRequest;
+use App\Services\Outstanding\OutstandingPaymentService;
+use App\Payment\CreatePaymentForOutstanding;
+use App\Permissions\Abilities;
 
 class OutstandingPaymentController extends Controller
 {
@@ -57,4 +62,42 @@ class OutstandingPaymentController extends Controller
         return  OutstandingPaymentResource::collection(OutstandingPaymentDto::fromEloquentCollection($fetchOutstadingPayment))
         ->response()->setStatusCode(Response::HTTP_OK);
     }
+    
+
+    public function makePayment(OutstandingRequest $request, OutstandingPaymentService $outstandingService, CreatePaymentForOutstanding $createPaymentForOutstanding, LoggingService $loggingService)
+    {
+          
+        $outstandingPayment = null;
+
+        // Validate the request and determine the type of payment
+        if (!empty($request->outstanding_id)) {
+            if ($request->payment_type === "Transaction") {
+                $outstandingPayment = $outstandingService->updateTransactionPaymentStatus($request->outstanding_id);
+            } elseif ($request->payment_type === "Commission") {
+                $outstandingPayment = $outstandingService->updateCommissionPaymentStatus($request->outstanding_id);
+            }
+    } else if ($request->outstanding_amount > 0) {
+        if ($request->payment_type === "Transaction") {
+            $outstandingPayment = $outstandingService->processOutstandingTransactionPayment($request->user_id, $request->outstanding_amount);
+        } elseif ($request->payment_type === "Commission") {
+            $outstandingPayment = $outstandingService->processOutstandingCommissionPayment($request->user_id, $request->outstanding_amount);
+        }
+    }
+
+    // Ensure that we only proceed if an OutstandingPayment was created or updated
+    if ($outstandingPayment) {
+        // Log the activity
+        $loggingService->logActivity($outstandingPayment, "outstanding_payment", "create");
+
+        return (new OutstandingPaymentResource(OutstandingPaymentDto::
+        fromEloquentModel($outstandingPayment->fresh())))->response()->setStatusCode(Response::HTTP_CREATED);
+
+        // Create payment record associated with the outstanding payment
+        $createPaymentForOutstanding->createPaymentForOutstanding($outstandingPayment);
+    } else {
+        // Handle the case when no OutstandingPayment was found/created
+        throw new \Exception("Outstanding Payment could not be processed.");
+    }
+    }
+    
 }

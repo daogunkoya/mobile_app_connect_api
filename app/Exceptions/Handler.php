@@ -5,6 +5,8 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use App\Http\Resources\ValidationErrorResource;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -58,6 +60,12 @@ class Handler extends ExceptionHandler
         if ($exception instanceof CommissionNotSetException) {
             // Custom rendering logic for your custom exception
             return response()->json(['error' => $exception->getMessage()], 500);
+        }
+
+        if ($exception instanceof AccessDeniedHttpException ) {
+            return response()->json([
+                'error' => 'You do not have the necessary permissions or scope to access this resource.'
+            ], 403); // HTTP 403 Forbidden
         }
 
         return parent::render($request, $exception);

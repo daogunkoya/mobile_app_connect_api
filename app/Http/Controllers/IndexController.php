@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use _PHPStan_950705577\Fig\Http\Message\StatusCodeInterface;
-use _PHPStan_950705577\React\Http\Message\Response;
+// use _PHPStan_950705577\Fig\Http\Message\StatusCodeInterface;
+// use _PHPStan_950705577\React\Http\Message\Response;
 use App\DTO\IndexDataObject;
 use App\Models\Sender;
 use App\Repositories\RateRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\DTO\SenderDTO;
-use App\DTO\ReceiverDTO;
-use App\DTO\TransactionDTO;
+use App\DTO\SenderDto;
+use App\DTO\ReceiverDto;
+use App\DTO\TransactionDto;
 use App\DTO\CurrencyDto;
 use App\DTO\HomeDto;
 use App\DTO\RateDto;
