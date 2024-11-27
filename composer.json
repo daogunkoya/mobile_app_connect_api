@@ -24,9 +24,9 @@
         "symfony/mailgun-mailer": "^6.4"
     },
     "require-dev": {
-        "laravel/horizon": "^5.24",
         "fakerphp/faker": "^1.9.1",
         "laravel/homestead": "^14.3",
+        "laravel/horizon": "^5.29",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.27",
         "mockery/mockery": "^1.4.4",
