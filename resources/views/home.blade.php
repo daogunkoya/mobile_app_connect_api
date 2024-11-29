@@ -682,7 +682,7 @@
               <a href="">
                 <i class="fa fa-phone" aria-hidden="true"></i>
                 <span>
-                  Call 07951170080
+                  Call +44 (0) 7951170080
                 </span>
               </a>
               <a href="">
@@ -715,21 +715,19 @@
               Links
             </h4>
             <div class="info_links">
-              <a class="active" href="index.html">
+              <a class="active" href="#home">
                 Home
               </a>
-              <a class="" href="about.html">
+              <a class="" href="#about">
                 About
               </a>
-              <a class="" href="service.html">
+              <a class="" href="#service">
                 Services
               </a>
-              <a class="" href="why.html">
-                Why Us
+              <a class="" href="#faq">
+               FAQs
               </a>
-              <a class="" href="team.html">
-                Team
-              </a>
+            
             </div>
           </div>
         </div>
