@@ -111,6 +111,9 @@ Route::prefix('v1')->group(function () {
 
     Route::group(['middleware' => ['auth:api','api']], function() {
 
+        // document upload
+      Route::post('/documents/upload', 'App\Http\Controllers\UserDocumentController@upload');
+
         //landing page
         Route::get('/', App\Http\Controllers\IndexController::class)->name('home');
 
