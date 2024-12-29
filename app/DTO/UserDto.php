@@ -2,6 +2,7 @@
 
 namespace App\DTO;
 use App\DTO\UserCurrencyDto;
+use App\DTO\UserDocumentDto;
 use App\Models\Sender;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -22,6 +23,7 @@ class UserDto
         public ?string $dob,
         public string $userName,
         public string $email,
+        public ?string $email_verified_at,
         public ?string $phone,
         public ?string $userHandle,
         public ?string $currencyId,
@@ -31,6 +33,7 @@ class UserDto
         public ?UserStatus $userStatus,
         public ?UserRoleType $userRoleType,
         public UserCurrencyDto | null $userCurrency,
+        public array | UserDocumentDto | null $userDocument,
         public ?string $transactionCount,
         public int $senderCount,
         public int $receiverCount,
@@ -57,6 +60,7 @@ class UserDto
             $user->dob,
           "$user->first_name $user->last_name",
             $user->email,
+            $user->email_verified_at,
             $user->phone,
             $user->user_handle,
             $user->currency_id,
@@ -66,6 +70,7 @@ class UserDto
             $user->status??UserStatus::ACTIVE,
             $user->user_role_type??UserRoleType::CUSTOMER,
             $user->latestUserCurrency ?UserCurrencyDto::fromEloquentModel($user->latestUserCurrency):null,
+            $user->userIdentityDocument ?UserDocumentDto::fromEloquentModel($user->userIdentityDocument):null,
             $user->transaction()->count(),
             $user->sender->count(),
             $user->receiver->count(),

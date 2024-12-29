@@ -196,6 +196,18 @@ class User extends Authenticatable
         return $this->hasMany(OutstandingPayment::class, 'user_id', 'id_user')
             ->where('commission_paid_status', 0);
     }
+    public function userDocuments()
+    {
+        return $this->hasMany(UserDocument::class, 'user_id', 'id_user')
+        ->select('document_type', 'mime_type', 'document_type', 'original_name');
+    }
+
+    public function userIdentityDocument()
+    {
+        return $this->hasOne(UserDocument::class, 'user_id', 'id_user')
+        ->where('document_type', 'identity')
+        ->select('document_type', 'mime_type', 'original_name', 'verification_result');
+    }
 
 
     // Polymorphic relationship

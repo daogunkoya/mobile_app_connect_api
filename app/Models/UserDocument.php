@@ -84,9 +84,11 @@ class UserDocument extends Model
         return $this->belongsTo(Receiver::class, 'bank_id');
     }
 
-    public function currency(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Currency::class, 'currency_id')
-        ->select('id_currency', 'currency_country', 'currency_symbol', 'currency_type','default_currency', 'currency_title', 'currency_status');;
+        return $this->belongsTo(User::class, 'user_id')
+        ->select('document_type', 'mime_type', 'document_type', 'original_name');;
     }
+
+
 }
