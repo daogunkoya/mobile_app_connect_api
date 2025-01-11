@@ -54,7 +54,8 @@ class User extends Authenticatable
         'status',
         'address',
         'postcode',
-        'metadata'
+        'metadata',
+        //'remember_token',
     ];
 
     /**

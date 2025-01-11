@@ -20,8 +20,8 @@ class TransactionCollection
         public float $totalCommission,
         public float $agentCommission,
         public float $localAmount,
-        public float $bouRate,
-        public float $soldRate,
+        public ?float $bouRate,
+        public ?float $soldRate,
         public string $transactionCode
     ) {
     }
@@ -52,8 +52,8 @@ class TransactionCollection
             totalCommission: $userCommission->value,
             agentCommission: $agentCommission,
             localAmount: $localSendingAmount ,
-            bouRate: $userRate->bouRate,
-            soldRate: $userRate->soldRate,
+            bouRate: $userRate?->bouRate,
+            soldRate: $userRate?->soldRate,
             transactionCode: self::generateTransactionCode()
         );
     }

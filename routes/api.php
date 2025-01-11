@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\TransactionReportController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
@@ -54,6 +55,9 @@ Route::prefix('v1')->group(function () {
 // Route for user login
     Route::post('/users/login', 'App\Http\Controllers\AuthController@login');
     Route::post('password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
+
+    Route::get('/user/verify-email', [EmailVerificationController::class, 'verifyEmail']);
+    
     // Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.reset');;
 
     // Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
@@ -125,6 +129,9 @@ Route::prefix('v1')->group(function () {
 
 
         Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.reset');;
+
+        Route::post('/user/send-verification-email', [EmailVerificationController::class, 'sendVerificationEmail']);
+      
 
         Route::post('/transactions/transfer/breakdown', 'App\Http\Controllers\TransactionController@calculateTransaction');
         Route::get('/transaction/{transaction:id_transaction}/download', [\App\Http\Controllers\TransactionController::class, 'downloadReceipt'])->name('transaction.download');

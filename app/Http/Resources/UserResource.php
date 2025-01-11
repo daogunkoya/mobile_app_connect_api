@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'user_mname' => $this->middleName,
             'user_dob' => $this->dob,
             'user_email' => $this->email,
-            'user_email_verfied_at' => $this->email_verified_at,
+            'user_email_verified_at' => $this->email_verified_at,
             'user_phone' => $this->phone,
             'user_address' => $this->address,
             'user_postcode' => $this->postcode,
