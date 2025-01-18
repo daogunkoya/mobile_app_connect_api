@@ -11,33 +11,43 @@ use App\Http\Controllers\Controller;
 class UserDocumentController extends Controller
 {
     public function upload(Request $request)
-    {
-        $request->validate([
-            'document' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120', // Max 5MB
-            'document_type' => 'required|string|in:profile,identity,files',
-        ]);
+{
+    $request->validate([
+        'id_image' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB max
+        'selfie_image' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+    ]);
 
-        $file = $request->file('document');
-        $user = auth()->user();
+    $user = auth()->user();
 
-        // Define directory path based on user and document type
-        $filePath = "images/users/{$user->id_user}/{$request->document_type}/original/";
-        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-        $storedPath = $file->storeAs($filePath, $fileName, 'public');
+    $idImage = $request->file('id_image');
+    $selfieImage = $request->file('selfie_image');
 
-        // Create a database record
-        $document = UserDocument::create([
-            'user_id' => $user->id_user,
-            'document_type' => $request->document_type,
-            'file_path' => $storedPath,
-            'original_name' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'file_size' => $file->getSize() / 1024, // Convert to KB
-        ]);
+    $idImagePath = $idImage->storeAs("images/users/{$user->id_user}/identity/original", uniqid() . '.' . $idImage->getClientOriginalExtension(), 'public');
+    $selfieImagePath = $selfieImage->storeAs("images/users/{$user->id_user}/selfie/original", uniqid() . '.' . $selfieImage->getClientOriginalExtension(), 'public');
 
-        // Dispatch background job
-        ProcessDocumentJob::dispatch($document);
+    $idDocument = UserDocument::create([
+        'user_id' => $user->id_user,
+        'document_type' => 'identity',
+        'file_path' => $idImagePath,
+        'original_name' => $idImage->getClientOriginalName(),
+        'mime_type' => $idImage->getMimeType(),
+        'file_size' => $idImage->getSize() / 1024, // Convert to KB
+    ]);
 
-        return response()->json(['message' => 'Document uploaded successfully!', 'document' => $document]);
-    }
+    $selfieDocument = UserDocument::create([
+        'user_id' => $user->id_user,
+        'document_type' => 'selfie',
+        'file_path' => $selfieImagePath,
+        'original_name' => $selfieImage->getClientOriginalName(),
+        'mime_type' => $selfieImage->getMimeType(),
+        'file_size' => $selfieImage->getSize() / 1024, // Convert to KB
+    ]);
+
+    // Dispatch background jobs
+    ProcessDocumentJob::dispatch($idDocument);
+    ProcessDocumentJob::dispatch($selfieDocument);
+
+    return response()->json(['message' => 'Documents uploaded successfully!']);
+}
+
 }

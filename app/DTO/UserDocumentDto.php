@@ -15,7 +15,7 @@ class UserDocumentDto extends BaseDto
         public string $originalName,
         public string $documentType,
         public string $mimeType,
-        public string $verificationResult
+        public null | string $verificationResult
 
     )
     {
