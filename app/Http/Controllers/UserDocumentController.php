@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\DTO\UserDocumentDto;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserDocument;
 use App\Jobs\ProcessDocumentJob;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserDocumentResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserDocumentController extends Controller
 {
@@ -43,11 +46,22 @@ class UserDocumentController extends Controller
         'file_size' => $selfieImage->getSize() / 1024, // Convert to KB
     ]);
 
+    $idDocDto = UserDocumentDto::fromEloquentModel($idDocument);
+
+    $selfieDocumentDto = UserDocumentDto::fromEloquentModel($selfieDocument);
+
     // Dispatch background jobs
     ProcessDocumentJob::dispatch($idDocument);
     ProcessDocumentJob::dispatch($selfieDocument);
 
-    return response()->json(['message' => 'Documents uploaded successfully!']);
+    
+
+    //return response()->json(['message' => 'Documents uploaded successfully!']);
+
+    // Return response with UserDocumentResource::collection
+    return UserDocumentResource::collection([$idDocDto, $selfieDocumentDto])
+        ->response()
+        ->setStatusCode(Response::HTTP_OK);
 }
 
 }
