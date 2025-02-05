@@ -14,13 +14,15 @@ use Dotenv\Exception\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\DTO\TransactionDTO;
+use App\Filters\TransactionFilter;
 
 class TransactionRepository
 {
 
     public function __construct(
         protected CommissionRepository $commissionRepository,
-        protected BankRepository       $bankRepository
+        protected BankRepository       $bankRepository,
+        protected TransactionFilter    $transactionFilter
     ) {
     }
 
@@ -36,12 +38,13 @@ class TransactionRepository
 
         $query = $transactionQuery->withCount('receiver')
             ->select(self::transactionSelectList())
-            ->filter([
-                'userId' => !$isAdmin?$user->userId: null,
-                'search' => $input['search'] ?? '',
-                'date' => $input['date'] ?? '',
-                'status' => $input['status'] ?? ''
-            ])
+            // ->filter([
+            //     'userId' => !$isAdmin?$user->userId: null,
+            //     'search' => $input['search'] ?? '',
+            //     'date' => $input['date'] ?? '',
+            //     'status' => $input['status'] ?? ''
+            // ])
+            ->filter($this->transactionFilter)
             ->orderBy('created_at', 'DESC');
 
 

@@ -4,15 +4,26 @@ namespace App\Filters;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\DTO\UserDto;
+use App\Enum\UserRoleType;
 
 abstract class BaseQuery
 {
     protected Builder $builder;
     protected array $filters = [];
+    // protected bool $isAdmin = false;
 
     public function __construct(
         protected Request $request
     ) {}
+
+
+    public function isUserAdmin(): bool
+    {
+        $user = UserDto::fromEloquentModel(auth()->user());
+       
+        return $user->userRoleType == UserRoleType::ADMIN;  
+    }
 
     public function filter(array $filters): Builder
     {

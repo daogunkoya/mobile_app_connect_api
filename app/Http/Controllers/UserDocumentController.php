@@ -10,10 +10,11 @@ use App\Jobs\ProcessDocumentJob;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserDocumentResource;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\UserDocumentRequest;
 
 class UserDocumentController extends Controller
 {
-    public function upload(Request $request)
+    public function upload(UserDocumentRequest $request)
 {
     $request->validate([
         'id_image' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB max

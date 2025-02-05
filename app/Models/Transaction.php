@@ -14,6 +14,7 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
+use App\Filters\BaseQuery;
 
 class Transaction extends Model
 {
@@ -71,42 +72,45 @@ class Transaction extends Model
 
     public $incrementing = false;
 
-
-
-    public function scopeFilter(Builder $query, array $filter): void
+    public function scopeFilter(Builder $query, BaseQuery $filter): void
     {
-        $query
-            ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
-                $search = trim($filter['search']);
-                $query->where('sender_fname', 'like', '%' . $search . '%')
-                    ->orWhere('sender_lname', 'like', '%' . $search . '%')
-                    ->orWhere('receiver_fname', 'like', '%' . $search . '%')
-                    ->orWhere('receiver_lname', 'like', '%' . $search . '%');
-            })
-            ->when($filter['senderId'] ?? false, fn($query) => $query->where('sender_id', $filter['senderId']))
-            ->when($filter['search'] ?? false, fn($query, $search) => $query->where('sender_fname', 'like', '%' . $search . '%')
-                    ->orWhere('sender_lname', 'like', '%' . $search . '%')
-                    ->orWhere('receiver_lname', 'like', '%' . $search . '%')
-                    ->orWhere('sender_fname', 'like', '%' . $search . '%')
-        )
-            ->when($filter['status'] ?? false, fn($query) => $query->where('transaction_status', TransactionStatus::getStatusEnumInstance($filter['status'])))
-            ->when(($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
-            ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
-                $searchDate = $filter['date'];
-                $query->when($searchDate, function ($query, $date) {
-                    return $query->where(fn ($query) => match ($date) {
-                        'today' => $query->whereDate('created_at', today()),
-                        'yesterday' => $query->whereDate('created_at', today()->subDay()),
-                        'week' => $query->whereBetween('created_at', [now()->subDays(7)->startOfDay(), now()->endOfDay()]),
-                        'month' => $query->whereBetween('created_at', [now()->subDays(30)->startOfDay(), now()->endOfDay()]),
-                        default => $query->whereBetween('created_at', [
-                            Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
-                            Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
-                        ]),
-                    });
-                });
-            });
+         $filter->apply($query);
     }
+
+    // public function scopeFilter(Builder $query, array $filter): void
+    // {
+    //     $query
+    //         ->when($filter['search'] ?? false, function ($query, $search) use($filter) {
+    //             $search = trim($filter['search']);
+    //             $query->where('sender_fname', 'like', '%' . $search . '%')
+    //                 ->orWhere('sender_lname', 'like', '%' . $search . '%')
+    //                 ->orWhere('receiver_fname', 'like', '%' . $search . '%')
+    //                 ->orWhere('receiver_lname', 'like', '%' . $search . '%');
+    //         })
+    //         ->when($filter['senderId'] ?? false, fn($query) => $query->where('sender_id', $filter['senderId']))
+    //         ->when($filter['search'] ?? false, fn($query, $search) => $query->where('sender_fname', 'like', '%' . $search . '%')
+    //                 ->orWhere('sender_lname', 'like', '%' . $search . '%')
+    //                 ->orWhere('receiver_lname', 'like', '%' . $search . '%')
+    //                 ->orWhere('sender_fname', 'like', '%' . $search . '%')
+    //     )
+    //         ->when($filter['status'] ?? false, fn($query) => $query->where('transaction_status', TransactionStatus::getStatusEnumInstance($filter['status'])))
+    //         ->when(($filter['userId']) ?? false, fn ($query) => $query->where('user_id', $filter['userId']))    
+    //         ->when($filter['date'] ?? false, function ($query,$search)use($filter) {
+    //             $searchDate = $filter['date'];
+    //             $query->when($searchDate, function ($query, $date) {
+    //                 return $query->where(fn ($query) => match ($date) {
+    //                     'today' => $query->whereDate('created_at', today()),
+    //                     'yesterday' => $query->whereDate('created_at', today()->subDay()),
+    //                     'week' => $query->whereBetween('created_at', [now()->subDays(7)->startOfDay(), now()->endOfDay()]),
+    //                     'month' => $query->whereBetween('created_at', [now()->subDays(30)->startOfDay(), now()->endOfDay()]),
+    //                     default => $query->whereBetween('created_at', [
+    //                         Carbon::createFromFormat('d/m/Y', $date['from'])->startOfDay(),
+    //                         Carbon::createFromFormat('d/m/Y', $date['to'])->endOfDay(),
+    //                     ]),
+    //                 });
+    //             });
+    //         });
+    // }
 
     public static function boot()
     {
