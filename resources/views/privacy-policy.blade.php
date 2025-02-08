@@ -234,7 +234,7 @@
             </ul>
             <p>
               To exercise these rights, please contact us at
-              <strong>[Your Email Address]</strong>.
+              <strong>admin@monytransfer.com</strong>.
             </p>
 
             <h3>6. International Transfers</h3>
@@ -244,21 +244,16 @@
               We ensure that such transfers comply with applicable laws.
             </p>
 
-            <h3>7. Cookies and Tracking Technologies</h3>
-            <p>
-              We use cookies and similar technologies to enhance your experience
-              and analyze usage. You can manage your cookie preferences through
-              your browser settings.
-            </p>
+     
 
-            <h3>8. Changes to This Policy</h3>
+            <h3>7. Changes to This Policy</h3>
             <p>
               We may update this Privacy Policy from time to time. We will
               notify you of any changes by posting the updated policy on our
               website or through the App.
             </p>
 
-            <h3>9. Contact Us</h3>
+            <h3>8. Contact Us</h3>
             <p>
               If you have any questions or concerns about this Privacy Policy,
               please contact us at:
